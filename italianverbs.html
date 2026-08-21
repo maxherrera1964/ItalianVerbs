@@ -309,7 +309,7 @@
       <div class="chips" id="gapChips" style="flex:2"></div>
     </div>
     <div class="addhint">Narrates verbs and tenses in the same order as the deck — set that above, under Tenses/Verbs.
-      The io (first-person) line for every tense is followed by its English translation, in a different voice.</div>
+      Every person, in every tense, is followed by its English translation, in a different voice.</div>
     <div class="row">
       <button class="btn" id="audioDl" style="flex:2">⬇︎ Export audio script</button>
       <button class="btn" id="audioShow">Show text</button>
@@ -4470,7 +4470,7 @@ function buildAudioScript(){
         const ex = audioSent(v,t,f,s.subj);
         const end = t==="imperativo" ? "" : ".";       // the form already ends in "!" for a command
         const base = s.pn+" "+f+end+(ex ? " [[slnc 400]] "+ex : "");
-        const en = s.i===0 ? sentenceEn(v,t,0) : null;   // io only
+        const en = sentenceEn(v,t,s.i);          // every person now, not just io
         if(en){
           // The English line gets rendered as a completely separate `say` pass by
           // render-audio.sh — not an embedded [[voice ...]] switch, which chokes on
@@ -4490,11 +4490,10 @@ function buildAudioScript(){
 /* rough runtime: ~3.75 s of speech per conjugation, plus the chosen gap */
 function audioEstimate(){
   const sel = audioSelection(), gap = (S.audioGap||2000)/1000;
-  let items = 0, blocks = 0, ioSlots = 0;
+  let items = 0, blocks = 0;
   sel.verbs.forEach(v=>{ const ts = audioTensesFor(v); blocks += ts.length;
-    items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0);
-    ioSlots += ts.filter(t=>t!=="imperativo").length; });   // every io slot gets an English line too
-  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5 + ioSlots*2.8;
+    items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0); });
+  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5 + items*2.8;   // every slot gets an English line too
   return {verbs:sel.verbs.length, tenses:sel.tenses.length, items:items, secs:secs};
 }
 

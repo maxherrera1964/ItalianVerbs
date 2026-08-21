@@ -1,0 +1,199 @@
+### Saluti e Convenevoli
+IT: Ciao, come stai?
+EN: Hi, how are you?
+
+IT: Sto bene, grazie. E tu?
+EN: I'm doing well, thanks. And you?
+
+IT: Non c'è male, tutto sommato.
+EN: Not bad, all things considered.
+
+IT: Piacere di conoscerti.
+EN: Nice to meet you.
+
+IT: Da quanto tempo non ci vediamo!
+EN: It's been so long since we've seen each other!
+
+IT: Che bella sorpresa vederti qui!
+EN: What a nice surprise to see you here!
+
+IT: Buona giornata, ci sentiamo presto.
+EN: Have a good day, we'll talk soon.
+
+IT: Salutami la tua famiglia.
+EN: Say hi to your family for me.
+
+### La Routine Quotidiana
+IT: Di solito mi sveglio verso le sette.
+EN: I usually wake up around seven.
+
+IT: Prima faccio colazione, poi esco di casa.
+EN: First I have breakfast, then I leave the house.
+
+IT: Il lunedì ho sempre un sacco da fare.
+EN: On Mondays I always have a ton to do.
+
+IT: Dopo il lavoro mi piace fare una passeggiata.
+EN: After work I like to go for a walk.
+
+IT: Stasera devo finire un progetto per domani.
+EN: Tonight I have to finish a project for tomorrow.
+
+IT: Che ne dici di guardare un film più tardi?
+EN: What do you say we watch a movie later?
+
+IT: Vado a letto presto, sono stanchissimo.
+EN: I'm going to bed early, I'm exhausted.
+
+IT: Il weekend cerco di rilassarmi un po'.
+EN: On weekends I try to relax a bit.
+
+### Al Bar e al Ristorante
+IT: Vorrei un caffè macchiato, per favore.
+EN: I'd like a macchiato, please.
+
+IT: Avete un tavolo per due?
+EN: Do you have a table for two?
+
+IT: Cosa mi consiglia?
+EN: What do you recommend?
+
+IT: Per me una pizza margherita, grazie.
+EN: I'll have a margherita pizza, thanks.
+
+IT: Il conto, per favore.
+EN: The check, please.
+
+IT: Era tutto buonissimo.
+EN: Everything was delicious.
+
+IT: Possiamo avere ancora un po' di pane?
+EN: Could we have a bit more bread?
+
+IT: Offro io questa volta.
+EN: I'm treating this time.
+
+### Chiedere Informazioni
+IT: Scusi, dov'è la stazione più vicina?
+EN: Excuse me, where's the nearest station?
+
+IT: Mi può aiutare, per favore?
+EN: Can you help me, please?
+
+IT: È lontano da qui?
+EN: Is it far from here?
+
+IT: Deve andare sempre dritto e poi girare a destra.
+EN: You have to go straight and then turn right.
+
+IT: Non sono sicuro di aver capito bene.
+EN: I'm not sure I understood correctly.
+
+IT: Può ripetere più lentamente, per cortesia?
+EN: Could you repeat that more slowly, please?
+
+IT: Grazie mille, è stato molto gentile.
+EN: Thank you so much, that was very kind.
+
+IT: Mi sono perso, può indicarmi la strada?
+EN: I'm lost, can you show me the way?
+
+### Fare Programmi
+IT: Cosa fai questo weekend?
+EN: What are you doing this weekend?
+
+IT: Ti va di uscire stasera?
+EN: Do you feel like going out tonight?
+
+IT: Perché non ci vediamo domani pomeriggio?
+EN: Why don't we meet up tomorrow afternoon?
+
+IT: A che ora ci troviamo?
+EN: What time should we meet?
+
+IT: Facciamo alle otto davanti al cinema.
+EN: Let's say eight in front of the cinema.
+
+IT: Purtroppo non posso, ho già un impegno.
+EN: Unfortunately I can't, I already have plans.
+
+IT: Rimandiamo a un'altra volta, allora.
+EN: Let's postpone to another time, then.
+
+IT: Non vedo l'ora!
+EN: I can't wait!
+
+### Fare Compere
+IT: Quanto costa questo?
+EN: How much does this cost?
+
+IT: È un po' caro per me.
+EN: It's a bit expensive for me.
+
+IT: Avete la taglia media?
+EN: Do you have this in medium?
+
+IT: Posso provarlo?
+EN: Can I try it on?
+
+IT: Accettate carte di credito?
+EN: Do you accept credit cards?
+
+IT: Vorrei restituire questo articolo.
+EN: I'd like to return this item.
+
+IT: C'è uno sconto se ne compro due?
+EN: Is there a discount if I buy two?
+
+IT: Va bene così, lo prendo.
+EN: That's fine, I'll take it.
+
+### Esprimere Opinioni e Sentimenti
+IT: Secondo me, hai ragione.
+EN: In my opinion, you're right.
+
+IT: Non sono per niente d'accordo.
+EN: I don't agree at all.
+
+IT: Mi dispiace tantissimo per te.
+EN: I'm so sorry for you.
+
+IT: Sono davvero felice per questa notizia.
+EN: I'm really happy about this news.
+
+IT: Mi manchi molto, sai?
+EN: I miss you a lot, you know?
+
+IT: Sono un po' preoccupato per l'esame.
+EN: I'm a bit worried about the exam.
+
+IT: Che rabbia, ho perso l'autobus!
+EN: How annoying, I missed the bus!
+
+IT: Non vedo l'ora di rivederti.
+EN: I can't wait to see you again.
+
+### Al Telefono e Saluti Finali
+IT: Pronto, chi parla?
+EN: Hello, who's speaking?
+
+IT: Un attimo, ti passo mia sorella.
+EN: One moment, I'll hand you over to my sister.
+
+IT: Ti richiamo tra dieci minuti.
+EN: I'll call you back in ten minutes.
+
+IT: La linea cade sempre qui.
+EN: The line always drops here.
+
+IT: Grazie per la chiamata, a presto!
+EN: Thanks for the call, see you soon!
+
+IT: Fammi sapere come va.
+EN: Let me know how it goes.
+
+IT: Ci sentiamo domani, buonanotte.
+EN: We'll talk tomorrow, goodnight.
+
+IT: Un abbraccio forte, ciao!
+EN: A big hug, bye!
