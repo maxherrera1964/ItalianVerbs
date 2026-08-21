@@ -265,6 +265,9 @@
       <button class="btn" id="allV">All verbs</button>
       <button class="btn" id="noneV">Clear</button>
     </div>
+    <div class="addhint">Conversation adds 41 everyday verbs to whatever's already selected, and switches
+      tenses to the 15 actually used in speech — dropping passato remoto, trapassato remoto, and futuro
+      progressivo (literary/unused register, not part of ordinary conversation).</div>
     <div class="row">
       <button class="btn" id="regV">Regular only</button>
       <button class="btn" id="irrV">Irregular only</button>
@@ -305,13 +308,38 @@
       <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Repeat gap</span>
       <div class="chips" id="gapChips" style="flex:2"></div>
     </div>
-    <div class="addhint">Narrates verbs and tenses in the same order as the deck — set that above, under Tenses/Verbs.</div>
+    <div class="addhint">Narrates verbs and tenses in the same order as the deck — set that above, under Tenses/Verbs.
+      The io (first-person) line for every tense is followed by its English translation, in a different voice.</div>
     <div class="row">
       <button class="btn" id="audioDl" style="flex:2">⬇︎ Export audio script</button>
       <button class="btn" id="audioShow">Show text</button>
     </div>
     <textarea class="tin" id="audioOut" style="display:none;height:160px;font-size:12px" readonly></textarea>
-    <div class="addhint">Uses the verbs and tenses selected above. Export, then run <b>render-audio.sh</b> on the downloaded file to build the m4a.</div>
+
+    <div class="addhint">
+      <b>Easiest:</b> double-click <b>Crea_audio.command</b> in Finder (it sits next to this html). It finds the
+      export automatically, lists your installed Italian voices, and runs render-audio.sh for you — no terminal typing.
+      English lines use Samantha by default; run render-audio.sh manually (below) to pick a different one.
+    </div>
+    <div class="addhint">
+      Prefer to type it yourself, or not on a Mac with Finder handy right now? A webpage can't launch a program
+      on its own — every browser blocks that — but this builds the exact command to paste instead:
+    </div>
+    <div class="row">
+      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">say voice</span>
+      <input class="tin" id="sayVoice" style="flex:2;margin:0" value="Paola (Enhanced)"
+             autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="row">
+      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">English voice</span>
+      <input class="tin" id="enVoice" style="flex:2;margin:0" value="Samantha"
+             autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="addhint" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#151a21;padding:8px 10px;border-radius:8px;white-space:pre-wrap;word-break:break-all" id="runCmd"></div>
+    <div class="row">
+      <button class="btn" id="copyCmd" style="flex:2">⧉ Copy command</button>
+    </div>
+    <div class="addhint" id="runHint">Uses the verbs and tenses selected above.</div>
 
     <h2>Progress</h2>
     <div class="stat" id="progStat"></div>
@@ -2613,6 +2641,16 @@ const CONVERSATION = [
   "continuare","finire","pagare","partire","iniziare","decidere"
 ];
 
+/* Tenses that essentially don't happen in spoken Italian — everything else here
+   (including the "compound past of past" tenses and both congiuntivo pasts) is
+   genuinely used in ordinary conversation, just less often than the core few:
+     - passatoRemoto / trapassatoRemoto: literary/narrative register — novels,
+       history, "C'era una volta…" — not something you'd say out loud outside
+       parts of the south
+     - futuroProgressivo: grammatically valid but essentially unused even in
+       writing; a native speaker reaches for futuro semplice instead */
+const NOT_SPOKEN = ["passatoRemoto","trapassatoRemoto","futuroProgressivo"];
+
 /* --- conjugation class + regularity --- */
 const META = {
   essere:  {g:"ere", reg:false, why:"Irregular everywhere: sono/sei/è…, future sar-, participle stato (aux essere)."},
@@ -4431,7 +4469,19 @@ function buildAudioScript(){
         const f  = audioAgree(form(v,t,s.i), s.fem);
         const ex = audioSent(v,t,f,s.subj);
         const end = t==="imperativo" ? "" : ".";       // the form already ends in "!" for a command
-        lines.push(s.pn+" "+f+end+(ex ? " [[slnc 400]] "+ex : "")+" [[slnc "+gap+"]]");
+        const base = s.pn+" "+f+end+(ex ? " [[slnc 400]] "+ex : "");
+        const en = s.i===0 ? sentenceEn(v,t,0) : null;   // io only
+        if(en){
+          // The English line gets rendered as a completely separate `say` pass by
+          // render-audio.sh — not an embedded [[voice ...]] switch, which chokes on
+          // compound names like "Paola (Enhanced)" and can end up read aloud instead
+          // of acted on. ¶EN¶ is a marker render-audio.sh splits on; never spoken.
+          lines.push(base+" [[slnc 500]]");
+          lines.push("¶EN¶ "+en);
+          lines.push("[[slnc "+gap+"]]");
+        } else {
+          lines.push(base+" [[slnc "+gap+"]]");
+        }
       });
     });
   });
@@ -4440,10 +4490,11 @@ function buildAudioScript(){
 /* rough runtime: ~3.75 s of speech per conjugation, plus the chosen gap */
 function audioEstimate(){
   const sel = audioSelection(), gap = (S.audioGap||2000)/1000;
-  let items = 0, blocks = 0;
+  let items = 0, blocks = 0, ioSlots = 0;
   sel.verbs.forEach(v=>{ const ts = audioTensesFor(v); blocks += ts.length;
-    items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0); });
-  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5;
+    items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0);
+    ioSlots += ts.filter(t=>t!=="imperativo").length; });   // every io slot gets an English line too
+  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5 + ioSlots*2.8;
   return {verbs:sel.verbs.length, tenses:sel.tenses.length, items:items, secs:secs};
 }
 
@@ -5510,7 +5561,11 @@ $("setBtn").onclick   = ()=>{ drawChips(); drawUserVerbs(); $("sheet").classList
 $("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
 $("sheet").onclick    = e =>{ if(e.target.id==="sheet"){ $("sheet").classList.remove("open"); buildDeck(); } };
 $("allV").onclick  = ()=>{ S.verbs=VERBS.map(v=>v.inf); save(); drawChips(); };
-$("convV").onclick = ()=>{ S.verbs=VERBS.filter(v=>v.conv).map(v=>v.inf); save(); drawChips(); };
+$("convV").onclick = ()=>{
+  S.verbs = Array.from(new Set(S.verbs.concat(VERBS.filter(v=>v.conv).map(v=>v.inf))));
+  S.tenses = TENSES.map(t=>t.id).filter(id=>!NOT_SPOKEN.includes(id));
+  save(); drawChips();
+};
 $("travV").onclick = ()=>{ S.verbs=VERBS.filter(v=>v.travel).map(v=>v.inf); save(); drawChips(); };
 $("regV").onclick  = ()=>{ S.verbs=VERBS.filter(v=>v.reg).map(v=>v.inf);  save(); drawChips(); };
 $("irrV").onclick  = ()=>{ S.verbs=VERBS.filter(v=>!v.reg).map(v=>v.inf); save(); drawChips(); };
@@ -5566,22 +5621,85 @@ function drawAudio(){
       (mins>=60 ? Math.floor(mins/60)+"h "+(mins%60)+"m" : mins+" min")+"</b> of audio."+
       (first ? "<br>Starts with: "+first+"…" : "")
     : "Select at least one verb and one tense above.";
+  updateRunCmd();
 }
+/* If opened as a plain local file (double-click, not a dev server), the file://
+   URL genuinely contains the real filesystem path — decode it once and reuse. */
+function htmlDir(){
+  if(location.protocol !== "file:") return null;
+  try{
+    const path = decodeURIComponent(location.pathname);
+    return path.slice(0, path.lastIndexOf("/")) || "/";
+  }catch(e){ return null; }
+}
+/* Tracks whether the last export landed exactly next to render-audio.sh (the
+   File System Access picker, Chrome/Edge only) or in the browser's ordinary
+   downloads folder (the universal fallback) — the copy-paste command differs. */
+let lastSave = null;   // null | "picker" | "download"
+function updateRunCmd(){
+  const filename = audioFilename();
+  const voice = ($("sayVoice").value || "Paola (Enhanced)").trim();
+  const enVoice = ($("enVoice").value || "Samantha").trim();
+  const dir = htmlDir();
+  let cmd, hint;
+  if(lastSave === "picker"){
+    cmd = './render-audio.sh "'+filename+'" "'+voice+'" "'+enVoice+'"';
+    hint = "Saved straight into this folder — or just double-click Crea_audio.command, it'll find this one too.";
+  } else if(dir){
+    cmd = 'cd "'+dir+'" && ./render-audio.sh ~/Downloads/"'+filename+'" "'+voice+'" "'+enVoice+'"';
+    hint = "Assumes the file downloaded to your browser's default Downloads folder — or skip this and double-click Crea_audio.command instead.";
+  } else {
+    cmd = './render-audio.sh ~/Downloads/"'+filename+'" "'+voice+'" "'+enVoice+'"';
+    hint = "Run this from whichever folder you put render-audio.sh in (couldn't detect it automatically here).";
+  }
+  $("runCmd").textContent = cmd;
+  $("runHint").textContent = hint;
+}
+$("sayVoice").oninput = updateRunCmd;
+$("enVoice").oninput = updateRunCmd;
+$("copyCmd").onclick = async ()=>{
+  try{
+    await navigator.clipboard.writeText($("runCmd").textContent);
+    const btn = $("copyCmd"); const was = btn.textContent;
+    btn.textContent = "✓ Copied"; setTimeout(()=>{ btn.textContent = was; }, 1500);
+  }catch(e){ $("runHint").textContent = "Couldn't copy automatically — select the line above and copy it by hand."; }
+};
 function audioFilename(){
   const e = audioEstimate();
   return "audio-script-"+e.verbs+"verbs-"+((S.audioGap||2000)/1000)+"s"+
          (S.verbOrder==="freq" ? "-freq" : "")+".txt";
 }
-$("audioDl").onclick = ()=>{
+$("audioDl").onclick = async ()=>{
   const txt = buildAudioScript();
   if(!txt){ $("audioStat").innerHTML = "Nothing selected — pick some verbs and tenses first."; return; }
+  const filename = audioFilename();
+  // Chrome/Edge: let the user point the save dialog at the same folder as render-audio.sh,
+  // so the exported file lands exactly next to it — no manual moving, no ~/Downloads guess.
+  if(window.showSaveFilePicker){
+    try{
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{description:"Text file", accept:{"text/plain":[".txt"]}}]
+      });
+      const w = await handle.createWritable();
+      await w.write(txt); await w.close();
+      lastSave = "picker"; updateRunCmd();
+      $("audioStat").innerHTML = "Saved. Double-click Crea_audio.command, or copy the command below.";
+      return;
+    }catch(e){
+      if(e.name === "AbortError") return;         // user cancelled the picker — don't also force a download
+      // any other failure (e.g. Safari lying about support): fall through to the classic download
+    }
+  }
   try{
     const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = audioFilename();
+    a.download = filename;
     document.body.appendChild(a); a.click();
     setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    lastSave = "download"; updateRunCmd();
+    $("audioStat").innerHTML = "Downloaded. Double-click Crea_audio.command, or copy the command below.";
   }catch(err){                                  // some file:// contexts block blob downloads
     $("audioShow").onclick();
     $("audioStat").innerHTML = "Download blocked here — copy the text below instead.";
