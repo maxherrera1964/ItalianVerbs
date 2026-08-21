@@ -249,8 +249,16 @@
 <div class="sheet" id="sheet">
   <div class="sheetbox">
     <h2>Tenses</h2>
+    <div class="row">
+      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Order</span>
+      <div class="chips" id="tenseOrdChips" style="flex:2"></div>
+    </div>
     <div class="chips" id="tenseChips"></div>
     <h2>Verbs</h2>
+    <div class="row">
+      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Order</span>
+      <div class="chips" id="verbOrdChips" style="flex:2"></div>
+    </div>
     <div class="row">
       <button class="btn" id="travV">✈︎ Travel pack</button>
       <button class="btn" id="allV">All verbs</button>
@@ -295,10 +303,7 @@
       <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Repeat gap</span>
       <div class="chips" id="gapChips" style="flex:2"></div>
     </div>
-    <div class="row">
-      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Order</span>
-      <div class="chips" id="ordChips" style="flex:2"></div>
-    </div>
+    <div class="addhint">Narrates verbs and tenses in the same order as the deck — set that above, under Tenses/Verbs.</div>
     <div class="row">
       <button class="btn" id="audioDl" style="flex:2">⬇︎ Export audio script</button>
       <button class="btn" id="audioShow">Show text</button>
@@ -3102,14 +3107,14 @@ const GROUP_LABEL = {are:"-are", ere:"-ere", ire:"-ire", isc:"-ire (-isc-)", orr
 
 /* --- the rules, for the Study view --- */
 const RULES = [
-  {title:"Presente — endings", rows:[
+  {title:"Presente — endings", tenses:["presente"], rows:[
     ["-are (parl-are)","o · i · a · iamo · ate · ano","parlo, parli, parla, parliamo, parlate, parlano"],
     ["-ere (cred-ere)","o · i · e · iamo · ete · ono","credo, credi, crede, crediamo, credete, credono"],
     ["-ire (dorm-ire)","o · i · e · iamo · ite · ono","dormo, dormi, dorme, dormiamo, dormite, dormono"],
     ["-ire -isc- (fin-ire)","isco · isci · isce · iamo · ite · iscono","finisco, finisci, finisce, finiamo, finite, finiscono"]
   ], foot:"Drop the infinitive ending, add the endings to the stem. The -isc- group (capire, finire, preferire, pulire) inserts -isc- in all forms except noi and voi."},
 
-  {title:"Presente progressivo — stare + gerundio", rows:[
+  {title:"Presente progressivo — stare + gerundio", tenses:["progressivo"], rows:[
     ["Step 1 — conjugate stare","sto · stai · sta · stiamo · state · stanno","sto… stai… sta…"],
     ["Step 2 — gerundio of -are","stem + -ando","mangiare → mangiando · parlare → parlando"],
     ["Step 2 — gerundio of -ere / -ire","stem + -endo","credere → credendo · dormire → dormendo · finire → finendo"],
@@ -3117,7 +3122,7 @@ const RULES = [
     ["Irregular gerundi","only a few, from the old Latin stem","fare → facendo · dire → dicendo · bere → bevendo"]
   ], foot:"Use it only for an action happening right at this moment (sto mangiando = I'm eating right now). For everything else — habits, near future, ongoing situations — Italian just uses the presente. It is not used with essere, avere, stare or the modals (potere, volere, dovere, sapere)."},
 
-  {title:"Imperfetto — one stem, one set of endings", rows:[
+  {title:"Imperfetto — one stem, one set of endings", tenses:["imperfetto"], rows:[
     ["Step 1 — build the stem","drop the final -re from the infinitive","parlare → parla- · credere → crede- · dormire → dormi-"],
     ["-are endings","avo · avi · ava · avamo · avate · avano","parlavo, parlavi, parlava, parlavamo, parlavate, parlavano"],
     ["-ere endings","evo · evi · eva · evamo · evate · evano","credevo, credevi, credeva, credevamo, credevate, credevano"],
@@ -3126,13 +3131,13 @@ const RULES = [
     ["Old Latin stems (endings still regular)","fare → face- · dire → dice- · bere → beve-","facevo, facevi, faceva… · dicevo, dicevi, diceva… · bevevo, bevevi, beveva…"]
   ], foot:"The imperfetto is the most forgiving tense in Italian — potere, dovere, volere, sapere, stare, andare, dare, vedere and venire all just add the regular endings to the infinitive stem. Use it for background description, habitual past actions ('da bambino giocavo sempre'), and anything already in progress when something else happened."},
 
-  {title:"Futuro semplice — one set of endings for everything", rows:[
+  {title:"Futuro semplice — one set of endings for everything", tenses:["futuro"], rows:[
     ["Step 1 — build the stem","drop the final -e; in -are verbs the a becomes e","parlare → parler- · credere → creder- · dormire → dormir-"],
     ["Step 2 — add the endings","ò · ai · à · emo · ete · anno","parlerò, parlerai, parlerà, parleremo, parlerete, parleranno"],
     ["-isc- verbs","behave like plain -ire in the future","finirò, finirai, finirà, finiremo, finirete, finiranno"]
   ], foot:"The endings never change — not even for irregular verbs. Irregulars only alter the stem, then take the exact same ò/ai/à/emo/ete/anno."},
 
-  {title:"Irregular future stems — the 3 patterns", rows:[
+  {title:"Irregular future stems — the 3 patterns", tenses:["futuro","condizionale"], rows:[
     ["1. Syncopated: the stem vowel drops",
      "and(a)r- · av(e)r- · pot(e)r- · dov(e)r- · sap(e)r- · ved(e)r-",
      "andrò (not anderò) · avrò · potrò · dovrò · saprò · vedrò"],
@@ -3145,25 +3150,25 @@ const RULES = [
     ["Suppletive (one-off)","essere → sar-","sarò, sarai, sarà, saremo, sarete, saranno"]
   ], foot:"Nothing here is random: a double -rr- is always a swallowed consonant (berrò is really bev-r-ò). Every one of these stems then takes the same ò/ai/à/emo/ete/anno. Learn the stem once and the whole tense follows. Note that the future stem is also the conditional stem — andr- gives both andrò and andrei."},
 
-  {title:"Spelling quirks in -are verbs (still regular!)", rows:[
+  {title:"Spelling quirks in -are verbs (still regular!)", tenses:["presente","futuro"], rows:[
     ["-care / -gare","add an h before i and e to keep the hard sound","pagare → tu paghi, noi paghiamo, futuro pagherò · cercare → tu cerchi, cercherò"],
     ["-ciare / -giare","never double the i","mangiare → tu mangi, futuro mangerò · viaggiare → tu viaggi, viaggerò"]
   ], foot:"These are spelling adjustments, not irregularities — the endings are exactly the ones in the tables above."},
 
-  {title:"Futuro anteriore — two jobs, one form", rows:[
+  {title:"Futuro anteriore — two jobs, one form", tenses:["futuroAnteriore"], rows:[
     ["Build it","futuro of avere/essere + past participle","avrò parlato · sarò andato/a · avremo finito"],
     ["Job 1 — finished by a future point","the earlier of two future actions, usually after quando/appena/dopo che","Quando avrò finito, ti chiamo. — When I've finished (will have finished), I'll call you."],
     ["Job 2 — a guess about the past","English uses \"must have…\", not a future tense at all","Non risponde: sarà uscito. — He's not answering: he must have gone out."],
     ["Same swap as futuro semplice","the futuro semplice alone can guess about now; the futuro anteriore guesses about the past","Sarà stanco. — He's probably tired. · Sarà stato stanco. — He was probably tired."]
   ], foot:"Job 2 trips up English speakers because English has no future tense hiding inside a guess about the past — \"sarà andato via\" is literally \"he will-have gone away\" but means \"he must have left\"/\"he's probably left\". If you can mentally swap in \"must have\" and the sentence still makes sense, it's this job, not the literal one."},
 
-  {title:"Condizionale presente — futuro stem + its own endings", rows:[
+  {title:"Condizionale presente — futuro stem + its own endings", tenses:["condizionale"], rows:[
     ["Step 1 — take the futuro stem","same stem as the futuro semplice (io form minus -ò)","parlerò → parler- · sarò → sar- · andrò → andr-"],
     ["Step 2 — add the endings","ei · esti · ebbe · emmo · este · ebbero","parlerei, parleresti, parlerebbe, parleremmo, parlereste, parlerebbero"],
     ["Irregular stems carry over","every contracted/irregular futuro stem is reused as-is","sarò → sarei · avrò → avrei · vorrò → vorrei · verrò → verrei"]
   ], foot:"If you know the futuro stem, you already know the condizionale — same stem, different endings. Used for polite requests (vorrei un caffè), hypotheticals (sarebbe bello), and giving advice (dovresti riposare)."},
 
-  {title:"Passato prossimo — auxiliary + past participle", rows:[
+  {title:"Passato prossimo — auxiliary + past participle", tenses:["passato"], rows:[
     ["Participle: -are","→ -ato","parlare → parlato"],
     ["Participle: -ere","→ -uto","credere → creduto"],
     ["Participle: -ire","→ -ito","dormire → dormito · finire → finito"],
@@ -3171,41 +3176,41 @@ const RULES = [
     ["With essere","sono · sei · è · siamo · siete · sono + participle","sono tornato/a, siamo partiti/e"]
   ], foot:"Most verbs take avere and the participle never changes. Verbs of motion and change of state (andare, venire, tornare, partire, essere, stare) take essere — and then the participle agrees with the subject: -o (m. sing), -a (f. sing), -i (m. pl), -e (f. pl)."},
 
-  {title:"Passato prossimo vs imperfetto — which one?", rows:[
+  {title:"Passato prossimo vs imperfetto — which one?", tenses:["passato","imperfetto"], rows:[
     ["Passato prossimo","a completed action with a clear edge — it happened once and it's over","Ieri ho mangiato una pizza. — Yesterday I ate a pizza."],
     ["Imperfetto","an ongoing state, habit, or background scene — no defined endpoint","Mangiavo la pizza ogni venerdì. — I used to eat pizza every Friday."],
     ["Quick test","“at that moment / once” → passato prossimo · “used to / was …-ing” → imperfetto","Ha telefonato alle tre. — She called at three. · Mentre parlava, guardava fuori. — While she was talking, she was looking out."],
     ["The classic combo","imperfetto paints the backdrop, passato prossimo is the event that interrupts it","Mentre camminavo, ho visto un cane. — While I was walking, I saw a dog."]
   ], foot:"Same weather, different focus: “Ha piovuto tutto il giorno” (it rained all day — the whole day is one finished block, passato prossimo) vs “Pioveva quando sono uscito” (it was raining when I went out — the rain is backdrop, imperfetto, and my leaving is the one-time event, passato prossimo)."},
 
-  {title:"Passato remoto — endings", rows:[
+  {title:"Passato remoto — endings", tenses:["passatoRemoto"], rows:[
     ["-are (parl-are)","ai · asti · ò · ammo · aste · arono","parlai, parlasti, parlò, parlammo, parlaste, parlarono"],
     ["-ere (cred-ere)","ei · esti · é · emmo · este · erono","credei, credesti, credé, credemmo, credeste, crederono"],
     ["-ire (dorm-ire)","ii · isti · ì · immo · iste · irono","dormii, dormisti, dormì, dormimmo, dormiste, dormirono"]
   ], foot:"Same job as the passato prossimo — a finished, one-time past action — but literary and narrative: novels, history, fairy tales, not everyday speech (outside parts of the south, where it's still spoken). You'll meet it reading far more than you'll need it writing."},
 
-  {title:"Irregular passato remoto — the 1-3-6 pattern", rows:[
+  {title:"Irregular passato remoto — the 1-3-6 pattern", tenses:["passatoRemoto"], rows:[
     ["What changes","only io, lui/lei, and loro (persons 1, 3, and 6)","mettere → misi, mise, misero"],
     ["What stays regular","tu, noi, voi — always the plain infinitive stem + esti/emmo/este or isti/immo/iste","mettere → mettesti, mettemmo, metteste"],
     ["-ere is the danger zone","most -are and -ire verbs are fully regular; most -ere verbs are not","scrivere → scrissi · chiudere → chiusi · prendere → presi"],
     ["A handful are irregular everywhere","essere, avere, dare, stare, fare, dire, bere — no regular tu/noi/voi to lean on","fui, fosti, fu, fummo, foste, furono · feci, facesti, fece…"]
   ], foot:"Learn the io form and you basically know lui/lei and loro too, by ear: -si → -se → -sero (misi/mise/misero), -qui → -que → -quero (piacqui/piacque/piacquero), -ssi → -sse → -ssero (scrissi/scrisse/scrissero). Compounds inherit their base verb's irregularity — mettere, mettere, mettere: commettere, ammettere, promettere, smettere all conjugate exactly like mettere."},
 
-  {title:"Presente vs condizionale presente — which one?", rows:[
+  {title:"Presente vs condizionale presente — which one?", tenses:["presente","condizionale"], rows:[
     ["Presente","a real, current fact, action, or ability","Posso aiutarti. — I can help you."],
     ["Condizionale","hypothetical, dependent on a condition, or just softened","Potrei aiutarti. — I could help you."],
     ["Quick test","plain statement → presente · “I would / could / should …” → condizionale","Voglio un caffè. — I want a coffee. · Vorrei un caffè. — I would like a coffee."],
     ["Where it matters most","politeness and softened advice — the condizionale is what you'll actually use out loud","Devi riposare. — You must rest. (blunt) · Dovresti riposare. — You should rest. (gentle)"]
   ], foot:"“Vorrei” instead of “voglio” is the single most useful swap for sounding polite in Italian — ordering food, asking for something, or making a request all default to the condizionale, not the presente."},
 
-  {title:"Congiuntivo presente — endings", rows:[
+  {title:"Congiuntivo presente — endings", tenses:["congiuntivo"], rows:[
     ["-are (parl-are)","i · i · i · iamo · iate · ino","parli, parli, parli, parliamo, parliate, parlino"],
     ["-ere (cred-ere)","a · a · a · iamo · iate · ano","creda, creda, creda, crediamo, crediate, credano"],
     ["-ire (dorm-ire)","a · a · a · iamo · iate · ano","dorma, dorma, dorma, dormiamo, dormiate, dormano"],
     ["-ire -isc- (fin-ire)","isca · isca · isca · iamo · iate · iscano","finisca, finisca, finisca, finiamo, finiate, finiscano"]
   ], foot:"The one thing to memorize: io, tu, and lui/lei are always identical, in every verb, no exceptions — so a subject pronoun (io, tu, lui, Lei) is often kept even though Italian normally drops it, just to avoid ambiguity. Noi and voi also match the presente indicativo noi/voi forms almost every time, even for irregular verbs."},
 
-  {title:"Irregular congiuntivo presente stems", rows:[
+  {title:"Irregular congiuntivo presente stems", tenses:["congiuntivo"], rows:[
     ["essere / avere","sia… siamo, siate, siano · abbia… abbiamo, abbiate, abbiano","Che io sia pronto. · Che tu abbia ragione."],
     ["fare / dire / dare / stare","facci- / dic- / di- / sti- + a, a, a, amo, ate, ano","faccia, faccia… facciano · dica… dicano · dia… diano · stia… stiano"],
     ["potere / volere / dovere / sapere","possa / voglia / debba / sappia + a, a, a, -iamo/-obbiamo, -iate/-obbiate, -ano/-abbiano","possa, possa… possano · voglia… vogliano"],
@@ -3213,7 +3218,7 @@ const RULES = [
     ["tenere / rimanere / bere","stressed stem teng- / rimang- / bev-, regular noi/voi","tenga… tengano · rimanga… rimangano · beva… bevano"]
   ], foot:"Most of these irregular stems are the same stressed stem the presente indicativo already uses for io (tengo→tenga, vengo→venga, esco→esca) — if you know the presente io form, you can usually guess the congiuntivo stem."},
 
-  {title:"Imperativo — no stem of its own, and no io", rows:[
+  {title:"Imperativo — no stem of its own, and no io", tenses:["imperativo"], rows:[
     ["io","doesn't exist","you can't command yourself"],
     ["tu","its own form — -are swaps presente's -i for -a; -ere/-ire is identical to presente tu","parla! (not parli!) · credi! · dormi! · finisci!"],
     ["Lei (formal)","borrowed from congiuntivo presente, 3rd singular","parli! · creda! · dorma! · finisca!"],
@@ -3222,13 +3227,13 @@ const RULES = [
     ["Loro (formal, rare)","borrowed from congiuntivo presente, 3rd plural","parlino! · credano! · dormano!"]
   ], foot:"Only tu has a form that truly belongs to the imperativo — every other person is on loan from a tense you already know. That's why lui/lei doesn't exist here at all: the formal command uses Lei (borrowed from congiuntivo presente), not lui or lei as such."},
 
-  {title:"Imperativo negativo — tu doesn't conjugate", rows:[
+  {title:"Imperativo negativo — tu doesn't conjugate", tenses:["imperativo"], rows:[
     ["Affirmative tu","its own imperativo form","Parla! · Aspetta! · Vai!"],
     ["Negative tu","non + infinitive, always — never the affirmative form with non in front","Non parlare! · Non aspettare! · Non andare!"],
     ["Every other person","just add non — the form itself doesn't change","Non parli! · Non parliamo! · Non parlate! · Non parlino!"]
   ], foot:"This trips everyone up at least once: \"Non parla!\" is simply wrong — the negative tu command borrows the infinitive instead of conjugating, full stop, even for irregular verbs (non andare!, not \"non va'!\"). Every other person keeps its normal (borrowed) form and just adds non in front."},
 
-  {title:"Irregular imperativo — the short tu forms", rows:[
+  {title:"Irregular imperativo — the short tu forms", tenses:["imperativo"], rows:[
     ["andare / dare / fare / stare","va' / da' / fa' / sta' — apocopated, one syllable (vai/dai/fai/stai also acceptable)","Va' via! · Dammi un minuto! · Fa' presto! · Sta' zitto!"],
     ["dire","di' — the only form, no long alternative in everyday use","Di' la verità!"],
     ["essere / avere","sii / abbi — irregular, learn as a pair","Sii gentile! · Abbi pazienza!"],
@@ -3236,7 +3241,7 @@ const RULES = [
     ["voi of essere / avere / sapere / volere","irregular — borrowed from congiuntivo voi, not presente indicativo","Siate pazienti! (not \"siete\") · Abbiate cura! (not \"avete\") · Sappiate che… · Vogliate accomodarvi."]
   ], foot:"Those apostrophed tu forms (va', da', fa', sta', di') are truncated versions of vai/dai/fai/stai/dici — both are heard, but the short form is what you'll see written. Doubling the following consonant when a pronoun is attached is the other classic trap: dammi (da' + mi), dimmi (di' + mi), fallo (fa' + lo). sapere and volere are rare in the tu imperativo (you don't often command someone to \"know\" or \"want\"), but when they appear, sappi/vogli — not sai/vuoi — are correct."},
 
-  {title:"When to use the congiuntivo — after che", rows:[
+  {title:"When to use the congiuntivo — after che", tenses:["congiuntivo"], rows:[
     ["Opinion / belief","credo che, penso che, mi sembra che","Penso che sia una buona idea. — I think it's a good idea."],
     ["Wish / desire","voglio che, spero che, preferisco che","Spero che tu venga. — I hope you come."],
     ["Doubt / emotion","dubito che, ho paura che, mi dispiace che, sono felice che","Ho paura che piova. — I'm afraid it will rain."],
@@ -3244,19 +3249,19 @@ const RULES = [
     ["After certain conjunctions","benché, sebbene, affinché, prima che, a meno che","Benché sia tardi, usciamo. — Even though it's late, let's go out."]
   ], foot:"If the che-clause states a plain fact (so che parli italiano — I know that you speak Italian), stay in the presente indicativo. The congiuntivo signals that what follows che is filtered through someone's mind — a wish, doubt, opinion, or feeling — not a fact anyone is claiming to know for certain."},
 
-  {title:"Congiuntivo imperfetto — endings", rows:[
+  {title:"Congiuntivo imperfetto — endings", tenses:["congiuntivoImpf"], rows:[
     ["-are (parl-are)","assi · assi · asse · assimo · aste · assero","parlassi, parlassi, parlasse, parlassimo, parlaste, parlassero"],
     ["-ere (cred-ere)","essi · essi · esse · essimo · este · essero","credessi, credessi, credesse, credessimo, credeste, credessero"],
     ["-ire (dorm-ire)","issi · issi · isse · issimo · iste · issero","dormissi, dormissi, dormisse, dormissimo, dormiste, dormissero"]
   ], foot:"Formed straight off the infinitive stem, and far more regular than the congiuntivo presente: even the -isc- verbs (capire → capissi, not capiscissi) and the stem-changing presente verbs (tenere → tenessi, not tenga-; andare → andassi, not vada-) drop their irregularities entirely here. io and tu are always identical."},
 
-  {title:"Irregular congiuntivo imperfetto stems", rows:[
+  {title:"Irregular congiuntivo imperfetto stems", tenses:["congiuntivoImpf"], rows:[
     ["essere","fossi, fossi, fosse, fossimo, foste, fossero","the one true exception — from Latin fuissem"],
     ["dare / stare","dessi, dessi, desse… · stessi, stessi, stesse…","the same irregular pattern, shared by both"],
     ["fare / dire / bere","facessi… · dicessi… · bevessi…","keep the old Latin infinitive stem (facere, dicere, bevere)"]
   ], foot:"Every other verb in this deck — including potere, volere, dovere, sapere, andare, venire, uscire, tenere, rimanere, and piacere — is completely regular here: just the infinitive stem plus the endings above."},
 
-  {title:"Congiuntivo imperfetto — used with se", rows:[
+  {title:"Congiuntivo imperfetto — used with se", tenses:["congiuntivoImpf"], rows:[
     ["Hypothetical “if” clauses","se + congiuntivo imperfetto, + condizionale presente","Se avessi tempo, verrei. — If I had time, I would come."],
     ["Sequence after a past-tense che","when the main verb is already in a past tense","Pensavo che fosse tardi. — I thought it was late."],
     ["Polite wish","vorrei che + congiuntivo imperfetto","Vorrei che tu venissi. — I wish you would come."]
@@ -3338,6 +3343,39 @@ const TENSES = [
   {id:"imperfettoProgressivo", label:"Imperfetto progressivo"},
   {id:"futuroProgressivo",  label:"Futuro progressivo"}
 ];
+
+/* TENSES above is grouped by STEM FAMILY — what a tense is built from — which is
+   the right lens for understanding *why* things are related (see the Rules tab).
+   It is the wrong lens for *learning order*: passato prossimo is a compound tense
+   by construction, but you need it in week one; passato remoto has its own simple
+   stem, but is essentially unused outside literature. TEACHING_ORDER instead
+   follows a dependency graph (a compound tense can't be learned before the aux
+   tense and participle/gerundio it's built from) blended with real communicative
+   frequency, roughly matching how Italian courses actually sequence things:
+     1. presente, passato prossimo, imperfetto, futuro — the everyday backbone
+     2. condizionale (reuses the futuro stem) and congiuntivo presente
+     3. imperativo — genuinely depends on BOTH of those (tu/noi/voi ← presente,
+        Lei/Loro ← congiuntivo presente), so it lands later than it "feels" like it should
+     4. presente progressivo, then every remaining "aux tense you know + participle
+        you already know" compound tense
+     5. passato remoto / trapassato remoto / futuro progressivo — literary or rare,
+        learned last regardless of how simple their construction is */
+const TEACHING_ORDER = [
+  "presente","passato","imperfetto","futuro","condizionale","congiuntivo","imperativo",
+  "progressivo","trapassatoProssimo","futuroAnteriore","condizionalePassato","congiuntivoPassato",
+  "congiuntivoImpf","congiuntivoTrapassato","imperfettoProgressivo",
+  "passatoRemoto","trapassatoRemoto","futuroProgressivo"
+];
+/* Both toggleable from Deck settings. "az" mirrors TENSES/VERBS' own built-in
+   order, so it costs nothing; "learn"/"freq" build a fresh array each call —
+   cheap at 18 tenses and a few hundred verbs, and always reflects the live S. */
+function orderedTenses(){
+  return (S.tenseOrder||"learn")==="family" ? TENSES : TEACHING_ORDER.map(id=>TENSES.find(t=>t.id===id));
+}
+function orderedVerbs(){
+  return (S.verbOrder||"freq")==="az" ? VERBS
+    : [...VERBS].sort((a,b)=> (b.freq||0)-(a.freq||0) || a.inf.localeCompare(b.inf,"it"));
+}
 
 /* gerundio: -are → -ando · -ere/-ire → -endo (a handful of irregular stems) */
 const GER_IRR = {fare:"facendo", dire:"dicendo", stare:"stando", essere:"essendo", dare:"dando", bere:"bevendo"};
@@ -4324,7 +4362,6 @@ function sentenceEn(v,t,i){
      · tenses run in TENSES order — grouped by shared stem.
      · [[slnc N]] is `say`'s pause directive, in milliseconds.
 ------------------------------------------------------- */
-const AUDIO_TSEQ = TENSES.map(t=>t.id);   // narrate in the same stem-family order as the deck
 const AUDIO_SLOTS = [
   {i:0, pn:"io",   subj:"Io",   fem:false},
   {i:1, pn:"tu",   subj:"Tu",   fem:false},
@@ -4354,17 +4391,16 @@ function audioSlotsFor(t){
   if(t!=="imperativo") return AUDIO_SLOTS;
   return AUDIO_SLOTS.filter(s => s.i!==0 && s.pn!=="lui");
 }
-/* the selected tenses this verb actually has forms in, in narration order */
+/* the selected tenses this verb actually has forms in, in the shared deck order
+   (S.tenseOrder — learning order by default, or grouped-by-stem) */
 function audioTensesFor(v){
-  return AUDIO_TSEQ.filter(t=>S.tenses.includes(t) && hasTense(v,t));
+  return orderedTenses().map(t=>t.id).filter(t=>S.tenses.includes(t) && hasTense(v,t));
 }
 function audioSelection(){
   // A verb with nothing left after the tense filter is dropped outright —
   // otherwise the track announces an infinitive and then falls silent.
-  const verbs = VERBS.filter(v=>S.verbs.includes(v.inf) && audioTensesFor(v).length);
-  if(S.audioOrder === "freq")            // most-used first; ties fall back to alphabetical
-    verbs.sort((a,b)=> (b.freq||0)-(a.freq||0) || (a.inf < b.inf ? -1 : 1));
-  return { verbs:verbs, tenses: AUDIO_TSEQ.filter(t=>S.tenses.includes(t)) };
+  const verbs = orderedVerbs().filter(v=>S.verbs.includes(v.inf) && audioTensesFor(v).length);
+  return { verbs:verbs, tenses: orderedTenses().map(t=>t.id).filter(t=>S.tenses.includes(t)) };
 }
 function buildAudioScript(){
   const gap = S.audioGap || 2000;
@@ -4972,12 +5008,14 @@ function saveUserSpecs(){ try { localStorage.setItem(USER_KEY, JSON.stringify(US
 
 /* ---------------- STATE ---------------- */
 const KEY = "verbi_v1";
-const VER = 17;
+const VER = 18;
 let S = {
   ver:VER,
   mode:"recall",                                  // recall | translate
   verbs:VERBS.map(v=>v.inf),
   tenses:TENSES.map(t=>t.id),
+  verbOrder:"freq",                               // freq | az — drives buildDeck() + the verb chip list
+  tenseOrder:"learn",                             // learn | family — drives buildDeck() + the tense chip list
   stats:{},                                       // cardId -> {r:right, w:wrong}
   known:{},                                       // cardId -> true (answered correctly, retired)
   seen:0, right:0
@@ -5001,11 +5039,11 @@ function cardId(vi,t,i){ return vi+"|"+t+"|"+i; }
 
 function buildDeck(){
   const groups = new Map();          // key: "verb|tense" -> its 6 cards, persons in order
-  VERBS.forEach(v=>{
+  orderedVerbs().forEach(v=>{
     if(!S.verbs.includes(v.inf)) return;
-    // iterate TENSES (stem-family order), not S.tenses, so the card sequence
-    // always follows the sorted tense order regardless of saved settings
-    TENSES.forEach(tt=>{
+    // iterate in the chosen tense order (learning-sequence by default), not S.tenses,
+    // so the card sequence always follows a sensible order regardless of saved settings
+    orderedTenses().forEach(tt=>{
       const t = tt.id;
       if(!S.tenses.includes(t)) return;
       if(!hasTense(v,t)) return;          // stare+gerundio isn't used with stative verbs, etc.
@@ -5014,10 +5052,9 @@ function buildDeck(){
       if(cards.length) groups.set(v.inf+"|"+t, cards);   // fully-known verb+tense drops out
     });
   });
-  // Alphabetical order: VERBS is sorted a-z by infinitive, and the Map
-  // preserves that insertion order (verb, then tense), so the deck plays
-  // verbs alphabetically. Within a group the six cards still cycle
-  // io → tu → lui → noi → voi → loro.
+  // Deck order: verbs play in whichever order orderedVerbs() returned (frequency
+  // by default), and within a verb, tenses play in the chosen tense order too.
+  // Within a verb+tense group the six cards still cycle io → tu → lui → noi → voi → loro.
   const out = [];
   Array.from(groups.values()).forEach(cards=>out.push(...cards));
   deck=out; pos=0;
@@ -5212,14 +5249,16 @@ function drawRules(){
   $("studyTitle").textContent = "Rules";
   $("navrow").style.display = "none";
   $("pickList").classList.remove("open");
-  $("studyBody").innerHTML = RULES.map(r=>
+  const rules = S.tenses.length ? RULES.filter(r=>r.tenses.some(t=>S.tenses.includes(t))) : RULES;
+  $("studyBody").innerHTML = rules.length ? rules.map(r=>
     '<div class="rulebox"><h3>'+r.title+'</h3>'+
       r.rows.map(row=>
         '<div class="rr"><div class="k">'+row[0]+'</div>'+
         '<div class="v">'+row[1]+'</div>'+
         '<div class="x">'+row[2]+'</div></div>').join("")+
       '<div class="rfoot">'+r.foot+'</div>'+
-    '</div>').join("");
+    '</div>').join("")
+    : '<div class="note" style="margin:16px">No grammar notes for the tenses currently selected in Deck settings — select more tenses there to see their rules here.</div>';
   $("studySheet").querySelector(".sheetbox").scrollTop = 0;
 }
 function drawStudy(){
@@ -5246,8 +5285,8 @@ function drawStudy(){
     drawStudy();
   });
 
-  const tenses = TENSES.filter(t=>S.tenses.includes(t.id));
-  const show = tenses.length ? tenses : TENSES;
+  const tenses = orderedTenses().filter(t=>S.tenses.includes(t.id));
+  const show = tenses.length ? tenses : orderedTenses();
 
   let html = '<div class="vhead">'+v.inf+'<em>'+v.en+'</em></div>';
   html += '<div><span class="badge '+(v.reg?'reg':'irr')+'">'+
@@ -5406,9 +5445,20 @@ $("tabVerbs").onclick = ()=>setTab("verbs");
 $("tabRules").onclick = ()=>setTab("rules");
 
 function drawChips(){
-  $("tenseChips").innerHTML = TENSES.map(t=>
+  $("tenseOrdChips").innerHTML = [["learn","Learning order"],["family","Grouped by stem"]].map(o=>
+    '<div class="chip '+((S.tenseOrder||"learn")===o[0]?'sel':'')+'" data-o="'+o[0]+'">'+o[1]+'</div>').join("");
+  $("tenseOrdChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
+    S.tenseOrder = el.dataset.o; save(); drawChips();
+  });
+  $("tenseChips").innerHTML = orderedTenses().map(t=>
     '<div class="chip '+(S.tenses.includes(t.id)?'sel':'')+'" data-t="'+t.id+'">'+t.label+'</div>').join("");
-  $("verbChips").innerHTML = VERBS.map(v=>
+
+  $("verbOrdChips").innerHTML = [["freq","Most used first"],["az","A–Z"]].map(o=>
+    '<div class="chip '+((S.verbOrder||"freq")===o[0]?'sel':'')+'" data-o="'+o[0]+'">'+o[1]+'</div>').join("");
+  $("verbOrdChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
+    S.verbOrder = el.dataset.o; save(); drawChips();
+  });
+  $("verbChips").innerHTML = orderedVerbs().map(v=>
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
       '<i class="dot '+(v.reg?'reg':'irr')+'"></i>'+v.inf+
       (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
@@ -5488,11 +5538,6 @@ function drawAudio(){
   $("gapChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     S.audioGap = +el.dataset.g; save(); drawAudio();
   });
-  $("ordChips").innerHTML = [["az","A–Z"],["freq","Most used first"]].map(o=>
-    '<div class="chip '+((S.audioOrder||"az")===o[0]?'sel':'')+'" data-o="'+o[0]+'">'+o[1]+'</div>').join("");
-  $("ordChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
-    S.audioOrder = el.dataset.o; save(); drawAudio();
-  });
 
   const e = audioEstimate();
   const mins = Math.round(e.secs/60);
@@ -5506,7 +5551,7 @@ function drawAudio(){
 function audioFilename(){
   const e = audioEstimate();
   return "audio-script-"+e.verbs+"verbs-"+((S.audioGap||2000)/1000)+"s"+
-         (S.audioOrder==="freq" ? "-freq" : "")+".txt";
+         (S.verbOrder==="freq" ? "-freq" : "")+".txt";
 }
 $("audioDl").onclick = ()=>{
   const txt = buildAudioScript();
