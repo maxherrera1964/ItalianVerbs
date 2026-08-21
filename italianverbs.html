@@ -260,6 +260,7 @@
       <div class="chips" id="verbOrdChips" style="flex:2"></div>
     </div>
     <div class="row">
+      <button class="btn" id="convV">💬 Conversation</button>
       <button class="btn" id="travV">✈︎ Travel pack</button>
       <button class="btn" id="allV">All verbs</button>
       <button class="btn" id="noneV">Clear</button>
@@ -273,6 +274,7 @@
       <span><i class="dot irr"></i>irregular</span>
       <span><b class="essmark">ⓔ</b> takes essere</span>
       <span>✈︎ travel verb</span>
+      <span>💬 conversation verb</span>
     </div>
     <div class="chips" id="verbChips" style="margin-top:10px"></div>
 
@@ -2597,6 +2599,20 @@ const TRAVEL = ["bere","assaggiare","viaggiare","ordinare","pagare","prenotare",
                 "volere","potere","prendere","andare","mangiare","aspettare","capire","parlare",
                 "dire","sapere","trovare","tornare","partire","dormire","guardare","essere","avere"];
 
+/* Curated for everyday conversation, not just a raw frequency cutoff — the top
+   of FREQ_VERB (below) includes a few outliers that read more like narrative/
+   dramatic transcripts than small talk (uccidere, testimoniare, voltare, subire),
+   so those are deliberately left out here even though they rank highly. */
+const CONVERSATION = [
+  // the structural 15: auxiliaries, modals, and irregular hubs used in nearly every sentence
+  "essere","avere","fare","stare","dire","volere","potere","sapere","andare","dovere",
+  "vedere","dare","parlare","venire","pensare",
+  // the next 25: everyday actions — asking, routine, opinions, logistics
+  "capire","sentire","chiamare","chiedere","lavorare","ricordare","tornare","guardare","uscire","credere",
+  "prendere","piacere","trovare","mettere","lasciare","portare","aiutare","aspettare","cercare","arrivare",
+  "continuare","finire","pagare","partire","iniziare","decidere"
+];
+
 /* --- conjugation class + regularity --- */
 const META = {
   essere:  {g:"ere", reg:false, why:"Irregular everywhere: sono/sei/è…, future sar-, participle stato (aux essere)."},
@@ -3092,6 +3108,7 @@ VERBS.push(
 VERBS.forEach(v=>{
   Object.assign(v, META[v.inf]);
   v.travel = TRAVEL.includes(v.inf);
+  v.conv = CONVERSATION.includes(v.inf);
 });
 
 /* --- frequency of each verb across the two transcripts (all inflected forms counted) --- */
@@ -4967,7 +4984,7 @@ function genVerb(spec, r){
   const v = {
     inf: r.inf, en: meaning ? (/^to\s+/i.test(meaning) ? meaning : ("to " + base)) : "",
     pres: r.pres, fut: r.fut, pp: r.pp, aux,
-    reg: r.reg, g: r.g, travel: false, custom: true
+    reg: r.reg, g: r.g, travel: false, conv: false, custom: true
   };
   if (r.latin) v.latin = r.latin;
   if (base){
@@ -5278,7 +5295,7 @@ function drawStudy(){
       '<i class="dot '+(x.reg?'reg':'irr')+'"></i>'+x.inf+
       '<span style="opacity:.55;margin-left:5px">×'+x.freq+'</span>'+
       (x.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (x.travel?' ✈︎':'')+'</div>').join("");
+      (x.travel?' ✈︎':'')+(x.conv?' 💬':'')+'</div>').join("");
   $("pickList").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     studyIdx = +el.dataset.i;
     $("pickList").classList.remove("open");
@@ -5293,6 +5310,7 @@ function drawStudy(){
             (v.reg?'regular':'irregular')+' · '+GROUP_LABEL[v.g]+'</span>'+
             (v.aux==="essere"?'<span class="badge ess">essere</span>':'')+
             (v.travel?'<span class="badge trv">✈︎ travel</span>':'')+
+            (v.conv?'<span class="badge trv">💬 conversation</span>':'')+
             '<span class="badge" style="background:#20262f;color:var(--dim)">used '+v.freq+'× in your transcripts</span>'+'</div>';
   html += '<div class="why">'+ (v.why ? v.why :
             (v.reg ? 'Follows the '+GROUP_LABEL[v.g]+' pattern exactly across every tense — see the Rules tab.'
@@ -5462,7 +5480,7 @@ function drawChips(){
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
       '<i class="dot '+(v.reg?'reg':'irr')+'"></i>'+v.inf+
       (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (v.travel?' ✈︎':'')+'</div>').join("");
+      (v.travel?' ✈︎':'')+(v.conv?' 💬':'')+'</div>').join("");
 
   $("tenseChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     const id=el.dataset.t;
@@ -5492,6 +5510,7 @@ $("setBtn").onclick   = ()=>{ drawChips(); drawUserVerbs(); $("sheet").classList
 $("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
 $("sheet").onclick    = e =>{ if(e.target.id==="sheet"){ $("sheet").classList.remove("open"); buildDeck(); } };
 $("allV").onclick  = ()=>{ S.verbs=VERBS.map(v=>v.inf); save(); drawChips(); };
+$("convV").onclick = ()=>{ S.verbs=VERBS.filter(v=>v.conv).map(v=>v.inf); save(); drawChips(); };
 $("travV").onclick = ()=>{ S.verbs=VERBS.filter(v=>v.travel).map(v=>v.inf); save(); drawChips(); };
 $("regV").onclick  = ()=>{ S.verbs=VERBS.filter(v=>v.reg).map(v=>v.inf);  save(); drawChips(); };
 $("irrV").onclick  = ()=>{ S.verbs=VERBS.filter(v=>!v.reg).map(v=>v.inf); save(); drawChips(); };
