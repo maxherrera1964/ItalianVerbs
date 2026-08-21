@@ -4,6 +4,10 @@
 # script" saves to, in Chrome/Edge), then falls back to your Downloads
 # folder (where every other browser's ordinary download lands).
 
+# Edit these two lines to change voices — no prompts, just runs.
+ITALIAN_VOICE="Paola (Enhanced)"
+ENGLISH_VOICE="Ava (Premium)"
+
 cd "$(dirname "$0")"
 
 SCRIPT=$(ls -t ./audio-script-*.txt 2>/dev/null | head -1)
@@ -26,26 +30,7 @@ fi
 echo "Found: $(basename "$SCRIPT")  (in $FOUND_WHERE)"
 echo
 
-# Offer the installed Italian voices
-VOICES=()
-while IFS= read -r line; do VOICES+=("$line"); done < <(
-  say -v '?' | grep it_IT | grep -viE "eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley" |
-  sed 's/  *it_IT.*//'
-)
-
-echo "Voice:"
-for i in "${!VOICES[@]}"; do echo "  $((i+1))) ${VOICES[$i]}"; done
-echo
-read -r -p "Number (Enter for Paola (Enhanced)): " PICK
-
-if [ -n "$PICK" ] && [ "$PICK" -ge 1 ] 2>/dev/null && [ "$PICK" -le "${#VOICES[@]}" ]; then
-  VOICE="${VOICES[$((PICK-1))]}"
-else
-  VOICE="Paola (Enhanced)"
-fi
-echo
-
-./render-audio.sh "$SCRIPT" "$VOICE"
+./render-audio.sh "$SCRIPT" "$ITALIAN_VOICE" "$ENGLISH_VOICE"
 
 echo
 read -n 1 -s -r -p "Press any key to close."
