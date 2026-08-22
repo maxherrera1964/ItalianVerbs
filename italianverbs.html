@@ -4367,9 +4367,11 @@ function sentenceIt(v,t,i){
     return "Dopo che "+SUBJ_IT[i].toLowerCase()+" "+f+" "+COMP[v.inf][0]+", …";
   return SUBJ_IT[i]+" "+f+" "+COMP[v.inf][0]+".";
 }
-function sentenceEn(v,t,i){
+function sentenceEn(v,t,i,fem){
   const o = SENT_V[v.inf] || {};
-  const s = EN_SUBJ[i].replace("he / she","he").replace("you (pl)","you all");
+  // fem only matters for i===2 (lui/lei share a slot) — every other call site
+  // omits it and gets the exact same "he" fallback as before, unchanged.
+  const s = (fem && i===2) ? "she" : EN_SUBJ[i].replace("he / she","he").replace("you (pl)","you all");
   if(t==="imperativo"){                               // no subject pronoun in English either
     if(i===0) return "";
     const w = o.b || cut(baseForm(v));
@@ -4470,7 +4472,7 @@ function buildAudioScript(){
         const ex = audioSent(v,t,f,s.subj);
         const end = t==="imperativo" ? "" : ".";       // the form already ends in "!" for a command
         const base = s.pn+" "+f+end+(ex ? " [[slnc 400]] "+ex : "");
-        const en = sentenceEn(v,t,s.i);          // every person now, not just io
+        const en = sentenceEn(v,t,s.i,s.fem);     // every person now, not just io — s.fem makes lei say "she"
         if(en){
           // The English line gets rendered as a completely separate `say` pass by
           // render-audio.sh — not an embedded [[voice ...]] switch, which chokes on
