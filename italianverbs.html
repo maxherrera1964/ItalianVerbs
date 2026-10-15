@@ -348,7 +348,7 @@
       <button class="btn" id="audioShow">Show text</button>
     </div>
     <textarea class="tin" id="audioOut" style="display:none;height:160px;font-size:12px" readonly></textarea>
-    <div class="addhint">Uses the verbs and tenses selected above. Export, then run <b>render-audio.sh</b> on the downloaded file to build the m4a.</div>
+    <div class="addhint">Uses the verbs and tenses selected above. In Chrome/Edge the script is saved into the same folder as this page (you pick that folder once, on the first export); other browsers download it instead. Then double-click <b>Crea_audio.command</b> to build the m4a.</div>
 
     <h2>Progress</h2>
     <div class="stat" id="progStat"></div>
@@ -4766,14 +4766,35 @@ function audioSelection(){
     verbs.sort((a,b)=> (b.freq||0)-(a.freq||0) || (a.inf < b.inf ? -1 : 1));
   return { verbs:verbs, tenses: AUDIO_TSEQ.filter(t=>S.tenses.includes(t)) };
 }
+/* the English meaning, cleaned up for speech: parenthetical notes dropped
+   ("to know (a fact)" -> "to know") and slashes read as alternatives
+   ("to say / to tell" -> "to say, or to tell") — a voice can't read "/" well */
+function audioMeaning(v){
+  let m = String(v.en || "")
+    .replace(/\s*\([^)]*\)/g, "")      // (notes)
+    .replace(/\s*\(.*$/, "")            // an unclosed "(" — drop the rest
+    .replace(/\s+[—–]\s.*$/, "")        // " — fermarsi = …" side notes
+    .replace(/\s*\/\s*/g, ", or ")
+    .replace(/[\s,;:.]+$/, "")
+    .replace(/\s+/g, " ").trim();
+  return m;
+}
 function buildAudioScript(){
   const gap = S.audioGap || 2000;
   const sel = audioSelection();
   const lines = [];
   sel.verbs.forEach(v=>{
-    lines.push("[[slnc "+Math.round(gap*1.25)+"]] "+v.inf+". [[slnc 1000]]");
+    const m = audioMeaning(v);
     audioTensesFor(v).forEach(t=>{
-      lines.push("[[slnc 1500]] "+TENSES.find(x=>x.id===t).label+". [[slnc 800]]");
+      // Each block opens: tense → infinitive → English meaning, e.g.
+      //   "Passato prossimo." … "nuotare." … "to swim." … io ho nuotato …
+      // The tense is read slower ([[rate -40]] … [[rate +40]]) and followed by
+      // a pause so its first word isn't swallowed. The line must END with
+      // "<infinitive>. [[slnc 1000]]" — render-audio.sh splits per verb on that.
+      lines.push("[[slnc "+(Math.round(gap*1.25)+500)+"]] [[rate -40]] "+
+                 TENSES.find(x=>x.id===t).label+". [[rate +40]] [[slnc 700]] "+v.inf+". [[slnc 1000]]");
+      // English meaning on its own ¶EN¶ line, voiced by the English voice
+      if(m) lines.push("¶EN¶ "+m+". [[slnc 1200]]");
       audioSlotsFor(t).forEach(s=>{
         const f  = audioAgree(form(v,t,s.i), s.fem);
         const ex = audioSent(v,t,f,s.subj);
@@ -4790,7 +4811,7 @@ function audioEstimate(){
   let items = 0, blocks = 0;
   sel.verbs.forEach(v=>{ const ts = audioTensesFor(v); blocks += ts.length;
     items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0); });
-  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5;
+  const secs = items*(3.75+gap) + blocks*8;   // each tense block: tense + infinitive + English meaning
   return {verbs:sel.verbs.length, tenses:sel.tenses.length, items:items, secs:secs};
 }
 
@@ -6065,9 +6086,79 @@ function audioFilename(){
   return "audio-script-"+e.verbs+"verbs-"+((S.audioGap||2000)/1000)+"s"+
          (S.audioOrder==="freq" ? "-freq" : "")+".txt";
 }
-$("audioDl").onclick = ()=>{
+/* ---- save exports into the folder italianverbs.html lives in ----
+   Chrome/Edge: the File System Access API. The first export asks you to pick
+   that folder once; the folder handle is remembered in IndexedDB, so later
+   exports write straight into it (the browser may ask once per session to
+   re-allow it). Other browsers (Safari, Firefox) can't do this, so they fall
+   back to an ordinary download — Crea_audio.command checks ~/Downloads too. */
+const EXPORT_DB = "italianverbs-export", EXPORT_KEY = "dir";
+function exportDb(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open(EXPORT_DB, 1);
+    r.onupgradeneeded = ()=> r.result.createObjectStore("handles");
+    r.onsuccess = ()=> res(r.result); r.onerror = ()=> rej(r.error);
+  });
+}
+async function exportDirGet(){
+  try{ const db = await exportDb();
+    return await new Promise(res=>{ const q = db.transaction("handles").objectStore("handles").get(EXPORT_KEY);
+      q.onsuccess = ()=> res(q.result || null); q.onerror = ()=> res(null); });
+  }catch(e){ return null; }
+}
+async function exportDirSet(h){
+  try{ const db = await exportDb();
+    await new Promise(res=>{ const tx = db.transaction("handles","readwrite");
+      if(h) tx.objectStore("handles").put(h, EXPORT_KEY); else tx.objectStore("handles").delete(EXPORT_KEY);
+      tx.oncomplete = res; tx.onerror = res; });
+  }catch(e){}
+}
+function pageFileName(){
+  try{ return decodeURIComponent(location.pathname.split("/").pop()) || "italianverbs.html"; }
+  catch(e){ return "italianverbs.html"; }
+}
+/* true if the picked folder holds this page (any case: "ItalianVerbs.html" too) */
+async function folderHoldsPage(dir){
+  const want = pageFileName().toLowerCase();
+  try{ for await (const [name] of dir.entries()) if(name.toLowerCase()===want) return true; }catch(e){}
+  return false;
+}
+async function saveToPageFolder(name, txt){
+  let dir = await exportDirGet();
+  if(dir){
+    let perm = await dir.queryPermission({mode:"readwrite"});
+    if(perm !== "granted") perm = await dir.requestPermission({mode:"readwrite"});
+    if(perm !== "granted") dir = null;
+  }
+  if(!dir){
+    $("audioStat").innerHTML = "Pick the folder that contains <b>"+pageFileName()+"</b> — only needed the first time.";
+    dir = await window.showDirectoryPicker({id:"italianverbs-export", mode:"readwrite", startIn:"documents"});
+    if(!(await folderHoldsPage(dir))){
+      $("audioStat").innerHTML = "That folder (<b>"+dir.name+"</b>) doesn't contain <b>"+pageFileName()+
+        "</b>. Tap Export again and pick the folder this page is in.";
+      return false;
+    }
+    await exportDirSet(dir);
+  }
+  const fh = await dir.getFileHandle(name, {create:true});
+  const w = await fh.createWritable(); await w.write(txt); await w.close();
+  $("audioStat").innerHTML = "Saved <b>"+name+"</b> to the <b>"+dir.name+"</b> folder, next to "+pageFileName()+
+    ". Now double-click <b>Crea_audio.command</b>. "+
+    '<a href="#" id="audioDirReset" style="color:var(--dim)">change folder</a>';
+  $("audioDirReset").onclick = async ev=>{ ev.preventDefault(); await exportDirSet(null);
+    $("audioStat").innerHTML = "Folder forgotten — the next export will ask you to pick it again."; };
+  return true;
+}
+$("audioDl").onclick = async ()=>{
   const txt = buildAudioScript();
   if(!txt){ $("audioStat").innerHTML = "Nothing selected — pick some verbs and tenses first."; return; }
+  if(window.showDirectoryPicker){
+    try{ await saveToPageFolder(audioFilename(), txt); return; }
+    catch(err){
+      if(err && err.name==="AbortError"){ drawAudio(); return; }      // picker cancelled
+      console.warn("folder save failed, falling back to download", err);
+    }
+  }
   try{
     const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
     const a = document.createElement("a");

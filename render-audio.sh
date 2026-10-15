@@ -69,11 +69,20 @@ trap 'rm -rf "$WORK"' EXIT
 rm -rf "$OUT"
 mkdir -p "$OUT/per-verbo" "$WORK/parts" "$WORK/segs" "$WORK/segaiff" "$WORK/aiff"
 
-# Pass 1 — split on verb-announcement lines: "[[slnc NNNN]] <infinitive>. [[slnc 1000]]"
+# Pass 1 — split on verb-announcement lines. Two formats are accepted:
+#   old: "[[slnc NNNN]] <infinitive>. [[slnc 1000]]"
+#   new: "[[slnc NNNN]] [[rate -40]] <Tense>. [[rate +40]] [[slnc 700]] <infinitive>. [[slnc 1000]]"
+# The infinitive is always the last word before ". [[slnc 1000]]". In the new
+# format every tense block repeats the announcement, so a new file is started
+# only when the infinitive changes — one file per verb, all its tenses inside.
 awk -v dir="$WORK/parts" '
-  /^\[\[slnc [0-9]+\]\] [a-zà-ù]+\. \[\[slnc 1000\]\]$/ {
-    split($0, a, "]] "); split(a[2], b, "."); verb = b[1]
-    file = sprintf("%s/%02d_%s.txt", dir, n++, verb)
+  /^\[\[slnc [0-9]+\]\] .*[a-zà-ù]+\. \[\[slnc 1000\]\]$/ {
+    line = $0; sub(/\. \[\[slnc 1000\]\]$/, "", line)
+    k = split(line, w, " "); verb = w[k]
+    if (verb != last) {
+      if (file) close(file)
+      file = sprintf("%s/%02d_%s.txt", dir, n++, verb); last = verb
+    }
   }
   file && NF { print > file }
 ' "$SCRIPT_FILE"
