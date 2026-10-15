@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1216">
+<title>Verbi — Reference Quiz</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0f1216; --panel:#181d24; --panel2:#212832; --line:#2c343f;
+    --txt:#eef2f6; --dim:#93a1b1; --accent:#4ade80; --accent2:#38bdf8;
+    --red:#f87171; --amber:#fbbf24; --violet:#c4b5fd;
+  }
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Segoe UI,Roboto,sans-serif;
+    display:flex; flex-direction:column; overscroll-behavior:none;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-user-select:none; user-select:none;
+  }
+  header{display:flex;align-items:center;gap:7px;padding:12px 14px 8px}
+  header h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.3px;flex:1}
+  header h1 span{color:var(--accent)}
+  .btn{
+    background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:10px; padding:8px 11px; font-size:13px; font-weight:600; cursor:pointer;
+    white-space:nowrap; font-family:inherit;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn.on{background:var(--accent);color:#06210f;border-color:var(--accent)}
+
+  .bar{height:4px;background:var(--panel2);margin:4px 16px 0;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+  .meta{display:flex;justify-content:space-between;padding:8px 16px;font-size:12px;color:var(--dim);gap:10px}
+  .meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 16px}
+  .card{
+    width:100%; max-width:520px; min-height:42vh;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line); border-radius:22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:30px 20px 26px; position:relative;
+  }
+  .card.tappable{cursor:pointer}
+  .tag{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim);
+    white-space:nowrap; max-width:90%; overflow:hidden; text-overflow:ellipsis;
+  }
+  .prompt{font-size:15px;color:var(--accent2);margin-bottom:6px;font-weight:600}
+  .big{font-size:clamp(24px,7vw,38px);font-weight:700;line-height:1.25;margin:6px 0}
+  .big.sm{font-size:clamp(19px,5.2vw,27px)}
+  .sub{font-size:15px;color:var(--dim);margin-top:10px;line-height:1.5}
+  .hint{position:absolute;bottom:14px;font-size:11px;color:#5d6b7a;letter-spacing:.5px}
+  .answer{display:none}
+  .card.flipped .answer{display:block}
+  .card.flipped .hint{display:none}
+  .pron{font-size:13px;color:var(--dim);margin-top:14px;line-height:1.5;max-width:400px}
+  .pron b{color:var(--txt)}
+  .ex{margin-top:14px;padding:12px 14px;border-radius:12px;background:#12181e;border:1px solid var(--line);max-width:400px}
+  .exit{font-size:16px;font-weight:600;line-height:1.4}
+  .exen{font-size:13px;color:var(--dim);margin-top:5px}
+  .spkrow{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .spk{
+    background:var(--panel2);color:var(--accent2);border:1px solid var(--line);
+    border-radius:99px;padding:9px 16px;font-size:14px;font-weight:650;cursor:pointer;font-family:inherit;
+  }
+  .spk.alt{color:var(--dim);font-weight:500}
+  .spk:active{transform:scale(.95)}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    padding:4px 9px;border-radius:99px;margin:10px 4px 0;background:#102a38;color:var(--accent2)}
+  .badge.warn{background:#33260f;color:var(--amber)}
+
+  footer{padding:10px 16px calc(14px + env(safe-area-inset-bottom))}
+  .rate{display:flex;gap:10px}
+  .rate button{flex:1;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .again{background:#3a2226;color:var(--red)}
+  .good{background:#12301f;color:var(--accent)}
+  .rate button:active{transform:scale(.97)}
+  .single{width:100%;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;
+    background:var(--panel2);color:var(--txt);cursor:pointer;font-family:inherit}
+
+  .opts{display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto}
+  .opt{
+    width:100%;text-align:left;padding:13px 14px;border-radius:12px;
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.35;
+    display:flex;gap:10px;align-items:baseline;
+  }
+  .opt i{font-style:normal;color:var(--dim);font-size:12px;font-weight:700;min-width:12px}
+  .opt:active{transform:scale(.99)}
+  .opt.right{background:#12301f;border-color:var(--accent);color:var(--accent)}
+  .opt.right i{color:var(--accent)}
+  .opt.wrong{background:#3a2226;border-color:var(--red);color:var(--red)}
+  .opt.wrong i{color:var(--red)}
+  .opt.mute{opacity:.45}
+  .opt[disabled]{cursor:default}
+
+  .typerow{display:flex;gap:8px}
+  .tin{
+    flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:12px;padding:14px;font-size:17px;font-family:inherit;font-weight:600;
+    -webkit-user-select:text;user-select:text;
+  }
+  .tin::placeholder{color:#5d6b7a;font-weight:400}
+  .tin.ok{border-color:var(--accent);color:var(--accent)}
+  .tin.no{border-color:var(--red);color:var(--red)}
+  .accrow{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .acc{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;
+    padding:8px 12px;font-size:16px;cursor:pointer;font-family:inherit}
+  .acc:active{transform:scale(.95)}
+
+  /* sheets */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:10;align-items:flex-end}
+  .sheet.open{display:flex}
+  .sheetbox{
+    background:var(--panel);width:100%;max-height:88vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);
+  }
+  .sheetbox h2{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:18px 0 10px}
+  .sheetbox h2:first-child{margin-top:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+    padding:8px 12px;border-radius:99px;font-size:13px;cursor:pointer;font-family:inherit;
+  }
+  .chip.sel{background:var(--accent);color:#06210f;border-color:var(--accent);font-weight:650}
+  .chip .n{opacity:.7;font-size:11px;margin-left:5px}
+  .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .row .btn{flex:1;text-align:center}
+  .addhint{font-size:12px;color:var(--dim);margin-top:9px;line-height:1.5}
+  .addhint b{color:var(--txt)}
+  .stat{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+  .close{width:100%;margin-top:22px;padding:14px;border-radius:14px;border:none;
+    background:var(--accent);color:#06210f;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+  .danger{background:transparent;color:var(--red);border:1px solid #4a2a2e}
+  .picker{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:11px;font-size:15px;font-weight:650;text-align:center;cursor:pointer;font-family:inherit}
+
+  /* reference view */
+  .sheet.full{align-items:stretch}
+  .sheet.full .sheetbox{border-radius:0;max-height:100vh;height:100%;padding-top:calc(14px + env(safe-area-inset-top))}
+  .studyhead{display:flex;align-items:center;gap:8px;position:sticky;top:0;
+    background:var(--panel);padding-bottom:10px;margin-bottom:4px;z-index:2}
+  .studyhead b{flex:1;font-size:16px}
+  .tbl{margin:16px 0 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .tbl h3{margin:0;padding:10px 14px;background:var(--panel2);font-size:12px;
+    text-transform:uppercase;letter-spacing:1.1px;color:var(--accent2)}
+  .tbl .r{display:flex;align-items:baseline;gap:10px;padding:10px 14px;border-top:1px solid var(--line);cursor:pointer}
+  .tbl .r:active{background:#1c2430}
+  .tbl .r .q{flex:1;font-size:14px;color:var(--dim)}
+  .tbl .r .a{font-size:16px;font-weight:650;text-align:right}
+  .note{font-size:12px;color:var(--amber);padding:10px 14px;border-top:1px solid var(--line);background:#1d1a12;line-height:1.5}
+  .studypad{padding-bottom:24px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Verbi <span>reference</span></h1>
+  <button class="btn" id="studyBtn">Study</button>
+  <button class="btn" id="modeBtn">Choice</button>
+  <button class="btn" id="setBtn">Deck</button>
+</header>
+<div class="bar"><i id="barFill"></i></div>
+<div class="meta"><span id="counter">—</span><span id="score">—</span></div>
+
+<main>
+  <div class="card" id="card">
+    <div class="tag" id="tag"></div>
+    <div id="front"></div>
+    <div class="answer" id="back"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</main>
+
+<footer><div id="controls"></div></footer>
+
+<div class="sheet full" id="studySheet">
+  <div class="sheetbox">
+    <div class="studyhead"><b id="studyTitle">Reference</b><button class="btn" id="studyClose">Done</button></div>
+    <div class="studypad" id="studyBody"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheetbox">
+    <h2>Test mode</h2>
+    <div class="chips" id="modeChips"></div>
+    <div class="addhint" id="modeHint"></div>
+
+    <h2>Sections</h2>
+    <div class="chips" id="catChips"></div>
+    <div class="row">
+      <button class="btn" id="allC">All</button>
+      <button class="btn" id="noneC">Clear</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="subC">Subjunctive block</button>
+      <button class="btn" id="formC">Forms drill</button>
+      <button class="btn" id="pastC">Past &amp; auxiliaries</button>
+    </div>
+    <div class="addhint"><b>Subjunctive block</b> is the congiuntivo presente, the imperfetto, and the three
+      hypotheticals — the part of the reference that actually decides whether a sentence sounds native.</div>
+
+    <h2>Order</h2>
+    <div class="chips" id="ordChips"></div>
+
+    <h2>Audio — Italian voice</h2>
+    <select id="voiceSel" class="picker" style="width:100%"></select>
+    <div class="row">
+      <button class="btn" id="autoSpk">Speak answer on reveal</button>
+      <button class="btn" id="testSpk">▶ Test</button>
+    </div>
+    <div class="stat" id="voiceStat"></div>
+
+    <h2>Progress</h2>
+    <div class="stat" id="progStat"></div>
+    <div class="row">
+      <button class="btn" id="resetKnownBtn">Reset known cards</button>
+      <button class="btn danger" id="resetBtn">Reset progress</button>
+    </div>
+    <button class="close" id="closeBtn">Start studying</button>
+  </div>
+</div>
+
+<script>
+/* =======================================================================
+   DATA — every drillable fact in "Italian Verb Reference"
+   Card: {cat, fam, q (Italian prompt), qs (what is being asked), a (answer),
+          alt[] (also accepted when typing), opts[] (fixed choice set),
+          note, ex, exen}
+   Distractors in Choice mode are drawn from cards sharing the same fam,
+   so the wrong answers are always the same kind of thing as the right one.
+   ======================================================================= */
+const CATS = [
+  {id:"radici",      label:"Irregular stems",   it:"Radici irregolari — futuro e condizionale"},
+  {id:"futuro",      label:"Future",            it:"Futuro semplice"},
+  {id:"condizionale",label:"Conditional",       it:"Condizionale presente"},
+  {id:"congiuntivo", label:"Subjunctive",       it:"Congiuntivo presente"},
+  {id:"congimpf",    label:"Impf. subjunctive", it:"Congiuntivo imperfetto"},
+  {id:"ipotetico",   label:"Hypotheticals",     it:"Il periodo ipotetico"},
+  {id:"ausiliari",   label:"Auxiliaries",       it:"Essere o avere"},
+  {id:"presente",    label:"Present irregulars",it:"Presente indicativo irregolare"},
+  {id:"participi",   label:"Participles",       it:"Participi passati irregolari"},
+  {id:"remoto",      label:"Passato remoto",    it:"Passato remoto"}
+];
+const PRESETS = {
+  sub:  ["congiuntivo","congimpf","ipotetico"],
+  form: ["radici","futuro","condizionale","presente"],
+  past: ["participi","remoto","ausiliari"]
+};
+
+const CARDS = [];
+const add = c => { CARDS.push(c); return c; };
+
+/* ---- 3. Irregular future & conditional stems ---- */
+[["essere","sar-","sarò · sarei"],["avere","avr-","avrò · avrei"],["fare","far-","farò · farei"],
+ ["dare","dar-","darò · darei"],["stare","star-","starò · starei"],["andare","andr-","andrò · andrei"],
+ ["dovere","dovr-","dovrò · dovrei"],["potere","potr-","potrò · potrei"],["sapere","sapr-","saprò · saprei"],
+ ["vedere","vedr-","vedrò · vedrei"],["vivere","vivr-","vivrò · vivrei"],["cadere","cadr-","cadrò · cadrei"],
+ ["bere","berr-","berrò · berrei"],["venire","verr-","verrò · verrei"],["volere","vorr-","vorrò · vorrei"],
+ ["tenere","terr-","terrò · terrei"],["rimanere","rimarr-","rimarrò · rimarrei"]
+].forEach(([inf,stem,ex])=> add({cat:"radici", fam:"stem", q:inf, qs:"irregular stem — future and conditional",
+  a:stem, alt:[stem.replace(/-$/,"")], ex:ex,
+  note:"Learn the contracted stem once and it serves both tenses — the endings stay perfectly regular. There is no such thing as an irregular future or conditional ending."}));
+
+add({cat:"radici", fam:"mean2", q:"verrebbe", qs:"whose conditional is this, and what does it mean?",
+  a:"he would come — venire", opts:["he would come — venire","he would want — volere","he would see — vedere","he would keep — tenere"],
+  note:"Verrebbe and vorrebbe are one letter apart and both extremely common. Listen for the r-r pair."});
+add({cat:"radici", fam:"mean2", q:"vorrebbe", qs:"whose conditional is this, and what does it mean?",
+  a:"he would want — volere", opts:["he would want — volere","he would come — venire","he would live — vivere","he would fall — cadere"],
+  note:"Vorrei / vorrebbe is the polite way to ask for anything in Italian: vorrei un caffè."});
+
+/* ---- 1. Future simple ---- */
+add({cat:"futuro", fam:"rule", q:"futuro semplice", qs:"which endings?",
+  a:"-ò, -ai, -à, -emo, -ete, -anno",
+  opts:["-ò, -ai, -à, -emo, -ete, -anno","-ei, -esti, -ebbe, -emmo, -este, -ebbero","-i, -i, -i, -iamo, -iate, -ino","-ai, -asti, -ò, -ammo, -aste, -arono"],
+  note:"Formation: -are drops the -e and changes a to e (parler-), -ere drops the -e (creder-), -ire drops the -e (dormir-). Then one single set of endings for all three."});
+add({cat:"futuro", fam:"rule", q:"parlerà, parlerò", qs:"why the written accent?",
+  a:"it is mandatory — parlera is not a word",
+  opts:["it is mandatory — parlera is not a word","it is optional in informal writing","it only marks the io form","it distinguishes the future from the conditional"],
+  note:"The io and lui/lei forms of the future carry a required accent. Dropping it is a spelling mistake, not a stylistic choice."});
+
+[["parlare","io","parlerò"],["credere","loro","crederanno"],["dormire","noi","dormiremo"],
+ ["prendere","tu","prenderai"],["essere","loro","saranno"],["avere","io","avrò"],
+ ["andare","tu","andrai"],["venire","lui / lei","verrà"],["volere","noi","vorremo"],
+ ["potere","voi","potrete"],["rimanere","io","rimarrò"],["bere","loro","berranno"],
+ ["fare","lui / lei","farà"],["dovere","io","dovrò"],["sapere","noi","sapremo"],["vedere","tu","vedrai"]
+].forEach(([inf,p,f])=> add({cat:"futuro", fam:"futform", q:inf, qs:"futuro semplice · "+p, a:f}));
+
+[["cercare","io","cercherò","-care and -gare insert an h to keep the hard sound."],
+ ["pagare","noi","pagheremo","-care and -gare insert an h to keep the hard sound."],
+ ["cominciare","io","comincerò","-ciare and -giare drop the i — but only when it is unstressed."],
+ ["mangiare","lui / lei","mangerà","-ciare and -giare drop the i — but only when it is unstressed."],
+ ["sciare","io","scierò","A stressed i survives: sciare → scierò, avviare → avvierò."]
+].forEach(([inf,p,f,n])=> add({cat:"futuro", fam:"futform", q:inf, qs:"futuro semplice · "+p, a:f, note:n}));
+
+/* ---- 2. Present conditional ---- */
+add({cat:"condizionale", fam:"rule", q:"condizionale presente", qs:"which endings?",
+  a:"-ei, -esti, -ebbe, -emmo, -este, -ebbero",
+  opts:["-ei, -esti, -ebbe, -emmo, -este, -ebbero","-ò, -ai, -à, -emo, -ete, -anno","-ssi, -ssi, -sse, -ssimo, -ste, -ssero","-a, -a, -a, -iamo, -iate, -ano"],
+  note:"Same stem as the future — learn the stem once, then choose which set of endings you want."});
+
+[["parlare","io","parlerei"],["essere","io","sarei"],["avere","tu","avresti"],["volere","io","vorrei"],
+ ["potere","io","potrei"],["dovere","io","dovrei"],["venire","lui / lei","verrebbe"],["andare","noi","andremmo"],
+ ["fare","io","farei"],["rimanere","lui / lei","rimarrebbe"],["bere","io","berrei"],["dare","loro","darebbero"],
+ ["sapere","tu","sapresti"],["vedere","lui / lei","vedrebbe"],["tenere","io","terrei"],["credere","voi","credereste"]
+].forEach(([inf,p,f])=> add({cat:"condizionale", fam:"condform", q:inf, qs:"condizionale presente · "+p, a:f}));
+
+[["parleremo","futuro — we will speak"],["parleremmo","condizionale — we would speak"],
+ ["saremo","futuro — we will be"],["saremmo","condizionale — we would be"],
+ ["andremo","futuro — we will go"],["andremmo","condizionale — we would go"],
+ ["avremo","futuro — we will have"],["avremmo","condizionale — we would have"],
+ ["prenderemo","futuro — we will take"],["prenderemmo","condizionale — we would take"]
+].forEach(([f,a])=> add({cat:"condizionale", fam:"mm", q:f, qs:"futuro or condizionale?", a:a,
+  opts:["futuro — we will "+a.split(" ").slice(-1)[0], "condizionale — we would "+a.split(" ").slice(-1)[0]],
+  note:"The noi forms differ only by a doubled consonant. One m is the future, two m's is the conditional — the single most missable letter in Italian."}));
+
+/* ---- 4. Present subjunctive ---- */
+add({cat:"congiuntivo", fam:"rule", q:"-are verbs", qs:"congiuntivo presente endings",
+  a:"-i, -i, -i, -iamo, -iate, -ino",
+  opts:["-i, -i, -i, -iamo, -iate, -ino","-a, -a, -a, -iamo, -iate, -ano","-ò, -ai, -à, -emo, -ete, -anno","-ssi, -ssi, -sse, -ssimo, -ste, -ssero"],
+  note:"The vowels swap: -are verbs take the -i endings, -ere and -ire verbs take the -a endings."});
+add({cat:"congiuntivo", fam:"rule", q:"-ere and -ire verbs", qs:"congiuntivo presente endings",
+  a:"-a, -a, -a, -iamo, -iate, -ano",
+  opts:["-a, -a, -a, -iamo, -iate, -ano","-i, -i, -i, -iamo, -iate, -ino","-ei, -esti, -ebbe, -emmo, -este, -ebbero","-ai, -asti, -ò, -ammo, -aste, -arono"],
+  note:"The vowels swap: -are verbs take the -i endings, -ere and -ire verbs take the -a endings."});
+add({cat:"congiuntivo", fam:"rule", q:"che io parli, che tu parli, che lui parli", qs:"what follows from this?",
+  a:"the subject pronoun is usually kept",
+  opts:["the subject pronoun is usually kept","the pronoun is always dropped","only the io form needs a pronoun","the forms are actually different in speech"],
+  note:"The first three persons are identical, which is why Italian keeps the pronoun here far more often than elsewhere: Penso che tu abbia ragione. The noi form is also identical to the present indicative."});
+add({cat:"congiuntivo", fam:"rule", q:"vengo, esco, dico, faccio", qs:"how do you build the irregular congiuntivo?",
+  a:"take the io indicative, drop -o, add -a",
+  opts:["take the io indicative, drop -o, add -a","take the infinitive and add -a","use the future stem plus -a","there is no shortcut — memorize all six"],
+  note:"vengo → venga · esco → esca · dico → dica · faccio → faccia · vado → vada · posso → possa · voglio → voglia. That form serves all three singular persons; loro adds -no, noi is identical to the indicative noi, and voi is that same stem plus -iate."});
+add({cat:"congiuntivo", fam:"rule", q:"essere, avere, dare, stare, sapere, dovere", qs:"what do these six have in common?",
+  a:"the io-indicative shortcut fails — memorize them",
+  opts:["the io-indicative shortcut fails — memorize them","they have no congiuntivo at all","they are the only regular ones","they take the -i endings instead"],
+  note:"Their noi and voi forms still follow the ordinary rule. Dovere also yields deva, which is accepted, though debba is standard."});
+
+[["essere","sia"],["avere","abbia"],["fare","faccia"],["stare","stia"],["dare","dia"],["andare","vada"],
+ ["potere","possa"],["volere","voglia"],["dovere","debba"],["sapere","sappia"],["dire","dica"],["bere","beva"],
+ ["venire","venga"],["uscire","esca"],["tenere","tenga"],["rimanere","rimanga"],["salire","salga"],["scegliere","scelga"],
+ ["parlare","parli"],["credere","creda"],["dormire","dorma"],["prendere","prenda"],["finire","finisca"]
+].forEach(([inf,f])=> add({cat:"congiuntivo", fam:"congio", q:inf, qs:"congiuntivo presente · che io / tu / lui", a:f,
+  note:"All three singular persons share this one form."}));
+
+[["essere","noi","siamo"],["essere","voi","siate"],["essere","loro","siano"],
+ ["avere","voi","abbiate"],["avere","loro","abbiano"],["fare","noi","facciamo"],["fare","voi","facciate"],
+ ["andare","voi","andiate"],["andare","loro","vadano"],["parlare","loro","parlino"],["parlare","voi","parliate"],
+ ["credere","loro","credano"],["finire","loro","finiscano"],["dormire","loro","dormano"],["venire","loro","vengano"]
+].forEach(([inf,p,f])=> add({cat:"congiuntivo", fam:"congother", q:inf, qs:"congiuntivo presente · che "+p, a:f}));
+
+[["Penso che…","congiuntivo","Opinion and belief: Penso che sia vero."],
+ ["So che…","indicativo","A fact you are claiming to know stays in the indicative: So che parli italiano."],
+ ["Dubito che…","congiuntivo","Doubt: Dubito che venga."],
+ ["Sono sicuro che…","indicativo","Certainty is a fact, not a filter: Sono sicuro che viene."],
+ ["Bisogna che…","congiuntivo","Impersonal: Bisogna che tu vada."],
+ ["È vero che…","indicativo","Stating something as true keeps the indicative."],
+ ["Mi dispiace che…","congiuntivo","Emotion: Mi dispiace che tu stia male."],
+ ["Spero che…","congiuntivo","Will and hope: Spero che tu abbia ragione."],
+ ["Ho paura che…","congiuntivo","Emotion again — fear counts."],
+ ["Benché…","congiuntivo","The conjunctions keep the subjunctive whatever the subject: Benché io sia stanco, esco."]
+].forEach(([opener,mood,n])=> add({cat:"congiuntivo", fam:"trigger", q:opener, qs:"indicativo or congiuntivo?",
+  a:mood, opts:["congiuntivo","indicativo"], note:n}));
+
+[["penso","di + infinito","Penso di avere ragione."],
+ ["spero","di + infinito","Spero di venire."],
+ ["credo","di + infinito","Credo di sapere la risposta."],
+ ["ho paura","di + infinito","Ho paura di sbagliare."],
+ ["mi dispiace","di + infinito","Mi dispiace di averlo detto."],
+ ["voglio","infinito da solo","Voglio partire — never ✗ Voglio di partire."],
+ ["preferisco","infinito da solo","Preferisco restare a casa."],
+ ["posso","infinito da solo","Posso venire con te?"],
+ ["devo","infinito da solo","Devo studiare stasera."],
+ ["bisogna","infinito da solo","Bisogna partire presto."],
+ ["è necessario","infinito da solo","È necessario prenotare."]
+].forEach(([v,link,ex])=> add({cat:"congiuntivo", fam:"linker", q:v+" + …", qs:"same subject — which linker?",
+  a:link, opts:["di + infinito","infinito da solo"], ex:ex,
+  note:"This applies only to the verb + che group. The conjunctions (benché, prima che, affinché…) keep the subjunctive even when the subject is the same."}));
+
+add({cat:"congiuntivo", fam:"rule", q:"congiuntivo passato", qs:"how is it built?",
+  a:"congiuntivo of avere / essere + participle",
+  opts:["congiuntivo of avere / essere + participle","future stem + -a endings","infinitive minus -re + -ssi","imperfect of avere / essere + participle"],
+  note:"Penso che sia già partito · Credo che abbiano già mangiato."});
+
+/* ---- 5. Imperfect subjunctive ---- */
+add({cat:"congimpf", fam:"rule", q:"congiuntivo imperfetto", qs:"how is it formed?",
+  a:"infinitive minus -re, then -ssi, -ssi, -sse, -ssimo, -ste, -ssero",
+  opts:["infinitive minus -re, then -ssi, -ssi, -sse, -ssimo, -ste, -ssero","future stem plus -ssi","io indicative minus -o, plus -a","infinitive plus -ei, -esti, -ebbe"],
+  note:"parlare → parla- → parlassi · credere → crede- → credessi · dormire → dormi- → dormissi."});
+add({cat:"congimpf", fam:"rule", q:"parlaste, credeste, dormiste", qs:"what is special about the voi form?",
+  a:"it has a single s — every other person doubles it",
+  opts:["it has a single s — every other person doubles it","it is identical to the indicative","it takes an accent","it borrows the passato remoto"],
+  note:"parlassi, parlassi, parlasse, parlassimo, parlaste, parlassero — the voi form is the odd one out."});
+add({cat:"congimpf", fam:"rule", q:"venire", qs:"does it use the verr- stem here?",
+  a:"no — it is regular: venissi",
+  opts:["no — it is regular: venissi","yes — verressi","yes, but only in the voi form","it has no imperfect subjunctive"],
+  note:"The verr- stem belongs only to the future and the conditional. In the congiuntivo imperfetto venire is completely regular."});
+
+[["parlare","io","parlassi"],["credere","tu","credessi"],["dormire","lui / lei","dormisse"],
+ ["prendere","noi","prendessimo"],["venire","loro","venissero"],["parlare","voi","parlaste"],
+ ["credere","voi","credeste"],["essere","io","fossi"],["essere","lui / lei","fosse"],["essere","noi","fossimo"],
+ ["essere","loro","fossero"],["dare","io","dessi"],["stare","io","stessi"],["fare","io","facessi"],
+ ["dire","io","dicessi"],["bere","io","bevessi"],["avere","io","avessi"],["dare","loro","dessero"],["stare","noi","stessimo"]
+].forEach(([inf,p,f])=> add({cat:"congimpf", fam:"impf", q:inf, qs:"congiuntivo imperfetto · "+p, a:f}));
+
+/* ---- 6. The three hypotheticals ---- */
+[["Se piove, resto a casa.","Type 1 — della realtà","Real and likely: se + indicative → present, future, or imperative."],
+ ["Se hai fame, mangia qualcosa.","Type 1 — della realtà","The result clause can be an imperative."],
+ ["Se domani fa bel tempo, andiamo al mare.","Type 1 — della realtà","Still Type 1 — a plain likely condition."],
+ ["Se avessi tempo, andrei in palestra.","Type 2 — della possibilità","se + congiuntivo imperfetto → condizionale presente."],
+ ["Se fossi ricco, comprerei una casa al mare.","Type 2 — della possibilità","Imagined but still possible."],
+ ["Se fossi in te, non lo farei.","Type 2 — della possibilità","A fixed idiom: if I were you."],
+ ["Se avessi saputo, sarei venuto.","Type 3 — dell'irrealtà","se + congiuntivo trapassato → condizionale passato. Too late now."],
+ ["Se fosse partito prima, non avrebbe perso il treno.","Type 3 — dell'irrealtà","Counterfactual: it did not happen."],
+ ["Se avessi studiato medicina, ora sarei medico.","mixed — past condition, present result","se + congiuntivo trapassato → condizionale presente. The pattern you will actually need."]
+].forEach(([s,t,n])=> add({cat:"ipotetico", fam:"type", q:s, qs:"which hypothetical?", a:t,
+  opts:["Type 1 — della realtà","Type 2 — della possibilità","Type 3 — dell'irrealtà","mixed — past condition, present result"], note:n}));
+
+[["Se avessi tempo, ___ in palestra.","andrei","condizionale presente"],
+ ["Se fossi ricco, ___ una casa al mare.","comprerei","condizionale presente"],
+ ["Se potessi, ti ___.","aiuterei","condizionale presente"],
+ ["Se sapessi la risposta, te la ___.","direi","condizionale presente"],
+ ["Se venissi con me, ___ contento.","sarei","condizionale presente"],
+ ["Se avessi saputo, ___ venuto.","sarei","condizionale passato — sarei venuto"],
+ ["Se avessi studiato, ___ passato l'esame.","avresti","condizionale passato — avresti passato"],
+ ["Se me l'avessi detto, ti ___ aiutato.","avrei","condizionale passato — avrei aiutato"],
+ ["Se fossi partito ieri, adesso ___ a Roma.","sarei","mixed pattern — condizionale presente"]
+].forEach(([s,f,n])=> add({cat:"ipotetico", fam:"hyp", q:s, qs:"complete the result clause", a:f, note:n}));
+
+[["Se ___ tempo, verrei.","avessi","✗ Se avrei tempo. Never a conditional after se."],
+ ["Se ___ in te, non lo farei.","fossi","✗ Se sarei in te. The conditional lives only in the result clause."],
+ ["Se non ___ così caro, lo comprerei.","fosse","Type 2 takes the congiuntivo imperfetto in the se clause."],
+ ["Se ___ piovuto, saremmo andati al mare.","non avesse","Type 3 takes the congiuntivo trapassato in the se clause."]
+].forEach(([s,f,n])=> add({cat:"ipotetico", fam:"hypse", q:s, qs:"fill the se clause", a:f, note:n+" This is the single most common mistake English speakers make."}));
+
+add({cat:"ipotetico", fam:"rule", q:"Non so se verrebbe.", qs:"is this conditional after se allowed?",
+  a:"yes — here se means whether",
+  opts:["yes — here se means whether","no, it is always wrong","only in speech","only with essere"],
+  note:"The ban on a conditional after se applies to hypothetical se. When se means whether, the conditional is fine."});
+add({cat:"ipotetico", fam:"rule", q:"Se lo sapevo, venivo.", qs:"what register is this?",
+  a:"casual speech — not accepted in writing",
+  opts:["casual speech — not accepted in writing","standard written Italian","a Type 1 hypothetical","a regional error only"],
+  note:"In casual speech Italians often flatten Type 3 into the imperfect indicative in both clauses. Recognize it, but do not imitate it on an exam."});
+
+/* ---- 7. Auxiliaries ---- */
+add({cat:"ausiliari", fam:"rule", q:"essere or avere?", qs:"what is the default rule?",
+  a:"avere for transitive verbs; essere for directional motion and change of state",
+  opts:["avere for transitive verbs; essere for directional motion and change of state","essere for every intransitive verb","avere for every verb except essere","essere whenever the verb describes motion"],
+  note:"Motion alone is not the test — camminare, viaggiare, nuotare and passeggiare all take avere. What matters is motion toward a goal, or a change of state. Every reflexive takes essere."});
+
+[["andare","essere"],["venire","essere"],["arrivare","essere"],["partire","essere"],["tornare","essere"],
+ ["entrare","essere"],["restare","essere"],["rimanere","essere"],["stare","essere"],["essere","essere"],
+ ["nascere","essere"],["morire","essere"],["diventare","essere"],["piacere","essere"],["succedere","essere"],
+ ["costare","essere"],["ogni verbo riflessivo","essere"],
+ ["camminare","avere"],["viaggiare","avere"],["nuotare","avere"],["passeggiare","avere"],["tuonare","avere"]
+].forEach(([v,aux])=> add({cat:"ausiliari", fam:"aux", q:v, qs:"which auxiliary?", a:aux, opts:["essere","avere"],
+  note:aux==="essere" ? "Essere verbs agree with the subject: sono andato / sono andata." : "Participle stays invariable with avere."}));
+
+[["___ finito il lavoro.","avere","Ho finito il lavoro — with a direct object, finire takes avere."],
+ ["Il film ___ finito.","essere","Il film è finito — no object, so essere."],
+ ["___ cominciato il libro.","avere","Ho cominciato il libro — with an object."],
+ ["La lezione ___ cominciata.","essere","La lezione è cominciata — no object, and the participle agrees."],
+ ["___ cambiato idea.","avere","Ho cambiato idea — idea is the object."],
+ ["Il tempo ___ cambiato.","essere","Il tempo è cambiato — a change of state, no object."],
+ ["___ passato l'esame.","avere","Ho passato l'esame — with an object."],
+ ["___ passato un anno.","essere","È passato un anno — no object."],
+ ["___ salito le scale.","avere","Ho salito le scale — le scale is a direct object."],
+ ["___ salito sul treno.","essere","Sono salito sul treno — motion toward a goal, no object."],
+ ["___ vissuto una bella vita.","avere","Ho vissuto una bella vita — with an object."],
+ ["___ vissuto a Roma.","essere","È vissuto a Roma — though ha vissuto a Roma is equally standard."]
+].forEach(([s,f,n])=> add({cat:"ausiliari", fam:"dual", q:s, qs:"dual-auxiliary verb — which one?", a:f,
+  opts:["avere","essere"], note:n}));
+
+add({cat:"ausiliari", fam:"rule", q:"piovere", qs:"è piovuto or ha piovuto?",
+  a:"both are correct",
+  opts:["both are correct","only avere","only essere","neither — piovere has no compound"],
+  note:"Same for nevicare and grandinare. Tendency: avere when stressing duration (ha piovuto tutta la notte), essere for the completed event (è piovuto, la strada è bagnata). Used figuratively with a real subject, only essere: sono piovute critiche. And weather built on fare always takes avere: ha fatto freddo."});
+add({cat:"ausiliari", fam:"rule", q:"vivere", qs:"how strict is the auxiliary here?",
+  a:"loose — ha vissuto a Roma is as standard as è vissuto a Roma",
+  opts:["loose — ha vissuto a Roma is as standard as è vissuto a Roma","strictly essere","strictly avere","it has no compound tenses"],
+  note:"Costare also takes avere in its figurative use: mi ha costato molta fatica."});
+
+/* ---- 8. Everyday irregular present indicative ---- */
+[["essere","io","sono"],["essere","lui / lei","è"],["essere","voi","siete"],["avere","loro","hanno"],
+ ["avere","noi","abbiamo"],["fare","io","faccio"],["fare","voi","fate"],["fare","loro","fanno"],
+ ["stare","loro","stanno"],["stare","io","sto"],["andare","io","vado"],["andare","loro","vanno"],
+ ["dare","lui / lei","dà"],["dare","loro","danno"],["potere","io","posso"],["potere","loro","possono"],
+ ["volere","io","voglio"],["volere","loro","vogliono"],["dovere","io","devo"],["dovere","noi","dobbiamo"],
+ ["sapere","io","so"],["sapere","loro","sanno"],["dire","io","dico"],["dire","voi","dite"],["dire","loro","dicono"],
+ ["bere","io","bevo"],["bere","loro","bevono"],["venire","io","vengo"],["venire","loro","vengono"],
+ ["uscire","io","esco"],["uscire","loro","escono"],["tenere","io","tengo"],["rimanere","io","rimango"],
+ ["salire","io","salgo"],["scegliere","io","scelgo"],["scegliere","loro","scelgono"]
+].forEach(([inf,p,f])=> add({cat:"presente", fam:"presform", q:inf, qs:"presente indicativo · "+p, a:f}));
+
+/* ---- Irregular past participles ---- */
+[["fare","fatto"],["dire","detto"],["essere","stato"],["prendere","preso"],["mettere","messo"],
+ ["scrivere","scritto"],["leggere","letto"],["vedere","visto"],["aprire","aperto"],["offrire","offerto"],
+ ["chiudere","chiuso"],["chiedere","chiesto"],["rispondere","risposto"],["rimanere","rimasto"],
+ ["scegliere","scelto"],["vincere","vinto"],["perdere","perso"],["decidere","deciso"],["vivere","vissuto"],
+ ["nascere","nato"],["morire","morto"],["rompere","rotto"],["correre","corso"],["spegnere","spento"],
+ ["accorgersi","accorto"],["succedere","successo"]
+].forEach(([inf,p])=> add({cat:"participi", fam:"part", q:inf, qs:"participio passato", a:p}));
+
+/* ---- 9. Passato remoto ---- */
+add({cat:"remoto", fam:"rule", q:"passato remoto", qs:"what is it for?",
+  a:"a completed action cut off from the present — narrative",
+  opts:["a completed action cut off from the present — narrative","an ongoing past action","a past action with present relevance","a polite request"],
+  note:"The tense of novels, history and fairy tales — and ordinary spoken usage in central and southern Italy, where northern speakers would say ho preso. Even if you never produce it, you need to read it."});
+add({cat:"remoto", fam:"rule", q:"presi, prendesti, prese, prendemmo, prendeste, presero", qs:"which persons go irregular?",
+  a:"three only — io, lui/lei, loro",
+  opts:["three only — io, lui/lei, loro","all six","only io","only the plural"],
+  note:"The other three (tu, noi, voi) keep the verb's ordinary stem — the same one the imperfetto uses. That is why fare, dire and bere give facesti, dicesti, bevesti."});
+add({cat:"remoto", fam:"rule", q:"presi", qs:"how do you get lui/lei and loro from the io form?",
+  a:"drop the -i and add -e; add -ero for loro",
+  opts:["drop the -i and add -e; add -ero for loro","add -o and -ono","add -ette and -ettero","they are unpredictable"],
+  note:"presi → prese → presero. Learn the io form and the rest follows."});
+add({cat:"remoto", fam:"rule", q:"essere, dare, stare", qs:"what is unusual about these three?",
+  a:"irregular in all six persons — memorize them whole",
+  opts:["irregular in all six persons — memorize them whole","completely regular","irregular only in io","they have no passato remoto"],
+  note:"fui, fosti, fu, fummo, foste, furono · desti, demmo, deste · stesti, stemmo, steste. Andare, by contrast, is completely regular here: andai, andasti, andò."});
+
+[["avere","ebbi"],["fare","feci"],["dare","diedi"],["stare","stetti"],["dire","dissi"],["vedere","vidi"],
+ ["venire","venni"],["volere","volli"],["sapere","seppi"],["tenere","tenni"],["bere","bevvi"],["prendere","presi"],
+ ["mettere","misi"],["scrivere","scrissi"],["leggere","lessi"],["chiedere","chiesi"],["rispondere","risposi"],
+ ["rimanere","rimasi"],["vivere","vissi"],["nascere","nacqui"],["conoscere","conobbi"],["scegliere","scelsi"],
+ ["vincere","vinsi"],["chiudere","chiusi"],["decidere","decisi"],["rompere","ruppi"],["essere","fui"],["andare","andai"]
+].forEach(([inf,f])=> add({cat:"remoto", fam:"remio", q:inf, qs:"passato remoto · io", a:f,
+  note:inf==="andare" ? "Andare is completely regular in the passato remoto." : ""}));
+
+[["presi","lui / lei","prese"],["presi","loro","presero"],["feci","loro","fecero"],["ebbi","lui / lei","ebbe"],
+ ["venni","loro","vennero"],["dissi","lui / lei","disse"],["fui","loro","furono"],["fui","tu","fosti"],
+ ["vidi","loro","videro"],["seppi","lui / lei","seppe"]
+].forEach(([io,p,f])=> add({cat:"remoto", fam:"rem3", q:io+" → "+p, qs:"passato remoto", a:f}));
+
+[["parlare","io","parlai"],["parlare","lui / lei","parlò"],["parlare","loro","parlarono"],
+ ["credere","io","credei"],["credere","lui / lei","credé"],["dormire","io","dormii"],["dormire","lui / lei","dormì"],
+ ["prendere","tu","prendesti"],["prendere","noi","prendemmo"]
+].forEach(([inf,p,f])=> add({cat:"remoto", fam:"remreg", q:inf, qs:"passato remoto · "+p, a:f,
+  alt: f==="credei" ? ["credetti"] : (f==="credé" ? ["credette"] : []),
+  note:f==="credei"||f==="credé" ? "Regular -ere verbs also allow the -etti set in these three persons: credetti, credette, credettero. Both are standard. The exception is a stem already ending in -t-, which takes only the plain set: potere → potei, poté, poterono." : ""}));
+
+[["comprendere","compreso"],["scendere","sceso"],["rendere","reso"],["spendere","speso"],["accendere","acceso"],
+ ["offendere","offeso"],["difendere","difeso"],["sorprendere","sorpreso"],["riprendere","ripreso"],["apprendere","appreso"]
+].forEach(([inf,p])=> add({cat:"remoto", fam:"fam", q:inf, qs:"participio passato — the prendere family", a:p,
+  note:"Prendere is regular everywhere except two places: the participle preso and the passato remoto presi / prese / presero. Every compound inherits both, and many other -ndere verbs follow the same -so participle / -si remoto shape."}));
+[["rispondere","risposto"],["nascondere","nascosto"],["vendere","venduto"]
+].forEach(([inf,p])=> add({cat:"remoto", fam:"fam", q:inf, qs:"participio passato — does it follow the -so family?", a:p,
+  note:"A family resemblance, not a rule: rispondere and nascondere break the -so pattern, and vendere is entirely regular (venduto, vendei)."}));
+
+/* =======================================================================
+   ENGINE
+   ======================================================================= */
+const MODES = [
+  {id:"choice", label:"Choice", hint:"The Italian prompt on the card, four answers underneath — tap one or press 1–4. Graded for you."},
+  {id:"type",   label:"Type",   hint:"Type the form yourself, accents and all. The accent buttons under the box insert à è é ì ò ù. Cards that ask you to choose between fixed options stay multiple choice."},
+  {id:"recall", label:"Recall", hint:"Say the answer out loud, reveal it, then rate yourself Again or Got it."}
+];
+const catLabel = id => (CATS.find(c=>c.id===id)||{}).label || id;
+
+const KEY = "verbiref_v1";
+let S = {
+  ver:1, mode:"choice", cats:CATS.map(c=>c.id), order:"section",
+  speak:false, voiceName:"", stats:{}, known:{}, seen:0, right:0
+};
+try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
+
+let deck=[], pos=0, flipped=false, answered=false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const cid = c => c.cat+"|"+c.q+"|"+c.qs;
+
+function pool(){ return CARDS.filter(c=>S.cats.includes(c.cat)); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function buildDeck(){
+  let list = pool().filter(c=>!S.known[cid(c)]);
+  if(S.order==="random") shuffle(list);
+  else{
+    const ord = CATS.map(c=>c.id);
+    list.sort((a,b)=> ord.indexOf(a.cat)-ord.indexOf(b.cat) || CARDS.indexOf(a)-CARDS.indexOf(b));
+  }
+  deck=list; pos=0; render();
+}
+
+function optionsFor(c){
+  if(c.opts && c.opts.length){
+    const list = c.opts.slice();
+    if(!list.includes(c.a)) list.push(c.a);
+    return {correct:c.a, list:list.length>2 ? shuffle(list) : list};
+  }
+  const same  = shuffle(CARDS.filter(x=>x!==c && x.fam===c.fam && x.a!==c.a));
+  const other = shuffle(CARDS.filter(x=>x!==c && x.fam!==c.fam && x.a!==c.a && !x.opts));
+  const picks=[];
+  const push = x => { if(picks.length<3 && !picks.some(p=>p.a===x.a)) picks.push(x); };
+  same.forEach(push); other.forEach(push);
+  return {correct:c.a, list:shuffle(picks.map(x=>x.a).concat(c.a))};
+}
+
+/* answers that are a real Italian form can be typed; fixed-choice cards cannot */
+const typable = c => !c.opts;
+
+const norm = s => String(s||"").toLowerCase().trim()
+  .replace(/[.!?]+$/,"").replace(/-+$/,"").replace(/\s+/g," ").replace(/[’']/g,"'");
+const strip = s => norm(s).replace(/[àá]/g,"a").replace(/[èé]/g,"e").replace(/[ìí]/g,"i")
+  .replace(/[òó]/g,"o").replace(/[ùú]/g,"u");
+
+function answersFor(c){ return [c.a].concat(c.alt||[]); }
+
+/* ---------------- RENDER ---------------- */
+function backHTML(c){
+  return '<div class="big'+(c.a.length>22?" sm":"")+'" style="color:var(--accent)">'+esc(c.a)+'</div>'+
+    (c.alt&&c.alt.length ? '<div class="sub">also correct: '+esc(c.alt.join(" · "))+'</div>' : '')+
+    (c.ex ? '<div class="ex"><div class="exit">'+esc(c.ex)+'</div>'+(c.exen?'<div class="exen">'+esc(c.exen)+'</div>':'')+'</div>' : '')+
+    '<div class="spkrow"><button class="spk" id="spkBtn">🔊 ascolta</button></div>'+
+    (c.note ? '<div class="pron">'+esc(c.note)+'</div>' : '');
+}
+
+function render(){
+  const card=$("card");
+  card.classList.remove("flipped"); flipped=false; answered=false;
+  card.classList.toggle("tappable", S.mode==="recall");
+  $("hint").textContent = S.mode==="recall" ? "tap to reveal" : "";
+
+  if(!deck.length){
+    $("tag").textContent="";
+    $("front").innerHTML='<div class="big">All done! ✓</div><div class="sub">Every selected card is retired as known, or no section is selected. Open “Deck” to reset known cards or pick more sections.</div>';
+    $("back").innerHTML=""; $("controls").innerHTML="";
+    $("counter").textContent="—"; $("score").textContent="—"; $("barFill").style.width="0";
+    return;
+  }
+  if(pos>=deck.length){ buildDeck(); return; }
+
+  const c = deck[pos];
+  $("tag").textContent = catLabel(c.cat).toUpperCase();
+  $("front").innerHTML = '<div class="prompt">'+esc(c.qs)+'</div>'+
+                         '<div class="big'+(c.q.length>26?" sm":"")+'">'+esc(c.q)+'</div>';
+  $("back").innerHTML = backHTML(c);
+
+  if(S.mode==="recall"){
+    $("controls").innerHTML = '<button class="single" id="revealBtn">Reveal</button>';
+    $("revealBtn").onclick = flip;
+  }else if(S.mode==="type" && typable(c)){
+    $("controls").innerHTML =
+      '<div class="typerow"><input class="tin" id="typeIn" placeholder="type the answer…" '+
+      'autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">'+
+      '<button class="btn" id="checkBtn" style="padding:0 18px">Check</button></div>'+
+      '<div class="accrow">'+["à","è","é","ì","ò","ù"].map(a=>'<button class="acc" data-a="'+a+'">'+a+'</button>').join("")+'</div>';
+    const inp = $("typeIn");
+    $("checkBtn").onclick = ()=>checkTyped(inp, c);
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); checkTyped(inp,c); } });
+    $("controls").querySelectorAll(".acc").forEach(b=> b.onclick = ()=>{
+      const s=inp.selectionStart||inp.value.length;
+      inp.value = inp.value.slice(0,s)+b.dataset.a+inp.value.slice(inp.selectionEnd||s);
+      inp.focus(); inp.setSelectionRange(s+1,s+1);
+    });
+    setTimeout(()=>inp.focus(),0);
+  }else{
+    const o = optionsFor(c);
+    $("controls").innerHTML = '<div class="opts">'+o.list.map((t,i)=>
+      '<button class="opt" data-v="'+esc(t)+'"><i>'+(i+1)+'</i><span>'+esc(t)+'</span></button>').join("")+'</div>';
+    $("controls").querySelectorAll(".opt").forEach(b=> b.onclick = ()=>choose(b,o.correct));
+  }
+
+  const st = S.stats[cid(c)];
+  $("counter").textContent = (pos+1)+" / "+deck.length + (st ? "  ·  ✓"+st.r+" ✗"+st.w : "");
+  const pct = S.seen ? Math.round(S.right/S.seen*100) : 0;
+  $("score").textContent = S.seen ? pct+"% correct ("+S.seen+" answered)" : "no answers yet";
+  $("barFill").style.width = (pos/deck.length*100)+"%";
+}
+
+function wireSpeak(){
+  const c = deck[pos]; if(!c) return;
+  const b=$("spkBtn");
+  const say = (c.ex && /[a-z]\s/i.test(c.ex)) ? c.ex : (c.a.replace(/-$/,"")+(c.ex?". "+c.ex:""));
+  if(b) b.onclick = e=>{ e.stopPropagation(); speak(say); };
+  if(S.speak) speak(say, true);
+}
+function reveal(){ flipped=true; $("card").classList.add("flipped"); wireSpeak(); }
+
+function flip(){
+  if(!deck.length || flipped) return;
+  reveal();
+  $("controls").innerHTML = '<div class="rate"><button class="again" id="againBtn">Again</button>'+
+                            '<button class="good" id="goodBtn">Got it</button></div>';
+  $("againBtn").onclick = ()=>rate(false);
+  $("goodBtn").onclick  = ()=>rate(true);
+}
+
+function nextButton(label, ok){
+  const n = document.createElement("button");
+  n.className="single"; n.style.marginTop="10px"; n.textContent=label;
+  n.onclick = ()=>rate(ok);
+  $("controls").appendChild(n); n.focus();
+}
+
+function choose(btn, correct){
+  if(answered) return; answered=true;
+  const ok = btn.dataset.v === correct;
+  $("controls").querySelectorAll(".opt").forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.v===correct) b.classList.add("right");
+    else if(b===btn) b.classList.add("wrong");
+    else b.classList.add("mute");
+  });
+  reveal();
+  nextButton(ok ? "Correct ✓ — next" : "Next", ok);
+}
+
+function checkTyped(inp, c){
+  if(answered) return;
+  const got = norm(inp.value);
+  if(!got) return;
+  const answers = answersFor(c);
+  const exact = answers.some(a=>norm(a)===got);
+  const loose = answers.some(a=>strip(a)===strip(got));
+  answered = true;
+  inp.disabled = true;
+  inp.classList.add(exact ? "ok" : "no");
+  reveal();
+  if(!exact && loose){
+    const b=document.createElement("div");
+    b.className="badge warn"; b.textContent="right word, wrong accents";
+    $("back").prepend(b);
+  }
+  nextButton(exact ? "Correct ✓ — next" : (loose ? "Accents count — next" : "Next"), exact);
+}
+
+function rate(ok){
+  const c = deck[pos], id = cid(c);
+  const st = S.stats[id] || {r:0,w:0};
+  ok ? st.r++ : st.w++;
+  S.stats[id]=st;
+  if(ok) S.known[id]=true;
+  S.seen++; if(ok) S.right++;
+  if(!ok){ const at=Math.min(pos+6, deck.length); deck.splice(at,0,c); }
+  save(); pos++; render();
+}
+
+$("card").onclick = ()=>{ if(S.mode==="recall" && !flipped) flip(); };
+
+document.addEventListener("keydown", e=>{
+  if($("sheet").classList.contains("open") || $("studySheet").classList.contains("open")) return;
+  const typing = document.activeElement && document.activeElement.id==="typeIn";
+  if((e.key===" "||e.key==="Enter") && !typing){
+    e.preventDefault();
+    if(S.mode==="recall" && !flipped) return flip();
+    const n=$("controls").querySelector(".single"); if(n) n.click();
+    return;
+  }
+  if(!typing && /^[1-4]$/.test(e.key)){
+    const b=$("controls").querySelectorAll(".opt")[+e.key-1]; if(b && !b.disabled) b.click();
+  }
+  if(!typing && flipped && S.mode==="recall"){
+    if(e.key==="a"||e.key==="A") rate(false);
+    if(e.key==="g"||e.key==="G") rate(true);
+  }
+});
+
+/* ---------------- AUDIO ---------------- */
+let itVoices=[], itVoice=null;
+function rankVoice(v){
+  const n=(v.name||"").toLowerCase(); let s=0;
+  if(/premium|enhanced|siri|neural/.test(n)) s+=40;
+  if(/alice|federica|luca|emma|paola|eloisa|carlo/.test(n)) s+=20;
+  if(v.localService) s+=10;
+  if(/^it[-_]IT$/i.test(v.lang)) s+=10;
+  return s;
+}
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return;
+  itVoices = speechSynthesis.getVoices().filter(v=>/^it\b|^it[-_]/i.test(v.lang)).sort((a,b)=>rankVoice(b)-rankVoice(a));
+  itVoice = itVoices.find(v=>v.name===S.voiceName) || itVoices[0] || null;
+}
+let voiceTries=0;
+function refreshVoices(){
+  try{ const had=itVoices.length; pickVoice(); if(itVoices.length!==had && $("voiceSel")) drawVoices(); }catch(e){}
+  return itVoices.length;
+}
+function pollVoices(){ if(refreshVoices() || ++voiceTries>40) return; setTimeout(pollVoices,250); }
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = ()=>{ voiceTries=0; refreshVoices(); };
+  setTimeout(pollVoices,0);
+  ["touchend","click","keydown"].forEach(ev=>
+    document.addEventListener(ev, ()=>{ voiceTries=0; pollVoices(); }, {passive:true, once:true}));
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshVoices(); });
+}
+function speak(text, quiet){
+  if(!("speechSynthesis" in window)) return;
+  if(!itVoice) pickVoice();
+  if(!itVoice){
+    if(quiet) return;
+    alert("No Italian voice has been detected yet.\n\n"+
+          "The voice list sometimes loads a moment late — tap this again in a few seconds.\n\n"+
+          "If it stays silent, add an Italian voice:\n"+
+          "iPhone / iPad: Settings › Accessibility › Spoken Content › Voices › Italian\n"+
+          "Mac: System Settings › Accessibility › Spoken Content › System Voice › Manage Voices…\n\n"+
+          "An English voice reading Italian sounds wrong, so audio stays off until one is available.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(String(text).replace(/___/g,"…").replace(/\s*—.*$/,""));
+  u.voice=itVoice; u.lang=itVoice.lang||"it-IT"; u.rate=0.95; u.pitch=1;
+  speechSynthesis.speak(u);
+}
+function drawVoices(){
+  const sel=$("voiceSel"); if(!sel) return;
+  sel.innerHTML = itVoices.length
+    ? itVoices.map(v=>'<option value="'+esc(v.name)+'"'+(itVoice&&v.name===itVoice.name?" selected":"")+'>'+esc(v.name)+' — '+esc(v.lang)+'</option>').join("")
+    : '<option>No Italian voice found on this device</option>';
+  $("voiceStat").textContent = itVoices.length
+    ? itVoices.length+" Italian voice"+(itVoices.length>1?"s":"")+" available. Enhanced or Premium voices sound markedly better."
+    : "Audio stays off until an Italian voice is installed — an English voice reading Italian sounds wrong.";
+}
+$("voiceSel").onchange = e=>{ S.voiceName=e.target.value; pickVoice(); save(); };
+$("autoSpk").onclick = ()=>{ S.speak=!S.speak; save(); drawChips(); };
+$("testSpk").onclick = ()=>{ speak("Se avessi tempo, andrei in palestra."); drawVoices(); };
+
+/* ---------------- SETTINGS ---------------- */
+function count(cat){ return CARDS.filter(c=>c.cat===cat).length; }
+function drawChips(){
+  $("modeChips").innerHTML = MODES.map(m=>
+    '<button class="chip'+(S.mode===m.id?" sel":"")+'" data-m="'+m.id+'">'+m.label+'</button>').join("");
+  $("modeChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    S.mode=b.dataset.m; save(); drawChips(); syncModeBtn(); render();
+  });
+  $("modeHint").textContent = (MODES.find(m=>m.id===S.mode)||{}).hint || "";
+
+  $("catChips").innerHTML = CATS.map(c=>
+    '<button class="chip'+(S.cats.includes(c.id)?" sel":"")+'" data-c="'+c.id+'">'+c.label+
+    '<span class="n">'+count(c.id)+'</span></button>').join("");
+  $("catChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const id=b.dataset.c;
+    S.cats = S.cats.includes(id) ? S.cats.filter(x=>x!==id) : S.cats.concat(id);
+    save(); drawChips(); buildDeck();
+  });
+
+  $("ordChips").innerHTML = [["section","By section"],["random","Shuffled"]].map(([id,l])=>
+    '<button class="chip'+(S.order===id?" sel":"")+'" data-o="'+id+'">'+l+'</button>').join("");
+  $("ordChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{ S.order=b.dataset.o; save(); drawChips(); buildDeck(); });
+
+  $("autoSpk").classList.toggle("on", !!S.speak);
+  const inPool=pool().length, known=pool().filter(c=>S.known[cid(c)]).length;
+  $("progStat").textContent = known+" of "+inPool+" selected cards retired as known · "+
+    S.seen+" answers, "+(S.seen?Math.round(S.right/S.seen*100):0)+"% correct.";
+  drawVoices();
+}
+function syncModeBtn(){ $("modeBtn").textContent = (MODES.find(m=>m.id===S.mode)||MODES[0]).label; }
+
+$("setBtn").onclick   = ()=>{ drawChips(); $("sheet").classList.add("open"); };
+$("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
+$("sheet").onclick    = e=>{ if(e.target===$("sheet")){ $("sheet").classList.remove("open"); buildDeck(); } };
+$("allC").onclick  = ()=>{ S.cats=CATS.map(c=>c.id); save(); drawChips(); buildDeck(); };
+$("noneC").onclick = ()=>{ S.cats=[]; save(); drawChips(); buildDeck(); };
+$("subC").onclick  = ()=>{ S.cats=PRESETS.sub.slice();  save(); drawChips(); buildDeck(); };
+$("formC").onclick = ()=>{ S.cats=PRESETS.form.slice(); save(); drawChips(); buildDeck(); };
+$("pastC").onclick = ()=>{ S.cats=PRESETS.past.slice(); save(); drawChips(); buildDeck(); };
+$("resetKnownBtn").onclick = ()=>{ S.known={}; save(); drawChips(); buildDeck(); };
+$("resetBtn").onclick = ()=>{
+  if(!confirm("Reset all progress — known cards, per-card stats, and the score?")) return;
+  S.known={}; S.stats={}; S.seen=0; S.right=0; save(); drawChips(); buildDeck();
+};
+$("modeBtn").onclick = ()=>{
+  const i = MODES.findIndex(m=>m.id===S.mode);
+  S.mode = MODES[(i+1)%MODES.length].id; save(); syncModeBtn(); render();
+};
+
+/* ---------------- REFERENCE ---------------- */
+function drawStudy(){
+  $("studyBody").innerHTML = CATS.map(cat=>{
+    const rows = CARDS.filter(c=>c.cat===cat.id).map(c=>
+      '<div class="r" data-say="'+esc(c.ex||c.a)+'">'+
+        '<div class="q">'+esc(c.q)+'<br><span style="font-size:11px;opacity:.7">'+esc(c.qs)+'</span></div>'+
+        '<div class="a">'+esc(c.a)+'</div></div>').join("");
+    return '<div class="tbl"><h3>'+esc(cat.it)+'</h3>'+rows+'</div>';
+  }).join("");
+  $("studyBody").insertAdjacentHTML("afterbegin",
+    '<div class="tbl"><h3>The five traps this deck keeps testing</h3>'+
+      '<div class="r" data-say="parleremo, parleremmo"><div class="q">One m or two</div><div class="a">parleremo = will · parleremmo = would</div></div>'+
+      '<div class="r" data-say="Se avessi tempo, verrei."><div class="q">Never a conditional after se</div><div class="a">se avessi, not se avrei</div></div>'+
+      '<div class="r" data-say="venissi"><div class="q">venire in the congiuntivo imperfetto</div><div class="a">venissi — regular, not verr-</div></div>'+
+      '<div class="r" data-say="parlaste"><div class="q">The voi imperfect subjunctive</div><div class="a">one s: parlaste</div></div>'+
+      '<div class="r" data-say="ho camminato"><div class="q">Motion is not the auxiliary test</div><div class="a">camminare, viaggiare, nuotare → avere</div></div>'+
+      '<div class="note">Everything below is drawn straight from the reference, section by section. Tap any row to hear it.</div>'+
+    '</div>');
+  $("studyBody").querySelectorAll(".r").forEach(el=> el.onclick = ()=> speak(el.dataset.say));
+}
+$("studyBtn").onclick   = ()=>{ drawStudy(); $("studySheet").classList.add("open"); };
+$("studyClose").onclick = ()=> $("studySheet").classList.remove("open");
+
+/* ---------------- BOOT ---------------- */
+syncModeBtn();
+buildDeck();
+</script>
+</body>
+</html>

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1216">
+<title>Connettivi — Italian Flashcards</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0f1216; --panel:#181d24; --panel2:#212832; --line:#2c343f;
+    --txt:#eef2f6; --dim:#93a1b1; --accent:#4ade80; --accent2:#38bdf8;
+    --red:#f87171; --amber:#fbbf24; --violet:#c4b5fd;
+  }
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Segoe UI,Roboto,sans-serif;
+    display:flex; flex-direction:column; overscroll-behavior:none;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-user-select:none; user-select:none;
+  }
+  header{display:flex;align-items:center;gap:7px;padding:12px 14px 8px}
+  header h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.3px;flex:1}
+  header h1 span{color:var(--accent)}
+  .btn{
+    background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:10px; padding:8px 11px; font-size:13px; font-weight:600; cursor:pointer;
+    white-space:nowrap; font-family:inherit;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn.on{background:var(--accent);color:#06210f;border-color:var(--accent)}
+
+  .bar{height:4px;background:var(--panel2);margin:4px 16px 0;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+  .meta{display:flex;justify-content:space-between;padding:8px 16px;font-size:12px;color:var(--dim);gap:10px}
+  .meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 16px}
+  .card{
+    width:100%; max-width:520px; min-height:44vh;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line); border-radius:22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:30px 20px 26px; position:relative;
+  }
+  .card.tappable{cursor:pointer}
+  .tag{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim);
+    white-space:nowrap;
+  }
+  .prompt{font-size:15px;color:var(--accent2);margin-bottom:6px;font-weight:600}
+  .big{font-size:clamp(26px,7.5vw,40px);font-weight:700;line-height:1.2;margin:6px 0}
+  .sub{font-size:15px;color:var(--dim);margin-top:10px;line-height:1.5}
+  .hint{position:absolute;bottom:14px;font-size:11px;color:#5d6b7a;letter-spacing:.5px}
+  .answer{display:none}
+  .card.flipped .answer{display:block}
+  .card.flipped .hint{display:none}
+  .pron{font-size:13px;color:var(--dim);margin-top:14px;line-height:1.5;max-width:380px}
+  .pron b{color:var(--txt)}
+  .syn{font-size:12.5px;color:var(--violet);margin-top:10px;line-height:1.5;max-width:380px}
+  .ex{
+    margin-top:16px;padding:12px 14px;border-radius:12px;background:#12181e;
+    border:1px solid var(--line);max-width:380px;
+  }
+  .exit{font-size:17px;font-weight:600;line-height:1.4}
+  .exen{font-size:13px;color:var(--dim);margin-top:5px}
+  .spkrow{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .spk{
+    background:var(--panel2);color:var(--accent2);border:1px solid var(--line);
+    border-radius:99px;padding:9px 16px;font-size:14px;font-weight:650;cursor:pointer;font-family:inherit;
+  }
+  .spk.alt{color:var(--dim);font-weight:500}
+  .spk:active{transform:scale(.95)}
+  .badge{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    padding:4px 9px;border-radius:99px;margin:10px 4px 0;
+  }
+  .badge.ind{background:#12301f;color:var(--accent)}
+  .badge.cong{background:#241a38;color:var(--violet)}
+  .badge.inf{background:#102a38;color:var(--accent2)}
+  .badge.non{background:#2a2f37;color:var(--dim)}
+  .badge.reg{background:#33260f;color:var(--amber)}
+
+  footer{padding:10px 16px calc(14px + env(safe-area-inset-bottom))}
+  .rate{display:flex;gap:10px}
+  .rate button{flex:1;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .again{background:#3a2226;color:var(--red)}
+  .good{background:#12301f;color:var(--accent)}
+  .rate button:active{transform:scale(.97)}
+  .single{width:100%;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;
+    background:var(--panel2);color:var(--txt);cursor:pointer;font-family:inherit}
+
+  .opts{display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto}
+  .opt{
+    width:100%;text-align:left;padding:13px 14px;border-radius:12px;
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.35;
+    display:flex;gap:10px;align-items:baseline;
+  }
+  .opt i{font-style:normal;color:var(--dim);font-size:12px;font-weight:700;min-width:12px}
+  .opt:active{transform:scale(.99)}
+  .opt.right{background:#12301f;border-color:var(--accent);color:var(--accent)}
+  .opt.right i{color:var(--accent)}
+  .opt.wrong{background:#3a2226;border-color:var(--red);color:var(--red)}
+  .opt.wrong i{color:var(--red)}
+  .opt.mute{opacity:.45}
+  .opt[disabled]{cursor:default}
+
+  /* sheets */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:10;align-items:flex-end}
+  .sheet.open{display:flex}
+  .sheetbox{
+    background:var(--panel);width:100%;max-height:88vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);
+  }
+  .sheetbox h2{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:18px 0 10px}
+  .sheetbox h2:first-child{margin-top:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+    padding:8px 12px;border-radius:99px;font-size:13px;cursor:pointer;font-family:inherit;
+  }
+  .chip.sel{background:var(--accent);color:#06210f;border-color:var(--accent);font-weight:650}
+  .chip .n{opacity:.7;font-size:11px;margin-left:5px}
+  .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .row .btn{flex:1;text-align:center}
+  .addhint{font-size:12px;color:var(--dim);margin-top:9px;line-height:1.5}
+  .addhint b{color:var(--txt)}
+  .stat{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+  .close{width:100%;margin-top:22px;padding:14px;border-radius:14px;border:none;
+    background:var(--accent);color:#06210f;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+  .danger{background:transparent;color:var(--red);border:1px solid #4a2a2e}
+  .picker{
+    flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:11px;font-size:15px;font-weight:650;text-align:center;cursor:pointer;font-family:inherit;
+  }
+
+  /* study view */
+  .sheet.full{align-items:stretch}
+  .sheet.full .sheetbox{border-radius:0;max-height:100vh;height:100%;padding-top:calc(14px + env(safe-area-inset-top))}
+  .studyhead{display:flex;align-items:center;gap:8px;position:sticky;top:0;
+    background:var(--panel);padding-bottom:10px;margin-bottom:4px;z-index:2}
+  .studyhead b{flex:1;font-size:16px}
+  .tbl{margin:16px 0 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .tbl h3{margin:0;padding:10px 14px;background:var(--panel2);font-size:12px;
+    text-transform:uppercase;letter-spacing:1.1px;color:var(--accent2)}
+  .tbl .r{padding:11px 14px;border-top:1px solid var(--line);cursor:pointer}
+  .tbl .r:active{background:#1c2430}
+  .tbl .r .f{font-size:17px;font-weight:650}
+  .tbl .r .f em{font-style:normal;color:var(--dim);font-size:13px;font-weight:500;margin-left:8px}
+  .tbl .r .m{font-size:13px;color:var(--txt);margin-top:3px}
+  .tbl .r .x{font-size:13px;color:var(--accent2);margin-top:4px;font-style:italic}
+  .tbl .r .xe{font-size:12px;color:var(--dim);margin-top:2px}
+  .note{font-size:12px;color:var(--amber);padding:10px 14px;border-top:1px solid var(--line);background:#1d1a12;line-height:1.5}
+  .studypad{padding-bottom:24px}
+  .legend{display:flex;gap:14px;margin-top:12px;font-size:12px;color:var(--dim);align-items:center;flex-wrap:wrap}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:99px;margin-right:5px}
+  .dot.ind{background:var(--accent)} .dot.cong{background:var(--violet)} .dot.inf{background:var(--accent2)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Connettivi <span>logici</span></h1>
+  <button class="btn" id="studyBtn">Study</button>
+  <button class="btn" id="modeBtn">Choice</button>
+  <button class="btn" id="setBtn">Deck</button>
+</header>
+<div class="bar"><i id="barFill"></i></div>
+<div class="meta">
+  <span id="counter">—</span>
+  <span id="score">—</span>
+</div>
+
+<main>
+  <div class="card" id="card">
+    <div class="tag" id="tag"></div>
+    <div id="front"></div>
+    <div class="answer" id="back"></div>
+    <div class="hint" id="hint">tap to reveal</div>
+  </div>
+</main>
+
+<footer><div id="controls"></div></footer>
+
+<div class="sheet full" id="studySheet">
+  <div class="sheetbox">
+    <div class="studyhead">
+      <b id="studyTitle">Reference</b>
+      <button class="btn" id="studyClose">Done</button>
+    </div>
+    <div class="studypad" id="studyBody"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheetbox">
+    <h2>Test mode</h2>
+    <div class="chips" id="modeChips"></div>
+    <div class="addhint" id="modeHint"></div>
+
+    <h2>Categories</h2>
+    <div class="chips" id="catChips"></div>
+    <div class="row">
+      <button class="btn" id="allC">All</button>
+      <button class="btn" id="noneC">Clear</button>
+      <button class="btn" id="coreC">Core 4</button>
+      <button class="btn" id="discC">Discourse only</button>
+    </div>
+    <div class="addhint"><b>Core 4</b> is cause, consequence, opposition, and concession — the connectives that carry
+      most of the meaning in an exam essay or a work email.</div>
+
+    <h2>Order</h2>
+    <div class="chips" id="ordChips"></div>
+
+    <h2>Audio — Italian voice</h2>
+    <select id="voiceSel" class="picker" style="width:100%"></select>
+    <div class="row">
+      <button class="btn" id="autoSpk">Speak example on reveal</button>
+      <button class="btn" id="testSpk">▶ Test</button>
+    </div>
+    <div class="stat" id="voiceStat"></div>
+
+    <h2>Progress</h2>
+    <div class="stat" id="progStat"></div>
+    <div class="row">
+      <button class="btn" id="resetKnownBtn">Reset known cards</button>
+      <button class="btn danger" id="resetBtn">Reset progress</button>
+    </div>
+    <button class="close" id="closeBtn">Start studying</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- DATA ----------------
+   Every connective from the lesson "Complex Logical Connectives".
+   it   — the Italian connective
+   en   — its meaning in English (this is what the test asks for)
+   cat  — category key
+   mood — the verb mood it governs
+   reg  — register
+   ex / exen — example sentence and its translation
+   note — usage trap worth knowing
+--------------------------------------- */
+const CATS = [
+  {id:"causa",        label:"Cause",        it:"Causa"},
+  {id:"conseguenza",  label:"Consequence",  it:"Conseguenza"},
+  {id:"opposizione",  label:"Opposition",   it:"Opposizione"},
+  {id:"concessione",  label:"Concession",   it:"Concessione"},
+  {id:"finalita",     label:"Purpose",      it:"Finalità"},
+  {id:"condizione",   label:"Condition",    it:"Condizione"},
+  {id:"tempo",        label:"Time",         it:"Tempo"},
+  {id:"aggiunta",     label:"Adding",       it:"Aggiungere"},
+  {id:"sequenza",     label:"Sequencing",   it:"Sequenza"},
+  {id:"conclusione",  label:"Concluding",   it:"Concludere"},
+  {id:"esempio",      label:"Examples",     it:"Esempi"}
+];
+const CORE = ["causa","conseguenza","opposizione","concessione"];
+const DISC = ["aggiunta","sequenza","conclusione","esempio"];
+
+const CARDS = [
+  /* ---- CAUSE ---- */
+  {it:"perché", en:"because", cat:"causa", mood:"Indicativo", reg:"Neutral",
+   ex:"Non esco perché piove.", exen:"I am not going out because it is raining.",
+   note:"Goes after the main clause. The same word means “so that” for purpose — and there it takes the subjunctive."},
+  {it:"poiché", en:"since / because", cat:"causa", mood:"Indicativo", reg:"Formal",
+   ex:"Poiché ero stanco, sono andato a letto.", exen:"Since I was tired, I went to bed.",
+   note:"Before or after the main clause. Written and formal register."},
+  {it:"siccome", en:"since / as", cat:"causa", mood:"Indicativo", reg:"Neutral",
+   ex:"Siccome piove, resto a casa.", exen:"Since it is raining, I am staying home.",
+   note:"Only at the beginning of the sentence, never after the main clause. “Resto a casa siccome piove” is wrong."},
+  {it:"dato che", en:"given that / since", cat:"causa", mood:"Indicativo", reg:"Neutral",
+   ex:"Dato che sei qui, aiutami.", exen:"Since you are here, help me.",
+   note:"Before or after the main clause."},
+  {it:"visto che", en:"seeing that / since", cat:"causa", mood:"Indicativo", reg:"Informal",
+   ex:"Visto che non rispondi, ti scrivo.", exen:"Seeing that you are not answering, I am writing to you.",
+   note:"The conversational cousin of dato che."},
+  {it:"dal momento che", en:"since / given that", cat:"causa", mood:"Indicativo", reg:"Formal",
+   ex:"Dal momento che hai finito, puoi andare.", exen:"Since you have finished, you can go.",
+   note:"Before or after the main clause."},
+  {it:"per il fatto che", en:"because of the fact that", cat:"causa", mood:"Indicativo", reg:"Formal",
+   ex:"È famoso per il fatto che ha vinto il premio.", exen:"He is famous because of the fact that he won the prize.",
+   note:"Heavier than perché — use it when you want to name the fact itself as the cause."},
+  {it:"a causa di", en:"because of / due to (+ noun)", cat:"causa", mood:"—", reg:"Neutral",
+   ex:"Sono in ritardo a causa del traffico.", exen:"I am late because of the traffic.",
+   note:"Takes a noun, not a clause — and it usually introduces a negative cause."},
+  {it:"per via di", en:"because of / owing to (+ noun)", cat:"causa", mood:"—", reg:"Informal",
+   ex:"L'evento è annullato per via della pioggia.", exen:"The event is canceled because of the rain.",
+   note:"Takes a noun. Spoken equivalent of a causa di."},
+  {it:"grazie a", en:"thanks to (+ noun)", cat:"causa", mood:"—", reg:"Neutral",
+   ex:"Ho superato l'esame grazie al tuo aiuto.", exen:"I passed the exam thanks to your help.",
+   note:"Takes a noun, and the cause has to be a positive one — the mirror image of a causa di."},
+
+  /* ---- CONSEQUENCE ---- */
+  {it:"quindi", en:"so / therefore", cat:"conseguenza", mood:"Indicativo", reg:"Neutral",
+   ex:"Piove, quindi resto a casa.", exen:"It is raining, so I am staying home.",
+   note:"The everyday default for a result."},
+  {it:"perciò", en:"so / therefore", cat:"conseguenza", mood:"Indicativo", reg:"Neutral",
+   ex:"Ero stanco, perciò sono andato a letto presto.", exen:"I was tired, so I went to bed early.",
+   note:"Interchangeable with quindi in speech."},
+  {it:"dunque", en:"thus / therefore", cat:"conseguenza", mood:"Indicativo", reg:"Formal",
+   ex:"Il progetto è completato, dunque possiamo procedere.", exen:"The project is complete, thus we can proceed.",
+   note:"Also used as a filler meaning “well then…” at the start of a turn."},
+  {it:"di conseguenza", en:"consequently / as a result", cat:"conseguenza", mood:"Indicativo", reg:"Formal",
+   ex:"Ha piovuto molto; di conseguenza, il fiume è straripato.", exen:"It rained a lot; as a result, the river overflowed.",
+   note:"Usually set off by a semicolon or a period, then a comma."},
+  {it:"pertanto", en:"therefore / hence", cat:"conseguenza", mood:"Indicativo", reg:"Very formal",
+   ex:"La domanda è incompleta, pertanto non può essere accettata.", exen:"The application is incomplete, therefore it cannot be accepted.",
+   note:"Bureaucratic and legal register — great in a formal letter, odd out loud."},
+  {it:"per questo (motivo)", en:"that is why / for this reason", cat:"conseguenza", mood:"Indicativo", reg:"Neutral",
+   ex:"Non mi piace il freddo, per questo vivo al Sud.", exen:"I do not like the cold, that is why I live in the South.",
+   note:"Points back at the whole preceding statement."},
+  {it:"così", en:"so (and so)", cat:"conseguenza", mood:"Indicativo", reg:"Informal",
+   ex:"Non c'era traffico, così sono arrivato presto.", exen:"There was no traffic, so I arrived early.",
+   note:"Casual narration. Different from così che, which is purpose plus the subjunctive."},
+
+  /* ---- OPPOSITION ---- */
+  {it:"ma", en:"but", cat:"opposizione", mood:"Indicativo", reg:"Neutral",
+   ex:"È intelligente, ma non studia.", exen:"He is intelligent, but he does not study.",
+   note:"The plain contrast. Only ever mid-sentence."},
+  {it:"però", en:"but / however", cat:"opposizione", mood:"Indicativo", reg:"Informal",
+   ex:"Mi piace, però costa troppo.", exen:"I like it, but it costs too much.",
+   note:"Can also land at the end of the sentence in speech: “Costa troppo, però.”"},
+  {it:"tuttavia", en:"however / nevertheless", cat:"opposizione", mood:"Indicativo", reg:"Formal",
+   ex:"Il progetto è buono; tuttavia, servono modifiche.", exen:"The project is good; however, changes are needed.",
+   note:"Written register — the one to use in a report."},
+  {it:"eppure", en:"and yet", cat:"opposizione", mood:"Indicativo", reg:"Neutral (emphatic)",
+   ex:"Ha studiato tanto, eppure non ha superato l'esame.", exen:"He studied so much, and yet he did not pass the exam.",
+   note:"Carries surprise: the second fact contradicts what the first led you to expect."},
+  {it:"invece", en:"instead / whereas", cat:"opposizione", mood:"Indicativo", reg:"Neutral",
+   ex:"Lui lavora, invece tu non fai niente.", exen:"He works, whereas you do nothing.",
+   note:"Sets two subjects against each other. Also “invece di” + infinitive = instead of doing."},
+  {it:"al contrario", en:"on the contrary", cat:"opposizione", mood:"Indicativo", reg:"Formal",
+   ex:"Non è peggiorato; al contrario, è migliorato.", exen:"It has not gotten worse; on the contrary, it has improved.",
+   note:"Reverses the previous statement outright, rather than just qualifying it."},
+
+  /* ---- CONCESSION ---- */
+  {it:"benché", en:"although / even though", cat:"concessione", mood:"Congiuntivo", reg:"Formal",
+   ex:"Esco benché piova.", exen:"I am going out although it is raining.",
+   note:"Always the subjunctive: benché piova, never benché piove."},
+  {it:"sebbene", en:"although / even though", cat:"concessione", mood:"Congiuntivo", reg:"Formal",
+   ex:"Sebbene sia stanco, continuo a lavorare.", exen:"Although I am tired, I keep working.",
+   note:"Same value as benché, same subjunctive."},
+  {it:"nonostante (che)", en:"despite the fact that / even though", cat:"concessione", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Nonostante faccia freddo, non accendo il riscaldamento.", exen:"Even though it is cold, I do not turn on the heat.",
+   note:"With a noun instead of a clause it means simply “despite”: nonostante la pioggia."},
+  {it:"malgrado", en:"in spite of / even though", cat:"concessione", mood:"Congiuntivo", reg:"Formal",
+   ex:"Malgrado sia tardi, resto ancora un po'.", exen:"Even though it is late, I am staying a little longer.",
+   note:"Interchangeable with nonostante, slightly more literary."},
+  {it:"anche se", en:"even if / even though", cat:"concessione", mood:"Indicativo", reg:"Neutral",
+   ex:"Esco anche se piove.", exen:"I am going out even if it is raining.",
+   note:"The one concessive that takes the indicative — the classic exam trap next to benché."},
+  {it:"pur + gerundio", en:"even though / while (doing)", cat:"concessione", mood:"Gerundio", reg:"Formal",
+   ex:"Pur essendo stanco, continuo.", exen:"Even though I am tired, I keep going.",
+   note:"Only works when both clauses share the same subject."},
+
+  /* ---- PURPOSE ---- */
+  {it:"affinché", en:"so that / in order that", cat:"finalita", mood:"Congiuntivo", reg:"Formal",
+   ex:"Ti aiuto affinché tu capisca.", exen:"I am helping you so that you understand.",
+   note:"Subjects must differ: I help, you understand. Same subject would take per + infinitive."},
+  {it:"perché (finale)", en:"so that (purpose)", cat:"finalita", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Parlo piano perché tutti capiscano.", exen:"I speak slowly so that everyone understands.",
+   note:"Identical in form to causal perché — the subjunctive is what tells you it means purpose."},
+  {it:"in modo che", en:"so that / in such a way that", cat:"finalita", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Scrivo chiaramente in modo che tu legga bene.", exen:"I write clearly so that you can read it easily.",
+   note:"Emphasizes the manner as well as the goal."},
+  {it:"così che", en:"so that", cat:"finalita", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Parlo lentamente così che tu capisca.", exen:"I speak slowly so that you understand.",
+   note:"Do not confuse it with plain così, which reports a result in the indicative."},
+  {it:"per + infinito", en:"(in order) to", cat:"finalita", mood:"Infinito", reg:"Neutral",
+   ex:"Studio per imparare.", exen:"I study in order to learn.",
+   note:"The form to use when one subject does both actions."},
+  {it:"allo scopo di", en:"for the purpose of (+ infinitive)", cat:"finalita", mood:"Infinito", reg:"Formal",
+   ex:"Lavoro allo scopo di guadagnare.", exen:"I work for the purpose of earning money.",
+   note:"Formal alternative to per + infinitive."},
+  {it:"al fine di", en:"with the aim of (+ infinitive)", cat:"finalita", mood:"Infinito", reg:"Very formal",
+   ex:"Studio al fine di migliorare.", exen:"I study with the aim of improving.",
+   note:"Documents and official writing."},
+
+  /* ---- CONDITION ---- */
+  {it:"se", en:"if", cat:"condizione", mood:"Indicativo / Congiuntivo", reg:"Neutral",
+   ex:"Se piove, resto a casa.", exen:"If it rains, I am staying home.",
+   note:"Real conditions take the indicative; hypothetical ones take the congiuntivo imperfetto with a conditional."},
+  {it:"a condizione che", en:"on condition that / provided that", cat:"condizione", mood:"Congiuntivo", reg:"Formal",
+   ex:"Ti aiuto a condizione che tu mi ascolti.", exen:"I will help you provided that you listen to me.",
+   note:"Always the subjunctive."},
+  {it:"purché", en:"provided that / as long as", cat:"condizione", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Vengo purché tu mi accompagni.", exen:"I will come as long as you come with me.",
+   note:"One word, always the subjunctive."},
+  {it:"a patto che", en:"on condition that / as long as", cat:"condizione", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Accetto a patto che le condizioni siano chiare.", exen:"I accept on condition that the terms are clear.",
+   note:"Slightly more like striking a deal than purché."},
+  {it:"qualora", en:"if / in the event that", cat:"condizione", mood:"Congiuntivo", reg:"Very formal",
+   ex:"Qualora avessi bisogno, chiamami.", exen:"Should you need anything, call me.",
+   note:"Contracts and formal letters; takes the congiuntivo imperfetto."},
+  {it:"a meno che (non)", en:"unless", cat:"condizione", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Vengo a meno che non piova.", exen:"I will come unless it rains.",
+   note:"That “non” is expletive — it does not make the clause negative."},
+  {it:"nel caso in cui", en:"in case / in the event that", cat:"condizione", mood:"Congiuntivo", reg:"Formal",
+   ex:"Nel caso in cui tu non possa, avvisami.", exen:"In case you cannot make it, let me know.",
+   note:"Always the subjunctive."},
+
+  /* ---- TIME ---- */
+  {it:"quando", en:"when", cat:"tempo", mood:"Indicativo", reg:"Neutral",
+   ex:"Quando arrivo, ti chiamo.", exen:"When I arrive, I will call you.",
+   note:"At the moment when."},
+  {it:"mentre", en:"while", cat:"tempo", mood:"Indicativo", reg:"Neutral",
+   ex:"Mentre mangio, guardo la TV.", exen:"While I eat, I watch TV.",
+   note:"Two actions running at once. It can also mean “whereas” in a contrast."},
+  {it:"dopo che", en:"after", cat:"tempo", mood:"Indicativo", reg:"Neutral",
+   ex:"Dopo che ho mangiato, esco.", exen:"After I have eaten, I go out.",
+   note:"With the same subject, prefer dopo + past infinitive: dopo aver mangiato."},
+  {it:"prima che", en:"before", cat:"tempo", mood:"Congiuntivo", reg:"Neutral",
+   ex:"Chiamami prima che tu esca.", exen:"Call me before you go out.",
+   note:"The only temporal connective that always takes the subjunctive. Same subject: prima di + infinitive."},
+  {it:"finché (non)", en:"until", cat:"tempo", mood:"Indicativo", reg:"Neutral",
+   ex:"Aspetto finché non arrivi.", exen:"I will wait until you arrive.",
+   note:"The “non” is expletive again — it does not negate anything. With an affirmative clause it shades into “for as long as”: finché ci sei, sono felice."},
+  {it:"non appena", en:"as soon as", cat:"tempo", mood:"Indicativo", reg:"Neutral",
+   ex:"Non appena arrivo, ti chiamo.", exen:"As soon as I arrive, I will call you.",
+   note:"Appena alone works the same way in speech."},
+  {it:"ogni volta che", en:"every time / whenever", cat:"tempo", mood:"Indicativo", reg:"Neutral",
+   ex:"Ogni volta che piove, mi viene il mal di testa.", exen:"Every time it rains, I get a headache.",
+   note:"Repeated events."},
+
+  /* ---- ADDING ---- */
+  {it:"inoltre", en:"moreover / furthermore", cat:"aggiunta", mood:"—", reg:"Formal",
+   ex:"È intelligente; inoltre, è simpatico.", exen:"He is intelligent; moreover, he is likeable.",
+   note:"Opens the sentence that adds the second argument."},
+  {it:"in più", en:"on top of that / in addition", cat:"aggiunta", mood:"—", reg:"Informal",
+   ex:"Costa poco; in più, è di qualità.", exen:"It is cheap; on top of that, it is good quality.",
+   note:"Spoken equivalent of inoltre."},
+  {it:"oltre a ciò", en:"besides that / in addition to that", cat:"aggiunta", mood:"—", reg:"Formal",
+   ex:"È un buon prodotto; oltre a ciò, ha un'ottima garanzia.", exen:"It is a good product; besides that, it has an excellent warranty.",
+   note:"Written register."},
+  {it:"non solo… ma anche", en:"not only… but also", cat:"aggiunta", mood:"—", reg:"Neutral",
+   ex:"Non solo è bello, ma è anche utile.", exen:"Not only is it beautiful, but it is also useful.",
+   note:"Paired structure — both halves have to appear."},
+
+  /* ---- SEQUENCING ---- */
+  {it:"innanzitutto", en:"first of all", cat:"sequenza", mood:"—", reg:"Neutral",
+   ex:"Innanzitutto, vorrei ringraziarvi.", exen:"First of all, I would like to thank you.",
+   note:"Also written prima di tutto."},
+  {it:"in primo luogo", en:"in the first place / firstly", cat:"sequenza", mood:"—", reg:"Formal",
+   ex:"In primo luogo, analizziamo i dati.", exen:"In the first place, let us analyze the data.",
+   note:"Pairs with in secondo luogo."},
+  {it:"poi / successivamente", en:"then / subsequently", cat:"sequenza", mood:"—", reg:"Neutral",
+   ex:"Prima studio, poi esco.", exen:"First I study, then I go out.",
+   note:"Successivamente is the formal one."},
+  {it:"infine", en:"finally / lastly", cat:"sequenza", mood:"—", reg:"Neutral",
+   ex:"Infine, voglio concludere con un ringraziamento.", exen:"Finally, I want to close with a word of thanks.",
+   note:"Alla fine means “in the end” as an outcome, not “lastly” in a list."},
+
+  /* ---- CONCLUDING ---- */
+  {it:"in conclusione", en:"in conclusion", cat:"conclusione", mood:"—", reg:"Formal",
+   ex:"In conclusione, il progetto è valido.", exen:"In conclusion, the project is sound.",
+   note:"Opens the closing paragraph of an essay."},
+  {it:"per concludere", en:"to conclude / to wrap up", cat:"conclusione", mood:"—", reg:"Neutral",
+   ex:"Per concludere, ringrazio tutti.", exen:"To conclude, I thank everyone.",
+   note:"Common at the end of a talk."},
+  {it:"in sintesi / in breve", en:"in summary / in short", cat:"conclusione", mood:"—", reg:"Neutral",
+   ex:"In sintesi, i risultati sono positivi.", exen:"In summary, the results are positive.",
+   note:"Signals that a compressed version follows."},
+  {it:"riassumendo", en:"to sum up / summarizing", cat:"conclusione", mood:"—", reg:"Neutral",
+   ex:"Riassumendo, abbiamo tre opzioni.", exen:"To sum up, we have three options.",
+   note:"A gerund used as a discourse marker."},
+  {it:"tutto sommato", en:"all in all / all things considered", cat:"conclusione", mood:"—", reg:"Informal",
+   ex:"Tutto sommato, è stato un successo.", exen:"All in all, it was a success.",
+   note:"Delivers a balanced verdict after weighing both sides."},
+
+  /* ---- EXAMPLES ---- */
+  {it:"per esempio / ad esempio", en:"for example", cat:"esempio", mood:"—", reg:"Neutral",
+   ex:"Mi piacciono i frutti rossi, per esempio le fragole.", exen:"I like red fruit, for example strawberries.",
+   note:"Ad esempio is a touch more formal."},
+  {it:"come", en:"like / such as", cat:"esempio", mood:"—", reg:"Neutral",
+   ex:"Alcuni animali, come il cane, sono domestici.", exen:"Some animals, such as the dog, are domestic.",
+   note:"Introduces the example directly, with no verb."},
+  {it:"cioè", en:"that is / in other words", cat:"esempio", mood:"—", reg:"Neutral",
+   ex:"È bilingue, cioè parla due lingue.", exen:"He is bilingual, that is, he speaks two languages.",
+   note:"Restates what came before rather than adding to it."},
+  {it:"in particolare", en:"in particular / particularly", cat:"esempio", mood:"—", reg:"Neutral",
+   ex:"Amo la musica, in particolare il jazz.", exen:"I love music, particularly jazz.",
+   note:"Narrows from a general statement to one case."}
+];
+
+/* ---------------- SYNONYM GROUPS ----------------
+   Several connectives are genuine synonyms — "since / given that" and
+   "given that / since" are the same answer in different word order, and no
+   learner could pick between them. A multiple-choice question must never
+   offer two options from the same group, so each group is tagged here and
+   the option builder keeps a card's own group out of its distractors.
+   The connectives inside a group are told apart by register and position,
+   not by meaning — the answer side lists them so that stays visible.
+-------------------------------------------------- */
+const SYN = [
+  ["perché","poiché","siccome","dato che","visto che","dal momento che","per il fatto che"],
+  ["a causa di","per via di"],
+  ["quindi","perciò","dunque","di conseguenza","pertanto","per questo (motivo)","così"],
+  ["ma","però","tuttavia","eppure"],
+  ["benché","sebbene","nonostante (che)","malgrado","anche se","pur + gerundio"],
+  ["affinché","perché (finale)","in modo che","così che"],
+  ["per + infinito","allo scopo di","al fine di"],
+  ["a condizione che","purché","a patto che"],
+  ["se","qualora","nel caso in cui"],
+  ["inoltre","in più","oltre a ciò"],
+  ["innanzitutto","in primo luogo"],
+  ["in conclusione","per concludere","in sintesi / in breve","riassumendo"],
+  ["per esempio / ad esempio","come"]
+];
+CARDS.forEach(c=>{
+  const g = SYN.findIndex(grp=>grp.includes(c.it));
+  c.syn = g<0 ? "solo:"+c.it : "g"+g;                       // its own group when nothing matches
+});
+/* every name in SYN has to match a card, or a group silently stops working */
+SYN.forEach(grp=>grp.forEach(name=>{ if(!CARDS.some(c=>c.it===name)) console.warn("SYN name not found:",name); }));
+const synMates = c => CARDS.filter(x=>x!==c && x.syn===c.syn).map(x=>x.it);
+
+const MOOD_CLASS = {"Indicativo":"ind","Congiuntivo":"cong","Infinito":"inf","Gerundio":"inf","Indicativo / Congiuntivo":"cong","—":"non"};
+const MOOD_OPTS  = ["Indicativo","Congiuntivo","Infinito","Nessuno (—)"];
+const moodAnswer = c => c.mood==="Gerundio" ? "Gerundio" : (c.mood==="Indicativo / Congiuntivo" ? null : (c.mood==="—" ? "Nessuno (—)" : c.mood));
+const catLabel   = id => (CATS.find(c=>c.id===id)||{}).label || id;
+
+const MODES = [
+  {id:"choice",  label:"Choice",  hint:"Italian connective on the card, four English meanings underneath — pick the right one. Graded for you."},
+  {id:"recall",  label:"Recall",  hint:"Italian connective on the card. Say the meaning out loud, reveal, then rate yourself Again or Got it."},
+  {id:"mood",    label:"Mood",    hint:"Italian connective on the card — does it take the indicativo, the congiuntivo, an infinitive, or no verb at all? Cards with no single answer are skipped."},
+  {id:"reverse", label:"Reverse", hint:"English meaning on the card, four Italian connectives underneath. Harder: this is the one that makes you produce the word."}
+];
+
+/* ---------------- STATE ---------------- */
+const KEY = "connettivi_v1";
+const VER = 1;
+let S = {
+  ver:VER,
+  mode:"choice",
+  cats:CATS.map(c=>c.id),
+  order:"category",              // category | random
+  speak:false,
+  voiceName:"",
+  stats:{}, known:{}, seen:0, right:0
+};
+try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
+
+let deck=[], pos=0, flipped=false, answered=false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+
+/* ---------------- DECK ---------------- */
+function pool(){
+  let list = CARDS.filter(c=>S.cats.includes(c.cat));
+  if(S.mode==="mood") list = list.filter(c=>moodAnswer(c));
+  return list;
+}
+function buildDeck(){
+  let list = pool().filter(c=>!S.known[c.it]);
+  if(S.order==="random"){
+    for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
+  }else{
+    const ord = CATS.map(c=>c.id);
+    list.sort((a,b)=> ord.indexOf(a.cat)-ord.indexOf(b.cat) || CARDS.indexOf(a)-CARDS.indexOf(b));
+  }
+  deck = list; pos = 0;
+  render();
+}
+
+/* ---------------- OPTIONS ---------------- */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function optionsFor(c){
+  if(S.mode==="mood"){
+    return {correct:moodAnswer(c), list:MOOD_OPTS.concat(c.mood==="Gerundio"?["Gerundio"]:[]).filter((v,i,a)=>a.indexOf(v)===i)};
+  }
+  const key = S.mode==="reverse" ? "it" : "en";
+  /* a distractor may never be a synonym of the answer, or both options are right */
+  const ok = x => x!==c && x.syn!==c.syn && x[key]!==c[key];
+  const same = shuffle(CARDS.filter(x=>ok(x) && x.cat===c.cat));
+  const other= shuffle(CARDS.filter(x=>ok(x) && x.cat!==c.cat));
+  const picks = [];
+  const push = x =>{ if(picks.length<3 && !picks.some(p=>p[key]===x[key])) picks.push(x); };
+  same.slice(0,2).forEach(push);
+  other.forEach(push);
+  return {correct:c[key], list:shuffle(picks.map(x=>x[key]).concat(c[key]))};
+}
+
+/* ---------------- RENDER ---------------- */
+function moodBadge(c){
+  const cl = MOOD_CLASS[c.mood] || "non";
+  const txt = c.mood==="—" ? "no verb mood" : c.mood;
+  return '<span class="badge '+cl+'">'+esc(txt)+'</span><span class="badge reg">'+esc(c.reg)+'</span>';
+}
+function synLine(c){
+  const m = synMates(c);
+  return m.length ? '<div class="syn">same meaning: '+esc(m.join(" · "))+
+                    ' — told apart by register and position, not by sense</div>' : "";
+}
+function answerBlock(c){
+  return '<div class="big" style="color:var(--accent)">'+esc(c.en)+'</div>'+
+         '<div class="sub">'+esc(catLabel(c.cat))+'</div>'+
+         '<div>'+moodBadge(c)+'</div>'+
+         synLine(c)+
+         '<div class="ex"><div class="exit">'+esc(c.ex)+'</div><div class="exen">'+esc(c.exen)+'</div></div>'+
+         '<div class="spkrow">'+
+           '<button class="spk" id="spkBtn">🔊 frase</button>'+
+           '<button class="spk alt" id="spkWord">🔊 solo il connettivo</button>'+
+         '</div>'+
+         '<div class="pron">'+esc(c.note)+'</div>';
+}
+
+function render(){
+  const card=$("card");
+  card.classList.remove("flipped"); flipped=false; answered=false;
+  card.classList.toggle("tappable", S.mode==="recall");
+  $("hint").textContent = S.mode==="recall" ? "tap to reveal" : "";
+
+  if(!deck.length){
+    $("tag").textContent="";
+    $("front").innerHTML='<div class="big">All done! ✓</div><div class="sub">Every selected card is retired as known, or no category is selected. Open “Deck” to reset known cards or pick more categories.</div>';
+    $("back").innerHTML=""; $("controls").innerHTML="";
+    $("counter").textContent="—"; $("score").textContent="—"; $("barFill").style.width="0";
+    return;
+  }
+  if(pos>=deck.length){ buildDeck(); return; }
+
+  const c = deck[pos];
+  $("tag").textContent = catLabel(c.cat).toUpperCase() + (S.mode==="mood" ? " · WHICH MOOD?" : "");
+
+  if(S.mode==="reverse"){
+    $("front").innerHTML = '<div class="prompt">Which connective says this?</div><div class="big">'+esc(c.en)+'</div>';
+    $("back").innerHTML  = '<div class="big" style="color:var(--accent)">'+esc(c.it)+'</div>'+
+                           '<div class="sub">'+esc(catLabel(c.cat))+'</div><div>'+moodBadge(c)+'</div>'+
+                           synLine(c)+
+                           '<div class="ex"><div class="exit">'+esc(c.ex)+'</div><div class="exen">'+esc(c.exen)+'</div></div>'+
+                           '<div class="spkrow"><button class="spk" id="spkBtn">🔊 frase</button>'+
+                           '<button class="spk alt" id="spkWord">🔊 solo il connettivo</button></div>'+
+                           '<div class="pron">'+esc(c.note)+'</div>';
+  }else if(S.mode==="mood"){
+    $("front").innerHTML = '<div class="prompt">'+esc(catLabel(c.cat))+'</div><div class="big">'+esc(c.it)+'</div>'+
+                           '<div class="sub">'+esc(c.en)+'</div>';
+    $("back").innerHTML  = '<div class="big" style="color:var(--accent)">'+esc(c.mood)+'</div>'+
+                           '<div class="ex"><div class="exit">'+esc(c.ex)+'</div><div class="exen">'+esc(c.exen)+'</div></div>'+
+                           '<div class="spkrow"><button class="spk" id="spkBtn">🔊 frase</button>'+
+                           '<button class="spk alt" id="spkWord">🔊 solo il connettivo</button></div>'+
+                           '<div class="pron">'+esc(c.note)+'</div>';
+  }else{
+    $("front").innerHTML = '<div class="prompt">What does it mean?</div><div class="big">'+esc(c.it)+'</div>';
+    $("back").innerHTML  = answerBlock(c);
+  }
+
+  if(S.mode==="recall"){
+    $("controls").innerHTML = '<button class="single" id="revealBtn">Reveal</button>';
+    $("revealBtn").onclick = flip;
+  }else{
+    const o = optionsFor(c);
+    card.dataset.correct = o.correct;
+    $("controls").innerHTML = '<div class="opts">'+o.list.map((t,i)=>
+      '<button class="opt" data-v="'+esc(t)+'"><i>'+(i+1)+'</i><span>'+esc(t)+'</span></button>').join("")+'</div>';
+    $("controls").querySelectorAll(".opt").forEach(b=> b.onclick = ()=>choose(b, o.correct));
+  }
+
+  const st = S.stats[c.it];
+  $("counter").textContent = (pos+1)+" / "+deck.length + (st ? "  ·  ✓"+st.r+" ✗"+st.w : "");
+  const pct = S.seen ? Math.round(S.right/S.seen*100) : 0;
+  $("score").textContent = S.seen ? pct+"% correct ("+S.seen+" answered)" : "no answers yet";
+  $("barFill").style.width = (pos/deck.length*100)+"%";
+}
+
+function wireSpeak(){
+  const c = deck[pos]; if(!c) return;
+  const b=$("spkBtn"), w=$("spkWord");
+  if(b) b.onclick = e=>{ e.stopPropagation(); speak(c.ex); };
+  if(w) w.onclick = e=>{ e.stopPropagation(); speak(c.it.replace(/\s*\(.*?\)/g,"").replace(/\s*\+.*$/,"")); };
+  if(S.speak) speak(c.ex, true);
+}
+
+function flip(){
+  if(!deck.length || flipped) return;
+  flipped = true;
+  $("card").classList.add("flipped");
+  wireSpeak();
+  $("controls").innerHTML = '<div class="rate"><button class="again" id="againBtn">Again</button>'+
+                            '<button class="good" id="goodBtn">Got it</button></div>';
+  $("againBtn").onclick = ()=>rate(false);
+  $("goodBtn").onclick  = ()=>rate(true);
+}
+
+function choose(btn, correct){
+  if(answered) return;
+  answered = true;
+  const ok = btn.dataset.v === correct;
+  $("controls").querySelectorAll(".opt").forEach(b=>{
+    b.disabled = true;
+    if(b.dataset.v === correct) b.classList.add("right");
+    else if(b === btn) b.classList.add("wrong");
+    else b.classList.add("mute");
+  });
+  flipped = true;
+  $("card").classList.add("flipped");
+  wireSpeak();
+  const next = document.createElement("button");
+  next.className = "single"; next.style.marginTop = "10px";
+  next.textContent = ok ? "Correct ✓ — next" : "Next";
+  next.onclick = ()=>rate(ok);
+  $("controls").appendChild(next);
+  next.focus();
+}
+
+function rate(ok){
+  const c = deck[pos];
+  const st = S.stats[c.it] || {r:0,w:0};
+  ok ? st.r++ : st.w++;
+  S.stats[c.it] = st;
+  if(ok) S.known[c.it] = true;
+  S.seen++; if(ok) S.right++;
+  if(!ok){ const at = Math.min(pos+6, deck.length); deck.splice(at,0,c); }
+  save(); pos++; render();
+}
+
+$("card").onclick = ()=>{ if(S.mode==="recall" && !flipped) flip(); };
+
+document.addEventListener("keydown", e=>{
+  if($("sheet").classList.contains("open") || $("studySheet").classList.contains("open")) return;
+  if(e.key===" " || e.key==="Enter"){
+    e.preventDefault();
+    if(S.mode==="recall" && !flipped) return flip();
+    const n = $("controls").querySelector(".single"); if(n) n.click();
+    return;
+  }
+  if(/^[1-4]$/.test(e.key)){
+    const b = $("controls").querySelectorAll(".opt")[+e.key-1]; if(b && !b.disabled) b.click();
+  }
+  if(flipped && S.mode==="recall"){
+    if(e.key==="a"||e.key==="A") rate(false);
+    if(e.key==="g"||e.key==="G") rate(true);
+  }
+});
+
+/* ---------------- AUDIO ---------------- */
+let itVoices = [], itVoice = null;
+function rankVoice(v){
+  const n=(v.name||"").toLowerCase(); let s=0;
+  if(/premium|enhanced|siri|neural/.test(n)) s+=40;
+  if(/alice|federica|luca|emma|paola|eloisa|carlo/.test(n)) s+=20;
+  if(v.localService) s+=10;
+  if(/^it[-_]IT$/i.test(v.lang)) s+=10;
+  return s;
+}
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return;
+  itVoices = speechSynthesis.getVoices().filter(v=>/^it\b|^it[-_]/i.test(v.lang)).sort((a,b)=>rankVoice(b)-rankVoice(a));
+  itVoice = itVoices.find(v=>v.name===S.voiceName) || itVoices[0] || null;
+}
+let voiceTries = 0;
+function refreshVoices(){
+  try{ const had=itVoices.length; pickVoice(); if(itVoices.length!==had && $("voiceSel")) drawVoices(); }catch(e){}
+  return itVoices.length;
+}
+function pollVoices(){ if(refreshVoices() || ++voiceTries>40) return; setTimeout(pollVoices,250); }
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = ()=>{ voiceTries=0; refreshVoices(); };
+  setTimeout(pollVoices,0);
+  ["touchend","click","keydown"].forEach(ev=>
+    document.addEventListener(ev, ()=>{ voiceTries=0; pollVoices(); }, {passive:true, once:true}));
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshVoices(); });
+}
+function speak(text, quiet){
+  if(!("speechSynthesis" in window)) return;
+  if(!itVoice) pickVoice();
+  if(!itVoice){
+    if(quiet) return;
+    alert("No Italian voice has been detected yet.\n\n"+
+          "The voice list sometimes loads a moment late — tap this again in a few seconds.\n\n"+
+          "If it stays silent, add an Italian voice:\n"+
+          "iPhone / iPad: Settings › Accessibility › Spoken Content › Voices › Italian\n"+
+          "Mac: System Settings › Accessibility › Spoken Content › System Voice › Manage Voices…\n\n"+
+          "An English voice reading Italian sounds wrong, so audio stays off until one is available.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = itVoice; u.lang = itVoice.lang || "it-IT"; u.rate = 0.95; u.pitch = 1;
+  speechSynthesis.speak(u);
+}
+function drawVoices(){
+  const sel = $("voiceSel"); if(!sel) return;
+  sel.innerHTML = itVoices.length
+    ? itVoices.map(v=>'<option value="'+esc(v.name)+'"'+(itVoice&&v.name===itVoice.name?" selected":"")+'>'+esc(v.name)+' — '+esc(v.lang)+'</option>').join("")
+    : '<option>No Italian voice found on this device</option>';
+  $("voiceStat").textContent = itVoices.length
+    ? itVoices.length+" Italian voice"+(itVoices.length>1?"s":"")+" available. Enhanced or Premium voices sound markedly better."
+    : "Audio stays off until an Italian voice is installed — an English voice reading Italian sounds wrong.";
+}
+$("voiceSel").onchange = e=>{ S.voiceName = e.target.value; pickVoice(); save(); };
+$("autoSpk").onclick = ()=>{ S.speak = !S.speak; save(); drawChips(); };
+$("testSpk").onclick = ()=>{ speak("Siccome piove, resto a casa; quindi leggo un libro."); drawVoices(); };
+
+/* ---------------- SETTINGS SHEET ---------------- */
+function count(cat){ return CARDS.filter(c=>c.cat===cat).length; }
+function drawChips(){
+  $("modeChips").innerHTML = MODES.map(m=>
+    '<button class="chip'+(S.mode===m.id?" sel":"")+'" data-m="'+m.id+'">'+m.label+'</button>').join("");
+  $("modeChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    S.mode = b.dataset.m; save(); drawChips(); syncModeBtn(); buildDeck();
+  });
+  $("modeHint").textContent = (MODES.find(m=>m.id===S.mode)||{}).hint || "";
+
+  $("catChips").innerHTML = CATS.map(c=>
+    '<button class="chip'+(S.cats.includes(c.id)?" sel":"")+'" data-c="'+c.id+'">'+c.label+
+    '<span class="n">'+count(c.id)+'</span></button>').join("");
+  $("catChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const id=b.dataset.c;
+    S.cats = S.cats.includes(id) ? S.cats.filter(x=>x!==id) : S.cats.concat(id);
+    save(); drawChips(); buildDeck();
+  });
+
+  $("ordChips").innerHTML = [["category","By category"],["random","Shuffled"]].map(([id,l])=>
+    '<button class="chip'+(S.order===id?" sel":"")+'" data-o="'+id+'">'+l+'</button>').join("");
+  $("ordChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    S.order=b.dataset.o; save(); drawChips(); buildDeck();
+  });
+
+  $("autoSpk").classList.toggle("on", !!S.speak);
+
+  const inPool = pool().length, known = pool().filter(c=>S.known[c.it]).length;
+  $("progStat").innerHTML = known+" of "+inPool+" selected cards retired as known · "+
+    S.seen+" answers, "+(S.seen?Math.round(S.right/S.seen*100):0)+"% correct.";
+  drawVoices();
+}
+function syncModeBtn(){ $("modeBtn").textContent = (MODES.find(m=>m.id===S.mode)||MODES[0]).label; }
+
+$("setBtn").onclick   = ()=>{ drawChips(); $("sheet").classList.add("open"); };
+$("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
+$("sheet").onclick    = e=>{ if(e.target===$("sheet")){ $("sheet").classList.remove("open"); buildDeck(); } };
+$("allC").onclick  = ()=>{ S.cats = CATS.map(c=>c.id); save(); drawChips(); buildDeck(); };
+$("noneC").onclick = ()=>{ S.cats = []; save(); drawChips(); buildDeck(); };
+$("coreC").onclick = ()=>{ S.cats = CORE.slice(); save(); drawChips(); buildDeck(); };
+$("discC").onclick = ()=>{ S.cats = DISC.slice(); save(); drawChips(); buildDeck(); };
+$("resetKnownBtn").onclick = ()=>{ S.known={}; save(); drawChips(); buildDeck(); };
+$("resetBtn").onclick = ()=>{
+  if(!confirm("Reset all progress — known cards, per-card stats, and the score?")) return;
+  S.known={}; S.stats={}; S.seen=0; S.right=0; save(); drawChips(); buildDeck();
+};
+$("modeBtn").onclick = ()=>{
+  const i = MODES.findIndex(m=>m.id===S.mode);
+  S.mode = MODES[(i+1)%MODES.length].id;
+  save(); syncModeBtn(); buildDeck();
+};
+
+/* ---------------- REFERENCE VIEW ---------------- */
+function drawStudy(){
+  const html = CATS.map(cat=>{
+    const rows = CARDS.filter(c=>c.cat===cat.id).map(c=>
+      '<div class="r" data-say="'+esc(c.ex)+'">'+
+        '<div class="f">'+esc(c.it)+'<em>'+esc(c.reg)+'</em></div>'+
+        '<div class="m">'+esc(c.en)+' · <span style="color:var(--dim)">'+esc(c.mood==="—"?"no verb mood":c.mood)+'</span></div>'+
+        '<div class="x">'+esc(c.ex)+'</div>'+
+        '<div class="xe">'+esc(c.exen)+'</div>'+
+      '</div>').join("");
+    return '<div class="tbl"><h3>'+esc(cat.it)+' — '+esc(cat.label)+'</h3>'+rows+'</div>';
+  }).join("");
+  $("studyBody").innerHTML =
+    '<div class="legend"><span><i class="dot ind"></i>indicativo</span><span><i class="dot cong"></i>congiuntivo</span>'+
+    '<span><i class="dot inf"></i>infinito</span><span>tap any row to hear the sentence</span></div>'+
+    '<div class="tbl"><h3>Summary — connective + verb mood</h3>'+
+      '<div class="r" data-say="Non esco perché piove."><div class="f">Indicativo</div>'+
+        '<div class="m">perché (cause), siccome, dato che, quindi, però, tuttavia, anche se, quando, mentre, dopo che</div></div>'+
+      '<div class="r" data-say="Esco benché piova."><div class="f">Congiuntivo</div>'+
+        '<div class="m">benché, sebbene, nonostante, affinché, perché (purpose), purché, a patto che, prima che, a meno che</div></div>'+
+      '<div class="r" data-say="Studio per imparare."><div class="f">Infinito</div>'+
+        '<div class="m">per, allo scopo di, al fine di, prima di, dopo (+ past infinitive)</div></div>'+
+      '<div class="note">Three traps worth memorizing: <b>siccome</b> only ever opens a sentence; '+
+        '<b>anche se</b> is the one concessive on the indicative side; <b>prima che</b> is the one temporal on the subjunctive side.</div>'+
+    '</div>' + html;
+  $("studyBody").querySelectorAll(".r").forEach(el=> el.onclick = ()=> speak(el.dataset.say));
+}
+$("studyBtn").onclick   = ()=>{ drawStudy(); $("studySheet").classList.add("open"); };
+$("studyClose").onclick = ()=> $("studySheet").classList.remove("open");
+
+/* ---------------- BOOT ---------------- */
+syncModeBtn();
+buildDeck();
+</script>
+</body>
+</html>

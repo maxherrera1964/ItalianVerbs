@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1216">
+<title>CI e NE — Italian Quiz</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0f1216; --panel:#181d24; --panel2:#212832; --line:#2c343f;
+    --txt:#eef2f6; --dim:#93a1b1; --accent:#4ade80; --accent2:#38bdf8;
+    --red:#f87171; --amber:#fbbf24; --violet:#c4b5fd;
+  }
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Segoe UI,Roboto,sans-serif;
+    display:flex; flex-direction:column; overscroll-behavior:none;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-user-select:none; user-select:none;
+  }
+  header{display:flex;align-items:center;gap:7px;padding:12px 14px 8px}
+  header h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.3px;flex:1}
+  header h1 span{color:var(--accent)}
+  header h1 em{font-style:normal;color:var(--amber)}
+  .btn{
+    background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:10px; padding:8px 11px; font-size:13px; font-weight:600; cursor:pointer;
+    white-space:nowrap; font-family:inherit;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn.on{background:var(--accent);color:#06210f;border-color:var(--accent)}
+
+  .bar{height:4px;background:var(--panel2);margin:4px 16px 0;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+  .meta{display:flex;justify-content:space-between;padding:8px 16px;font-size:12px;color:var(--dim);gap:10px}
+  .meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 16px;overflow-y:auto}
+  .card{
+    width:100%; max-width:520px; min-height:40vh; margin:auto;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line); border-radius:22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:32px 20px 26px; position:relative;
+  }
+  .card.tappable{cursor:pointer}
+  .tag{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim);
+    white-space:nowrap; max-width:92%; overflow:hidden; text-overflow:ellipsis;
+  }
+  .prompt{font-size:15px;color:var(--accent2);margin-bottom:6px;font-weight:600}
+  .big{font-size:clamp(24px,7vw,38px);font-weight:700;line-height:1.25;margin:6px 0}
+  .big.sm{font-size:clamp(18px,5vw,26px)}
+  .big.xs{font-size:clamp(16px,4.3vw,21px);line-height:1.4}
+  .gloss{font-size:15px;color:var(--violet);margin-top:6px;font-weight:600;line-height:1.45}
+  .sub{font-size:15px;color:var(--dim);margin-top:10px;line-height:1.5}
+  .hint{position:absolute;bottom:14px;font-size:11px;color:#5d6b7a;letter-spacing:.5px}
+  .answer{display:none;width:100%}
+  .card.flipped .answer{display:block}
+  .card.flipped .hint{display:none}
+  .pron{font-size:13px;color:var(--dim);margin:14px auto 0;line-height:1.55;max-width:420px}
+  .pron b{color:var(--txt)}
+  .ex{margin:14px auto 0;padding:12px 14px;border-radius:12px;background:#12181e;border:1px solid var(--line);max-width:420px}
+  .exit{font-size:16px;font-weight:600;line-height:1.4}
+  .exen{font-size:13px;color:var(--dim);margin-top:5px}
+  .spkrow{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .spk{
+    background:var(--panel2);color:var(--accent2);border:1px solid var(--line);
+    border-radius:99px;padding:9px 16px;font-size:14px;font-weight:650;cursor:pointer;font-family:inherit;
+  }
+  .spk:active{transform:scale(.95)}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    padding:4px 9px;border-radius:99px;margin:0 4px 8px;background:#33260f;color:var(--amber)}
+
+  /* "what it replaces" strip */
+  .der{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:14px auto 0;max-width:430px}
+  .der .pill{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;text-align:center}
+  .der .pill small{display:block;font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--dim);margin-bottom:3px}
+  .der .pill b{font-size:16px}
+  .der .pill.from b{color:var(--accent2)}
+  .der .pill.to{background:#12301f;border-color:var(--accent)}
+  .der .pill.to b{color:var(--accent)}
+  .der .pill.ne{background:#241a38;border-color:var(--violet)}
+  .der .pill.ne b{color:var(--violet)}
+  .der .op{font-size:18px;color:var(--dim);font-weight:700}
+
+  footer{padding:10px 16px calc(14px + env(safe-area-inset-bottom))}
+  .rate{display:flex;gap:10px}
+  .rate button{flex:1;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .again{background:#3a2226;color:var(--red)}
+  .good{background:#12301f;color:var(--accent)}
+  .rate button:active{transform:scale(.97)}
+  .single{width:100%;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;
+    background:var(--panel2);color:var(--txt);cursor:pointer;font-family:inherit}
+
+  .opts{display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto}
+  .opt{
+    width:100%;text-align:left;padding:13px 14px;border-radius:12px;
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.35;
+    display:flex;gap:10px;align-items:baseline;
+  }
+  .opt i{font-style:normal;color:var(--dim);font-size:12px;font-weight:700;min-width:12px}
+  .opt:active{transform:scale(.99)}
+  .opt.right{background:#12301f;border-color:var(--accent);color:var(--accent)}
+  .opt.right i{color:var(--accent)}
+  .opt.wrong{background:#3a2226;border-color:var(--red);color:var(--red)}
+  .opt.wrong i{color:var(--red)}
+  .opt.mute{opacity:.45}
+  .opt[disabled]{cursor:default}
+
+  .typerow{display:flex;gap:8px}
+  .tin{
+    flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:12px;padding:14px;font-size:17px;font-family:inherit;font-weight:600;
+    -webkit-user-select:text;user-select:text;
+  }
+  .tin::placeholder{color:#5d6b7a;font-weight:400}
+  .tin.ok{border-color:var(--accent);color:var(--accent)}
+  .tin.no{border-color:var(--red);color:var(--red)}
+  .accrow{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .acc{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;
+    padding:8px 12px;font-size:16px;cursor:pointer;font-family:inherit}
+  .acc:active{transform:scale(.95)}
+
+  /* sheets */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:10;align-items:flex-end}
+  .sheet.open{display:flex}
+  .sheetbox{
+    background:var(--panel);width:100%;max-height:88vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);
+  }
+  .sheetbox h2{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:18px 0 10px}
+  .sheetbox h2:first-child{margin-top:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+    padding:8px 12px;border-radius:99px;font-size:13px;cursor:pointer;font-family:inherit;
+  }
+  .chip.sel{background:var(--accent);color:#06210f;border-color:var(--accent);font-weight:650}
+  .chip .n{opacity:.7;font-size:11px;margin-left:5px}
+  .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .row .btn{flex:1;text-align:center}
+  .addhint{font-size:12px;color:var(--dim);margin-top:9px;line-height:1.55}
+  .addhint b{color:var(--txt)}
+  .stat{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+  .close{width:100%;margin-top:22px;padding:14px;border-radius:14px;border:none;
+    background:var(--accent);color:#06210f;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+  .danger{background:transparent;color:var(--red);border:1px solid #4a2a2e}
+  .picker{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:11px;font-size:15px;font-weight:650;text-align:center;cursor:pointer;font-family:inherit}
+
+  /* reference */
+  .sheet.full{align-items:stretch}
+  .sheet.full .sheetbox{border-radius:0;max-height:100vh;height:100%;padding-top:calc(14px + env(safe-area-inset-top))}
+  .studyhead{display:flex;align-items:center;gap:6px;position:sticky;top:0;
+    background:var(--panel);padding-bottom:10px;margin-bottom:4px;z-index:2;flex-wrap:wrap}
+  .studyhead b{flex:1;font-size:16px;min-width:110px}
+  .wrap{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:14px}
+  .wrap h3{margin:0;padding:10px 14px;background:var(--panel2);font-size:12px;
+    text-transform:uppercase;letter-spacing:1.1px;color:var(--accent2)}
+  .wrap h3.n{color:var(--violet)}
+  .plain{font-size:13.5px;color:var(--dim);padding:11px 14px;border-top:1px solid var(--line);line-height:1.6}
+  .plain b{color:var(--txt)}
+  .plain i{color:var(--accent2);font-style:italic}
+  .note{font-size:12.5px;color:var(--amber);padding:11px 14px;border-top:1px solid var(--line);background:#1d1a12;line-height:1.6}
+  .r{display:flex;align-items:baseline;gap:10px;padding:10px 14px;border-top:1px solid var(--line);cursor:pointer}
+  .r:active{background:#1c2430}
+  .r .p{width:118px;flex:none;font-size:13.5px;font-weight:650}
+  .r .f{flex:1;font-size:13.5px;color:var(--dim)}
+  .r .x{font-size:13.5px;color:var(--accent2);font-style:italic;text-align:right;max-width:46%}
+  .dlg{padding:11px 14px;border-top:1px solid var(--line);font-size:14px;line-height:1.7;cursor:pointer}
+  .dlg b{color:var(--accent2)}
+  .studypad{padding-bottom:24px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>CI</span> e <em>NE</em></h1>
+  <button class="btn" id="studyBtn">Study</button>
+  <button class="btn" id="modeBtn">Choice</button>
+  <button class="btn" id="setBtn">Deck</button>
+</header>
+<div class="bar"><i id="barFill"></i></div>
+<div class="meta"><span id="counter">—</span><span id="score">—</span></div>
+
+<main>
+  <div class="card" id="card">
+    <div class="tag" id="tag"></div>
+    <div id="front"></div>
+    <div class="answer" id="back"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</main>
+
+<footer><div id="controls"></div></footer>
+
+<div class="sheet full" id="studySheet">
+  <div class="sheetbox">
+    <div class="studyhead">
+      <b id="studyTitle">Reference</b>
+      <button class="btn on" id="tabCi">CI</button>
+      <button class="btn" id="tabNe">NE</button>
+      <button class="btn" id="tabVerbs">Verbs</button>
+      <button class="btn" id="tabPos">Position</button>
+      <button class="btn" id="tabIdi">Idioms</button>
+      <button class="btn" id="studyClose">Done</button>
+    </div>
+    <div class="studypad" id="studyBody"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheetbox">
+    <h2>Test mode</h2>
+    <div class="chips" id="modeChips"></div>
+    <div class="addhint" id="modeHint"></div>
+
+    <h2>What to drill</h2>
+    <div class="chips" id="catChips"></div>
+    <div class="row">
+      <button class="btn" id="allC">All</button>
+      <button class="btn" id="noneC">Clear</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="choiceC">CI or NE?</button>
+      <button class="btn" id="prepC">Which preposition</button>
+      <button class="btn" id="verbC">Esserci &amp; volerci</button>
+      <button class="btn" id="idiC">Idioms</button>
+    </div>
+    <div class="addhint"><b>CI or NE?</b> is the drill that matters most — the particle is decided by the preposition
+      the verb takes, so <i>pensare a</i> gives ci and <i>parlare di</i> gives ne, every time.</div>
+
+    <h2>Order</h2>
+    <div class="chips" id="ordChips"></div>
+
+    <h2>Audio — Italian voice</h2>
+    <select id="voiceSel" class="picker" style="width:100%"></select>
+    <div class="row">
+      <button class="btn" id="autoSpk">Speak answer on reveal</button>
+      <button class="btn" id="testSpk">▶ Test</button>
+    </div>
+    <div class="stat" id="voiceStat"></div>
+
+    <h2>Progress</h2>
+    <div class="stat" id="progStat"></div>
+    <div class="row">
+      <button class="btn" id="resetKnownBtn">Reset known cards</button>
+      <button class="btn danger" id="resetBtn">Reset progress</button>
+    </div>
+    <button class="close" id="closeBtn">Start studying</button>
+  </div>
+</div>
+
+<script>
+/* =======================================================================
+   CI and NE
+     CI  replaces a / in / su / da + PLACE, and a + thing with certain verbs
+     NE  replaces DI + thing, a quantity out of a whole, and da + place (origin)
+   The preposition the verb governs is what decides which particle you need.
+   ======================================================================= */
+const CATS = [
+  {id:"ci",       label:"CI — uses",        it:"Gli usi di CI"},
+  {id:"ne",       label:"NE — uses",        it:"Gli usi di NE"},
+  {id:"scelta",   label:"CI or NE?",        it:"CI o NE?"},
+  {id:"prep",     label:"Which preposition", it:"Quale preposizione regge il verbo?"},
+  {id:"verbi",    label:"Esserci · volerci",it:"Esserci, volerci, metterci"},
+  {id:"posizione",label:"Position",         it:"Dove vanno CI e NE"},
+  {id:"accordo",  label:"Agreement",        it:"NE e l'accordo del participio"},
+  {id:"risposte", label:"Answer it",        it:"Rispondi usando CI o NE"},
+  {id:"idiomi",   label:"Idioms",           it:"Espressioni idiomatiche"}
+];
+const CARDS = [];
+const add = c => { CARDS.push(c); return c; };
+
+/* ---------- 1. CI: what it replaces ---------- */
+[["Vai spesso a Roma? — Sì, ___ vado ogni mese.","ci","a Roma","place with a"],
+ ["Sei mai stato in Giappone? — No, non ___ sono mai stato.","ci","in Giappone","place with in"],
+ ["Vai spesso al cinema? — ___ vado una volta alla settimana.","Ci","al cinema","place with a"],
+ ["Quando andate in vacanza? — ___ andiamo ad agosto.","Ci","in vacanza","place with in"],
+ ["Resti a casa stasera? — Sì, ___ resto.","ci","a casa","place with a"],
+ ["Sei salito sul treno? — Sì, ___ sono salito.","ci","sul treno","place with su"]
+].forEach(([s,a,from,lab])=> add({cat:"ci", fam:"cif", q:s, qs:"fill the gap", a:a, opts:["ci","ne"],
+  der:{from:from, to:"ci", kind:"ci"}, note:"Locative ci — it stands for a place introduced by a, in, su or da. "+lab+"."}));
+
+[["pensare a","Penso spesso a questo problema.","Ci penso spesso.","to think about"],
+ ["credere a / in","Credi ai fantasmi?","Ci credi?","to believe in"],
+ ["riuscire a","Non riesco a capire.","Non ci riesco.","to manage to"],
+ ["provare a","Hai provato a chiamarlo?","Ci hai provato?","to try to"],
+ ["rinunciare a","Non rinuncio a questo progetto.","Non ci rinuncio.","to give up on"],
+ ["contare su","Conto sul tuo aiuto.","Ci conto.","to count on"]
+].forEach(([v,full,short,en])=> add({cat:"ci", fam:"citr", q:full, qs:"rewrite it with CI", a:short,
+  der:{from:v.indexOf("su")>-1?"su + thing":"a + thing", to:"ci", kind:"ci"},
+  note:v+" ("+en+") governs "+(v.indexOf("su")>-1?"su":"a")+", so the particle is ci — never ne."}));
+
+add({cat:"ci", fam:"rule", q:"CI", qs:"what does it replace?",
+  a:"a place, and a / su + thing with certain verbs",
+  opts:["a place, and a / su + thing with certain verbs","di + thing, and quantities","a direct object","an indirect person only"],
+  note:"a/in/su/da + place: Vai a scuola? → Ci vai? · a + thing: Pensi al lavoro? → Ci pensi? · su + thing: Conti su di me? → Ci conti?"});
+
+/* ---------- 2. NE: what it replaces ---------- */
+[["Quanti libri hai? — ___ ho tre.","Ne","tre libri","a quantity"],
+ ["Quante mele vuoi? — ___ vorrei due.","Ne","due mele","a quantity"],
+ ["Hai fratelli? — Sì, ___ ho uno.","ne","un fratello","a quantity"],
+ ["Bevi molto caffè? — ___ bevo tre al giorno.","Ne","tre caffè","a quantity"],
+ ["Avete comprato dei fiori? — Sì, ___ abbiamo comprati molti.","ne","molti fiori","a quantity"]
+].forEach(([s,a,from,lab])=> add({cat:"ne", fam:"nef", q:s, qs:"fill the gap", a:a, opts:["ci","ne"],
+  der:{from:from, to:"ne", kind:"ne"}, note:"Partitive ne — it stands for "+lab+" out of a whole already mentioned."}));
+
+[["parlare di","Parliamo di politica.","Ne parliamo.","to talk about"],
+ ["avere bisogno di","Ho bisogno di aiuto.","Ne ho bisogno.","to need"],
+ ["avere voglia di","Ho voglia di gelato.","Ne ho voglia.","to feel like"],
+ ["occuparsi di","Mi occupo di questo problema.","Me ne occupo.","to take care of"],
+ ["essere sicuro di","Sei sicuro di questo?","Ne sei sicuro?","to be sure of"],
+ ["sapere di","Non so nulla di questa storia.","Non ne so nulla.","to know about"]
+].forEach(([v,full,short,en])=> add({cat:"ne", fam:"netr", q:full, qs:"rewrite it with NE", a:short,
+  der:{from:"di + thing", to:"ne", kind:"ne"},
+  note:v+" ("+en+") governs di, so the particle is ne — never ci."+
+       (v==="occuparsi di" ? " With a reflexive verb, mi becomes me before ne: mi + ne = me ne." : "")}));
+
+[["Sei appena uscito dal cinema? — Sì, ___ sono appena uscito.","ne","dal cinema"],
+ ["Sono andato in banca e ___ sono uscito alle 12.","ne","dalla banca"],
+ ["Roma è bella, ___ sono tornato ieri.","ne","da Roma"]
+].forEach(([s,a,from])=> add({cat:"ne", fam:"nef", q:s, qs:"fill the gap", a:a, opts:["ci","ne"],
+  der:{from:from, to:"ne", kind:"ne"},
+  note:"Ne can also mean FROM that place — motion away from it. Ci is going there, ne is coming from there."}));
+
+add({cat:"ne", fam:"rule", q:"NE", qs:"what does it replace?",
+  a:"di + thing, a quantity, and da + place",
+  opts:["di + thing, a quantity, and da + place","a place you are going to","an indirect person","a direct object"],
+  note:"di + thing: Parli di lavoro? → Ne parli? · quantity: Quanti ne vuoi? Ne voglio due. · da + place: Esci dal bar? → Ne esci?"});
+
+/* ---------- 3. CI or NE? — the discrimination drill ---------- */
+[["Vai spesso al cinema? — Sì, ___ vado ogni settimana.","ci","al cinema is a place — locative ci."],
+ ["Quanti caffè bevi al giorno? — ___ bevo tre.","ne","A quantity out of a whole — partitive ne."],
+ ["Pensi ancora a Marco? — No, non ___ penso più.","ci","pensare a governs a → ci."],
+ ["Hai parlato del problema con il capo? — Sì, ___ ho parlato ieri.","ne","parlare di governs di → ne."],
+ ["Credi ai fantasmi? — No, non ___ credo.","ci","credere a governs a → ci."],
+ ["Hai bisogno di aiuto? — Sì, ___ ho molto bisogno.","ne","avere bisogno di governs di → ne."],
+ ["Riesci a capire? — No, non ___ riesco.","ci","riuscire a governs a → ci."],
+ ["Hai voglia di gelato? — Sì, ___ ho voglia.","ne","avere voglia di governs di → ne."],
+ ["Conti sul mio aiuto? — Sì, ___ conto.","ci","contare su governs su → ci."],
+ ["Sei sicuro di questo? — Sì, ___ sono sicuro.","ne","essere sicuro di governs di → ne."],
+ ["Sei mai stato in Giappone? — No, non ___ sono mai stato.","ci","in Giappone is a place → ci."],
+ ["Quante sorelle hai? — ___ ho due.","ne","A quantity → ne."],
+ ["Ti occupi di questo problema? — Sì, me ___ occupo.","ne","occuparsi di governs di → ne."],
+ ["Sei uscito dal bar? — Sì, ___ sono uscito alle 12.","ne","Motion away from a place → ne, not ci."],
+ ["Andate in vacanza ad agosto? — Sì, ___ andiamo ad agosto.","ci","in vacanza is a place → ci."],
+ ["Hai provato a chiamarlo? — Sì, ___ ho provato.","ci","provare a governs a → ci."],
+ ["Rinunci a questo progetto? — No, non ___ rinuncio.","ci","rinunciare a governs a → ci."],
+ ["Sai qualcosa di questa storia? — No, non ___ so nulla.","ne","sapere di governs di → ne."],
+ ["Vai a scuola domani? — Sì, ___ vado.","ci","a scuola is a place → ci."],
+ ["Vuoi del pane? — Sì, ___ voglio un po'.","ne","A quantity out of a whole → ne."]
+].forEach(([s,a,n])=> add({cat:"scelta", fam:"cine", q:s, qs:"CI or NE?", a:a, opts:["ci","ne"],
+  note:n+" The preposition the verb takes is what decides it."}));
+
+/* ---------- 4. esserci, volerci, metterci ---------- */
+[["C'è un problema.","present, singular","c'è = there is"],
+ ["Ci sono molti turisti in città.","present, plural","ci sono = there are"],
+ ["Non c'è nessuno in casa.","present, singular","Negative: non c'è nessuno = there is nobody"],
+ ["Ieri c'è stata una festa.","passato prossimo, feminine singular","c'è stato / c'è stata — esserci takes essere, so the participle agrees"],
+ ["Una volta c'erano meno macchine.","imperfetto, plural","c'era / c'erano = there was / there were"]
+].forEach(([s,form,n])=> add({cat:"verbi", fam:"ess", q:s, qs:"which form of esserci is this?", a:form,
+  opts:["present, singular","present, plural","passato prossimo, feminine singular","imperfetto, plural"],
+  note:n+". Esserci means to exist or to be present in a place."}));
+
+[["Quanto tempo ___ per arrivare? — Mezz'ora.","ci vuole","mezz'ora is singular → ci vuole"],
+ ["Per fare la torta ___ tre uova.","ci vogliono","tre uova is plural → ci vogliono"],
+ ["Per imparare l'italiano ___ pazienza.","ci vuole","pazienza is singular → ci vuole"],
+ ["___ molti soldi per comprare una casa.","Ci vogliono","molti soldi is plural → ci vogliono"],
+ ["___ coraggio per fare questo!","Ci vuole","coraggio is singular → ci vuole"],
+ ["___ tempo per finire il progetto. (passato)","C'è voluto","Volerci takes essere: c'è voluto tempo"],
+ ["___ tre giorni per finire. (passato)","Ci sono voluti","Plural in the past: ci sono voluti tre giorni"]
+].forEach(([s,a,n])=> add({cat:"verbi", fam:"vol", q:s, qs:"volerci — singular or plural?", a:a,
+  note:n+". Volerci agrees with the time or quantity that follows, not with a person."}));
+
+[["Quanto tempo ___ per arrivare all'aeroporto? (in general)","ci vuole","Impersonal — no one in particular, so volerci."],
+ ["Io ___ sempre un'ora per prepararmi.","ci metto","A specific person takes the time, so metterci."],
+ ["Per imparare l'italiano ___ pazienza.","ci vuole","Impersonal → volerci."],
+ ["Marco ___ tre ore per finire l'esame.","ci ha messo","Marco is the subject → metterci, in the passato prossimo."],
+ ["___ due uova per fare questa torta.","Ci vogliono","Impersonal and plural → ci vogliono."]
+].forEach(([s,a,n])=> add({cat:"verbi", fam:"volmet", q:s, qs:"volerci or metterci?", a:a, note:n}));
+
+add({cat:"verbi", fam:"rule", q:"volerci vs metterci", qs:"what is the difference?",
+  a:"volerci is impersonal, metterci has a personal subject",
+  opts:["volerci is impersonal, metterci has a personal subject","they are interchangeable",
+        "volerci is past, metterci is present","metterci is impersonal, volerci is personal"],
+  note:"Ci vuole un'ora per arrivare a Milano (in general) · Io ci metto un'ora per arrivare a Milano (I, personally)."});
+add({cat:"verbi", fam:"rule", q:"esserci", qs:"what does it express?",
+  a:"the existence or presence of something in a place",
+  opts:["the existence or presence of something in a place","how long something takes","a quantity","movement away from a place"],
+  note:"c'è / ci sono · c'è stato / ci sono stati · c'era / c'erano. C'è un problema · Ci sono molti turisti in città."});
+
+/* ---------- 5. position ---------- */
+add({cat:"posizione", fam:"rule", q:"simple and compound tenses", qs:"where do ci and ne go?",
+  a:"before the verb",
+  opts:["before the verb","attached to the end of the verb","after the subject","either, freely"],
+  note:"Ci vado domani. (presente) · Ne ho comprati tre. (passato prossimo) · Ci andavo spesso. (imperfetto) · Ne parleremo domani. (futuro)"});
+add({cat:"posizione", fam:"rule", q:"an infinitive", qs:"where do ci and ne go?",
+  a:"attached to the end, and the infinitive drops its final -e",
+  opts:["attached to the end, and the infinitive drops its final -e","before it, always","attached, keeping the -e","they cannot be used with an infinitive"],
+  note:"andare + ci → andarci · parlare + ne → parlarne · pensare + ci → pensarci. Voglio andarci. · Devo parlarne con te. · È bello andarci in estate."});
+add({cat:"posizione", fam:"rule", q:"potere, volere, dovere + infinitive", qs:"where do ci and ne go?",
+  a:"either before the modal or attached to the infinitive",
+  opts:["either before the modal or attached to the infinitive","only before the modal","only attached to the infinitive","between the two verbs"],
+  note:"Ci voglio andare. = Voglio andarci. · Ne devo comprare tre. = Devo comprarne tre. · Ci posso pensare? = Posso pensarci? · Ne vorrei parlare. = Vorrei parlarne."});
+add({cat:"posizione", fam:"rule", q:"affirmative imperative (tu, noi, voi)", qs:"where do ci and ne go?",
+  a:"after the verb, attached",
+  opts:["after the verb, attached","before the verb","either","they are dropped"],
+  note:"Pensaci! · Parlane con lui! · Andiamoci! The formal Lei keeps them in front: Ci vada!"});
+add({cat:"posizione", fam:"rule", q:"negative imperative", qs:"where do ci and ne go?",
+  a:"before or after — both are correct",
+  opts:["before or after — both are correct","only before","only after","they are dropped"],
+  note:"Non pensarci! = Non ci pensare! · Non parlarne! = Non ne parlare! But the formal Lei allows only one: Non ci vada!"});
+add({cat:"posizione", fam:"rule", q:"da', di', fa', sta', va'", qs:"what happens to ci and ne after them?",
+  a:"the consonant doubles",
+  opts:["the consonant doubles","nothing changes","they go before the verb instead","the apostrophe is kept"],
+  note:"va' + ci = Vacci! · da' + ne = Danne un po' a Marco! · fa' + ne = Fanne due! · di' + ci = Dicci la verità!"});
+
+[["Voglio andare a Roma. (attach it)","Voglio andarci.","andare + ci → andarci"],
+ ["Devo parlare di questo con te. (attach it)","Devo parlarne con te.","parlare + ne → parlarne"],
+ ["È bello andare al mare in estate. (attach it)","È bello andarci in estate.","andare + ci → andarci"],
+ ["Preferisco non pensare a questo.","Preferisco non pensarci.","pensare + ci → pensarci"],
+ ["Ci voglio andare. (the other position)","Voglio andarci.","Both are correct with a modal verb."],
+ ["Ne devo comprare tre. (the other position)","Devo comprarne tre.","Both are correct with a modal verb."],
+ ["Posso pensarci? (the other position)","Ci posso pensare?","Both are correct with a modal verb."],
+ ["Vorrei parlarne. (the other position)","Ne vorrei parlare.","Both are correct with a modal verb."],
+ ["Pensa a questo! (tu, affirmative)","Pensaci!","Affirmative imperative — attached."],
+ ["Parla di questo con lui! (tu, affirmative)","Parlane con lui!","Affirmative imperative — attached."],
+ ["Andiamo a Roma! (noi)","Andiamoci!","Affirmative imperative — attached, one word."],
+ ["Vada a Roma! (Lei, formal)","Ci vada!","The formal imperative keeps them in front."],
+ ["va' + ci","Vacci!","The short imperative doubles the consonant: va' + ci = vacci."],
+ ["da' + ne (un po' a Marco)","Danne un po' a Marco!","da' + ne = danne."],
+ ["fa' + ne (due)","Fanne due!","fa' + ne = fanne."],
+ ["di' + ci (la verità)","Dicci la verità!","di' + ci = dicci."]
+].forEach(([s,a,n])=> add({cat:"posizione", fam:"pos", q:s, qs:"put the particle in the right place", a:a, note:n}));
+
+/* ---------- 6. NE and participle agreement ---------- */
+[["Quanti libri hai letto? — Ne ho (leggere) ___ tre.","letti","tre libri — masculine plural → -i"],
+ ["Quante mele hai comprato? — Ne ho (comprare) ___ cinque.","comprate","cinque mele — feminine plural → -e"],
+ ["Quanto vino hai bevuto? — Ne ho (bere) ___ un bicchiere.","bevuto","un bicchiere — masculine singular → -o"],
+ ["Quanta pasta hai mangiato? — Ne ho (mangiare) ___ molta.","mangiata","molta pasta — feminine singular → -a"],
+ ["Hai visto i nuovi film? — Sì, ne ho (vedere) ___ alcuni.","visti","alcuni film — masculine plural → -i"],
+ ["Avete fatto le foto? — Sì, ne abbiamo (fare) ___ tante!","fatte","tante foto — feminine plural → -e"],
+ ["Hai comprato del pane? — Sì, ne ho (comprare) ___ un chilo.","comprato","un chilo — masculine singular → -o"],
+ ["Avete comprato dei fiori? — Sì, ne abbiamo (comprare) ___ molti.","comprati","molti fiori — masculine plural → -i"],
+ ["Hai parlato del problema? — Sì, ne ho (parlare) ___.","parlato","Here ne means “of this”, not a quantity — the participle stays invariable."]
+].forEach(([s,a,n])=> add({cat:"accordo", fam:"agr", q:s, qs:"agree the past participle", a:a, note:n}));
+
+add({cat:"accordo", fam:"rule", q:"partitive NE (a quantity)", qs:"does the participle agree?",
+  a:"yes — with the quantity",
+  opts:["yes — with the quantity","no, never","only in the plural","only with essere"],
+  note:"Ne ho mangiati tre. · Ne ho comprate cinque. The participle takes its ending from the noun the quantity refers to."});
+add({cat:"accordo", fam:"rule", q:"NE meaning “of this”", qs:"does the participle agree?",
+  a:"agreement is optional — it usually stays invariable",
+  opts:["agreement is optional — it usually stays invariable","yes, always","no, never — it is an error to agree","only with feminine nouns"],
+  note:"Hai parlato del problema? — Sì, ne ho parlato. With a reflexive the auxiliary is essere, and there it does agree: Ti sei occupato della pratica? — Sì, me ne sono occupato."});
+
+/* ---------- 7. answer the question ---------- */
+[["Vai in palestra? — Sì, ___","ci vado","in palestra is a place → ci."],
+ ["Sei mai stato in Giappone? — No, ___","non ci sono mai stato","The particle stays before the auxiliary: non ci sono mai stato."],
+ ["Riesci a capire questa lezione? — Sì, ___","ci riesco","riuscire a → ci."],
+ ["Conti sul mio aiuto? — Certo che ___","ci conto","contare su → ci."],
+ ["Quante sorelle hai? (2)","Ne ho due.","Partitive ne plus the number."],
+ ["Quanti libri hai letto quest'anno? (5)","Ne ho letti cinque.","Partitive ne — and the participle agrees: letti."],
+ ["Quanta pasta vuoi? (un po')","Ne vorrei un po'.","Partitive ne with an unspecified quantity."],
+ ["Hai comprato delle mele? (3) — Sì, ___","ne ho comprate tre","Feminine plural quantity → comprate."],
+ ["Vai spesso a Roma? — Sì, ___","ci vado spesso","Locative ci."],
+ ["Pensi al lavoro anche in vacanza? — No, ___","non ci penso","pensare a → ci."]
+].forEach(([s,a,n])=> add({cat:"risposte", fam:"ans", q:s, qs:"answer using CI or NE", a:a, note:n}));
+
+/* ---------- 8. idioms ---------- */
+const IDI_CI = [
+  ["farcela","to manage, to succeed","Ce la fai? — Sì, ce la faccio!"],
+  ["volerci","to be necessary, to take","Ci vuole tempo."],
+  ["metterci","to take (time), said of a person","Ci metto un'ora."],
+  ["entrarci","to have to do with something","Io non c'entro niente!"],
+  ["starci","to be up for it, to agree","Ci stai a venire con noi?"],
+  ["vederci","to be able to see","Non ci vedo bene da lontano."],
+  ["sentirci","to be able to hear","Parla più forte, non ci sento!"],
+  ["crederci","to believe it","Non ci credo!"],
+  ["pensarci","to think about it, to take care of it","Ci penso io!"],
+  ["contarci","to count on it","Ci conto!"]
+];
+const IDI_NE = [
+  ["non poterne più","to be exhausted, to be fed up","Non ne posso più!"],
+  ["valerne la pena","to be worth it","Ne vale la pena."],
+  ["andarsene","to go away, to leave","Me ne vado!"],
+  ["fregarsene","not to care (informal)","Me ne frego! (Non m'importa)"],
+  ["averne abbastanza","to have had enough","Ne ho abbastanza!"],
+  ["combinarne di tutti i colori","to get up to all kinds of mischief","I bambini ne combinano di tutti i colori!"]
+];
+IDI_CI.concat(IDI_NE).forEach(([e,m,ex])=> add({cat:"idiomi", fam:"idi", q:e, qs:"what does this expression mean?",
+  a:m, ex:ex, noType:true,
+  note:"The ci or ne is welded into the verb here — it no longer points at any particular thing."}));
+
+[["Sono stanchissimo, ___!","non ne posso più","non poterne più — to be worn out or fed up"],
+ ["Vieni alla festa? — Sì, ___!","ci sto","starci — to be up for it"],
+ ["Non preoccuparti, ___ a tutto.","ci penso io","pensarci — I will take care of it"],
+ ["Il viaggio è lungo, ma ___.","ne vale la pena","valerne la pena — it is worth it"],
+ ["È tardi, ___. Ciao!","me ne vado","andarsene — I am off"],
+ ["L'esame è difficile, ma ___!","ce la faccio","farcela — I can do it"],
+ ["Parla più forte, non ___!","ci sento","sentirci — I cannot hear"],
+ ["Io non ___ niente con questa storia!","c'entro","entrarci — it has nothing to do with me"]
+].forEach(([s,a,n])=> add({cat:"idiomi", fam:"idifill", q:s, qs:"complete the expression", a:a, note:n}));
+
+/* ---------- 9. which preposition does the verb take? ----------
+   The particle is decided by the verb's preposition, and that preposition is
+   part of the verb's dictionary entry — like "depend on" in English. These
+   cards ask for the preposition first, since that is the real decision.
+------------------------------------------------------------------ */
+const PREP_A  = "a → ci";
+const PREP_DI = "di → ne";
+const PREP_SU = "su → ci";
+const PREP_NO = "nothing — direct object → lo / la";
+const PREP_OPTS = [PREP_A, PREP_DI, PREP_SU, PREP_NO];
+
+[["pensare","a","to think about","Ci penso spesso."],
+ ["credere","a","to believe (a claim, or in something)","Non ci credo!"],
+ ["riuscire","a","to manage to","Non ci riesco."],
+ ["provare","a","to try to","Ci ho provato."],
+ ["rinunciare","a","to give up on","Non ci rinuncio."],
+ ["tenere","a","to care about","Ci tengo molto."],
+ ["abituarsi","a","to get used to","Mi ci sono abituato."],
+ ["partecipare","a","to take part in","Ci partecipo."],
+ ["assistere","a","to attend, to witness","Ci ho assistito."],
+ ["fare attenzione","a","to pay attention to","Facci attenzione!"],
+ ["fare caso","a","to notice","Non ci ho fatto caso."],
+ ["badare","a","to mind, to look after","Ci bado io."],
+ ["giocare","a","to play (a game)","Giochi a tennis? — Sì, ci gioco."],
+ ["servire","a","to be good for","Non ci serve a niente."],
+
+ ["contare","su","to count on","Ci conto!"],
+ ["riflettere","su","to reflect on","Ci rifletto."],
+ ["scommettere","su","to bet on","Ci scommetto."],
+ ["basarsi","su","to be based on","Su questo ci si basa."],
+ ["concentrarsi","su","to focus on","Mi ci concentro."],
+ ["insistere","su","to insist on","Non ci insisto."],
+
+ ["parlare","di","to talk about","Ne parliamo."],
+ ["avere bisogno","di","to need","Ne ho bisogno."],
+ ["avere voglia","di","to feel like","Ne ho voglia."],
+ ["avere paura","di","to be afraid of","Ne ho paura."],
+ ["occuparsi","di","to deal with, to take care of","Me ne occupo."],
+ ["interessarsi","di","to be interested in","Me ne interesso."],
+ ["ricordarsi","di","to remember","Me ne ricordo."],
+ ["dimenticarsi","di","to forget","Me ne sono dimenticato."],
+ ["accorgersi","di","to notice, to realize","Me ne sono accorto."],
+ ["rendersi conto","di","to realize","Me ne rendo conto."],
+ ["lamentarsi","di","to complain about","Se ne lamenta sempre."],
+ ["pentirsi","di","to regret","Me ne pento."],
+ ["vergognarsi","di","to be ashamed of","Me ne vergogno."],
+ ["fidarsi","di","to trust","Non me ne fido."],
+ ["essere sicuro","di","to be sure of","Ne sono sicuro."],
+ ["essere stanco","di","to be tired of","Ne sono stanco."],
+ ["essere capace","di","to be capable of","Ne sono capace."],
+ ["sapere","di","to know about","Non ne so nulla."],
+ ["soffrire","di","to suffer from","Ne soffre da anni."],
+ ["discutere","di","to discuss","Ne abbiamo discusso."],
+ ["fare a meno","di","to do without","Non posso farne a meno."],
+
+ ["ascoltare","none","to listen to","La ascolto. — never ✘ ci ascolto"],
+ ["guardare","none","to look at","Lo guardo."],
+ ["cercare","none","to look for","La cerco."],
+ ["aspettare","none","to wait for","Lo aspetto."],
+ ["pagare","none","to pay for","L'ho pagato."],
+ ["chiedere","none","to ask for","L'ho chiesto."],
+ ["seguire","none","to follow","La seguo."]
+].forEach(function(row){
+  var v=row[0], pr=row[1], en=row[2], ex=row[3];
+  var a = pr==="a" ? PREP_A : (pr==="di" ? PREP_DI : (pr==="none" ? PREP_NO : PREP_SU));
+  var note = pr==="none"
+    ? "English puts a preposition here, Italian does not — " + v + " takes a plain direct object, so the pronoun is lo / la / li / le. This is the single most expensive trap in the whole topic."
+    : v + " " + pr + " (" + en + ") — the verb governs " + pr + ", so the particle is " + (pr==="di" ? "ne" : "ci") + "."
+      + (v==="credere" ? " Credere in (to have faith in) takes ci as well — there is no ne with credere." : "");
+  var vg = pr==="none" ? v + " — " + en + " · no preposition in Italian"
+                       : v + " " + pr + " — " + en;
+  add({cat:"prep", fam:"prep", q:v, sub:en, qs:"which preposition does it take?", a:a, opts:PREP_OPTS,
+       vg:vg, ex:ex, note:note});
+});
+
+/* the same verb, a different preposition, a different meaning */
+[["___ penso spesso. (it is on my mind)","ci","pensare — to think","pensare a — to have on your mind",
+  "pensare a = to have something on your mind."],
+ ["Che ___ pensi? (what is your opinion of it?)","ne","pensare — to think","pensare di — to have an opinion about",
+  "pensare di = to have an opinion. Same verb, other preposition, other particle."],
+ ["Non ___ credo! (I do not believe that)","ci","credere — to believe","credere a / in — to believe a claim, or in something",
+  "credere a / in both give ci — there is no ne with credere."],
+ ["___ ho parlato ieri. (about the matter)","ne","parlare — to speak, to talk","parlare di — to talk about",
+  "parlare di a topic gives ne. Parlare a a person gives gli / le instead."],
+ ["Hai finito il lavoro? — Sì, ___ ho finito.","lo","finire — to finish","finire qualcosa — direct object · finire di fare — to stop doing",
+  "finire takes a direct object here, so lo — not ci or ne."]
+].forEach(function(row){
+  add({cat:"prep", fam:"cine2", q:row[0], sub:row[2], qs:"which pronoun?", a:row[1], opts:["ci","ne","lo"],
+       vg:row[3], note:row[4]});
+});
+
+/* things take ci / ne; people keep the full form */
+[["Penso a Marco.","Penso a lui.",["Penso a lui.","Ci penso.","Lo penso.","Gli penso."],
+  "pensare a — to think about",
+  "With a person, a + tonic pronoun. Ci penso would mean you are thinking about the matter, not about Marco."],
+ ["Parlo di Maria.","Parlo di lei.",["Parlo di lei.","Ne parlo.","La parlo.","Le parlo."],
+  "parlare di — to talk about",
+  "With a person, di + tonic pronoun. Ne parlo is for topics."],
+ ["Ho bisogno di te.","Ho bisogno di te.",["Ho bisogno di te.","Ne ho bisogno.","Ti ho bisogno.","Ci ho bisogno."],
+  "avere bisogno di — to need",
+  "Nothing to replace — with a person the tonic pronoun stays as it is."],
+ ["Parlo a Marco.","Gli parlo.",["Gli parlo.","Ne parlo.","Ci parlo.","Lo parlo."],
+  "parlare a — to speak to someone",
+  "Parlare a a person is an indirect object, so gli / le — not ci."]
+].forEach(function(row){
+  add({cat:"prep", fam:"pers", q:row[0], sub:row[3], qs:"how do you pronominalize it?", a:row[1], opts:row[2],
+       vg:row[3], note:row[4]});
+});
+
+[["Ascolto la musica.","La ascolto.",["La ascolto.","Ci ascolto.","Ne ascolto.","Le ascolto."],
+  "ascoltare — to listen to"],
+ ["Aspetto l'autobus.","Lo aspetto.",["Lo aspetto.","Ci aspetto.","Ne aspetto.","Gli aspetto."],
+  "aspettare — to wait for"],
+ ["Cerco le chiavi.","Le cerco.",["Le cerco.","Ne cerco.","Ci cerco.","Li cerco."],
+  "cercare — to look for"],
+ ["Guardo il film.","Lo guardo.",["Lo guardo.","Ci guardo.","Ne guardo.","Gli guardo."],
+  "guardare — to look at, to watch"],
+ ["Ho pagato il conto.","L'ho pagato.",["L'ho pagato.","Ci ho pagato.","Ne ho pagato.","Gli ho pagato."],
+  "pagare — to pay for"]
+].forEach(function(row){
+  add({cat:"prep", fam:"trap", q:row[0], sub:row[3], qs:"which pronoun?", a:row[1], opts:row[2],
+       vg:row[3]+" · a direct object in Italian",
+       note:"English adds a preposition to this verb — listen TO, wait FOR, look FOR, look AT, pay FOR — but Italian does not. No preposition means a direct object, so lo / la / li / le."});
+});
+
+add({cat:"prep", fam:"rule", q:"occuparsi, ricordarsi, accorgersi, pentirsi, lamentarsi",
+  sub:"to deal with · to remember · to notice · to regret · to complain",
+  vg:"occuparsi di · ricordarsi di · accorgersi di · pentirsi di · lamentarsi di",
+  qs:"what do these reflexive verbs have in common?",
+  a:"they all take di, so they all take ne",
+  opts:["they all take di, so they all take ne","they all take a, so they all take ci",
+        "they take a direct object","they take no particle at all"],
+  note:"A useful heuristic: a reflexive verb followed by a preposition is usually a di-verb. And the reflexive pronoun changes shape before ne: mi + ne = me ne. Me ne occupo · Me ne ricordo · Me ne sono accorto."});
+add({cat:"prep", fam:"rule", q:"ci and ne with people", qs:"what do you use instead?",
+  a:"a / di + a tonic pronoun, or gli / le for an indirect object",
+  opts:["a / di + a tonic pronoun, or gli / le for an indirect object","ci for people, ne for things",
+        "always ne","always ci"],
+  note:"Penso a lui, not ci penso · Parlo di lei, not ne parlo · Ho bisogno di te, not ne ho bisogno. But parlare a a person is an indirect object: Gli parlo. Ci and ne are for things, places and topics."});
+add({cat:"prep", fam:"rule", q:"pensare", sub:"to think",
+  vg:"pensare a — to have on your mind · pensare di — to have an opinion",
+  qs:"why does it appear in both lists?",
+  a:"pensare a and pensare di are different verbs in meaning",
+  opts:["pensare a and pensare di are different verbs in meaning","it is an exception with no rule",
+        "the particle is free with pensare","it never takes ne"],
+  note:"Ci penso = it is on my mind, I will take care of it. Che ne pensi? = what is your opinion of it. Both are correct Italian and neither substitutes for the other."});
+
+/* =======================================================================
+   ENGINE
+   ======================================================================= */
+const MODES = [
+  {id:"choice", label:"Choice", hint:"The Italian on the card, the options underneath — tap one or press the number key. Graded for you."},
+  {id:"type",   label:"Type",   hint:"Type the answer yourself, accents and apostrophes included. Meaning and rule cards stay multiple choice."},
+  {id:"recall", label:"Recall", hint:"Say the answer out loud, reveal it, then rate yourself Again or Got it."}
+];
+const catLabel = id => (CATS.find(c=>c.id===id)||{}).label || id;
+
+const KEY = "cine_v1";
+let S = {
+  ver:1, mode:"choice", cats:CATS.map(c=>c.id), order:"section",
+  speak:false, voiceName:"", stats:{}, known:{}, seen:0, right:0
+};
+try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
+
+let deck=[], pos=0, flipped=false, answered=false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const cid = c => c.cat+"|"+c.q+"|"+c.qs;
+const low = s => String(s).toLowerCase();
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+function pool(){ return CARDS.filter(c=>S.cats.includes(c.cat)); }
+function buildDeck(){
+  let list = pool().filter(c=>!S.known[cid(c)]);
+  if(S.order==="random") shuffle(list);
+  else{
+    const ord = CATS.map(c=>c.id);
+    list.sort((a,b)=> ord.indexOf(a.cat)-ord.indexOf(b.cat) || CARDS.indexOf(a)-CARDS.indexOf(b));
+  }
+  deck=list; pos=0; render();
+}
+
+/* distractors: same family, compared case-insensitively so "Ne" and "ne"
+   can never show up as two separate options */
+function optionsFor(c){
+  if(c.opts && c.opts.length){
+    const list=c.opts.slice();
+    if(!list.some(x=>low(x)===low(c.a))) list.push(c.a);
+    return {correct:c.a, list:list.length>2 ? shuffle(list) : list};
+  }
+  const clash = (a,b) => { const x=strip(a), y=strip(b); return x===y || x.startsWith(y+" ") || y.startsWith(x+" "); };
+  const ok = x => x!==c && x.fam===c.fam && !clash(x.a, c.a);
+  const same = shuffle(CARDS.filter(ok));
+  const rest = shuffle(CARDS.filter(x=>x!==c && !x.opts && !clash(x.a, c.a)));
+  const picks=[];
+  const push = x => { if(picks.length<3 && !picks.some(p=>low(p.a)===low(x.a))) picks.push(x); };
+  same.forEach(push); rest.forEach(push);
+  return {correct:c.a, list:shuffle(picks.map(x=>x.a).concat(c.a))};
+}
+
+const typable = c => !c.opts && !c.noType;
+const norm  = s => String(s||"").toLowerCase().trim().replace(/[.!?]+$/,"").replace(/\s+/g," ").replace(/[’']/g,"'");
+const strip = s => norm(s).replace(/[àá]/g,"a").replace(/[èé]/g,"e").replace(/[ìí]/g,"i").replace(/[òó]/g,"o").replace(/[ùú]/g,"u");
+const answersFor = c => [c.a].concat(c.alt||[]);
+
+/* ---------------- RENDER ---------------- */
+function derStrip(d){
+  if(!d) return "";
+  return '<div class="der">'+
+    '<div class="pill from"><small>it replaces</small><b>'+esc(d.from)+'</b></div>'+
+    '<span class="op">→</span>'+
+    '<div class="pill '+(d.kind==="ne"?"ne":"to")+'"><small>particle</small><b>'+esc(d.to)+'</b></div></div>';
+}
+function backHTML(c){
+  return '<div class="big'+(c.a.length>26?" xs":(c.a.length>16?" sm":""))+'" style="color:var(--accent)">'+esc(c.a)+'</div>'+
+    (c.vg ? '<div class="gloss">'+esc(c.vg)+'</div>' : "")+
+    (c.fam==="idi" ? '<div class="sub">'+esc(c.q)+'</div>' : "")+
+    derStrip(c.der)+
+    (c.ex ? '<div class="ex"><div class="exit">'+esc(c.ex)+'</div></div>' : "")+
+    '<div class="spkrow"><button class="spk" id="spkBtn">🔊 ascolta</button></div>'+
+    (c.note ? '<div class="pron">'+esc(c.note)+'</div>' : "");
+}
+function render(){
+  const card=$("card");
+  card.classList.remove("flipped"); flipped=false; answered=false;
+  card.classList.toggle("tappable", S.mode==="recall");
+  $("hint").textContent = S.mode==="recall" ? "tap to reveal" : "";
+
+  if(!deck.length){
+    $("tag").textContent="";
+    $("front").innerHTML='<div class="big">All done! ✓</div><div class="sub">Every selected card is retired as known, or nothing is selected. Open “Deck” to reset known cards or pick more sections.</div>';
+    $("back").innerHTML=""; $("controls").innerHTML="";
+    $("counter").textContent="—"; $("score").textContent="—"; $("barFill").style.width="0";
+    return;
+  }
+  if(pos>=deck.length){ buildDeck(); return; }
+
+  const c=deck[pos];
+  $("tag").textContent = catLabel(c.cat).toUpperCase();
+  $("front").innerHTML = '<div class="prompt">'+esc(c.qs)+'</div>'+
+    '<div class="big'+(c.q.length>34?" xs":(c.q.length>20?" sm":""))+'">'+esc(c.q)+'</div>'+
+    (c.sub ? '<div class="gloss">'+esc(c.sub)+'</div>' : "");
+  $("back").innerHTML = backHTML(c);
+
+  if(S.mode==="recall"){
+    $("controls").innerHTML = '<button class="single" id="revealBtn">Reveal</button>';
+    $("revealBtn").onclick = flip;
+  }else if(S.mode==="type" && typable(c)){
+    $("controls").innerHTML =
+      '<div class="typerow"><input class="tin" id="typeIn" placeholder="type the answer…" '+
+      'autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">'+
+      '<button class="btn" id="checkBtn" style="padding:0 18px">Check</button></div>'+
+      '<div class="accrow">'+["à","è","é","ì","ò","ù","'"].map(a=>'<button class="acc" data-a="'+a+'">'+a+'</button>').join("")+'</div>';
+    const inp=$("typeIn");
+    $("checkBtn").onclick = ()=>checkTyped(inp,c);
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); checkTyped(inp,c); } });
+    $("controls").querySelectorAll(".acc").forEach(b=> b.onclick = ()=>{
+      const s=inp.selectionStart||inp.value.length;
+      inp.value = inp.value.slice(0,s)+b.dataset.a+inp.value.slice(inp.selectionEnd||s);
+      inp.focus(); inp.setSelectionRange(s+1,s+1);
+    });
+    setTimeout(()=>inp.focus(),0);
+  }else{
+    const o=optionsFor(c);
+    $("controls").innerHTML = '<div class="opts">'+o.list.map((t,i)=>
+      '<button class="opt" data-v="'+esc(t)+'"><i>'+(i+1)+'</i><span>'+esc(t)+'</span></button>').join("")+'</div>';
+    $("controls").querySelectorAll(".opt").forEach(b=> b.onclick = ()=>choose(b,o.correct));
+  }
+
+  const st=S.stats[cid(c)];
+  $("counter").textContent = (pos+1)+" / "+deck.length + (st ? "  ·  ✓"+st.r+" ✗"+st.w : "");
+  const pct = S.seen ? Math.round(S.right/S.seen*100) : 0;
+  $("score").textContent = S.seen ? pct+"% correct ("+S.seen+" answered)" : "no answers yet";
+  $("barFill").style.width = (pos/deck.length*100)+"%";
+}
+
+function sayFor(c){
+  if(c.ex) return c.ex;
+  if(c.q.indexOf("___")>-1) return c.q.replace("___", c.a).replace(/\(.*?\)/g,"");
+  if(c.fam==="citr"||c.fam==="netr"||c.fam==="pos"||c.fam==="ans") return c.a;
+  return c.a;
+}
+function wireSpeak(){
+  const c=deck[pos]; if(!c) return;
+  const b=$("spkBtn");
+  if(b) b.onclick = e=>{ e.stopPropagation(); speak(sayFor(c)); };
+  if(S.speak) speak(sayFor(c), true);
+}
+function reveal(){
+  flipped=true; $("card").classList.add("flipped"); wireSpeak();
+  const m=document.querySelector("main");
+  setTimeout(()=>{ if(m.scrollHeight>m.clientHeight) m.scrollTop=m.scrollHeight; },0);
+}
+function flip(){
+  if(!deck.length || flipped) return;
+  reveal();
+  $("controls").innerHTML = '<div class="rate"><button class="again" id="againBtn">Again</button>'+
+                            '<button class="good" id="goodBtn">Got it</button></div>';
+  $("againBtn").onclick = ()=>rate(false);
+  $("goodBtn").onclick  = ()=>rate(true);
+}
+function nextButton(label, ok){
+  const n=document.createElement("button");
+  n.className="single"; n.style.marginTop="10px"; n.textContent=label;
+  n.onclick=()=>rate(ok);
+  $("controls").appendChild(n); n.focus();
+}
+function choose(btn, correct){
+  if(answered) return; answered=true;
+  const ok = low(btn.dataset.v)===low(correct);
+  $("controls").querySelectorAll(".opt").forEach(b=>{
+    b.disabled=true;
+    if(low(b.dataset.v)===low(correct)) b.classList.add("right");
+    else if(b===btn) b.classList.add("wrong");
+    else b.classList.add("mute");
+  });
+  reveal();
+  nextButton(ok ? "Correct ✓ — next" : "Next", ok);
+}
+function checkTyped(inp, c){
+  if(answered) return;
+  const got=norm(inp.value); if(!got) return;
+  const answers=answersFor(c);
+  const exact = answers.some(a=>norm(a)===got);
+  const loose = answers.some(a=>strip(a)===strip(got) || strip(a).replace(/'/g,"")===strip(got).replace(/'/g,""));
+  answered=true; inp.disabled=true;
+  inp.classList.add(exact?"ok":"no");
+  reveal();
+  if(!exact && loose){
+    const b=document.createElement("div");
+    b.className="badge"; b.textContent="right words, check accents and apostrophes";
+    $("back").prepend(b);
+  }
+  nextButton(exact ? "Correct ✓ — next" : (loose ? "Almost — next" : "Next"), exact);
+}
+function rate(ok){
+  const c=deck[pos], id=cid(c);
+  const st=S.stats[id]||{r:0,w:0};
+  ok ? st.r++ : st.w++;
+  S.stats[id]=st;
+  if(ok) S.known[id]=true;
+  S.seen++; if(ok) S.right++;
+  if(!ok){ const at=Math.min(pos+6, deck.length); deck.splice(at,0,c); }
+  save(); pos++; render();
+}
+$("card").onclick = ()=>{ if(S.mode==="recall" && !flipped) flip(); };
+
+document.addEventListener("keydown", e=>{
+  if($("sheet").classList.contains("open") || $("studySheet").classList.contains("open")) return;
+  const typing = document.activeElement && document.activeElement.id==="typeIn";
+  if((e.key===" "||e.key==="Enter") && !typing){
+    e.preventDefault();
+    if(S.mode==="recall" && !flipped) return flip();
+    const n=$("controls").querySelector(".single"); if(n) n.click();
+    return;
+  }
+  if(!typing && /^[1-4]$/.test(e.key)){
+    const b=$("controls").querySelectorAll(".opt")[+e.key-1]; if(b && !b.disabled) b.click();
+  }
+  if(!typing && flipped && S.mode==="recall"){
+    if(e.key==="a"||e.key==="A") rate(false);
+    if(e.key==="g"||e.key==="G") rate(true);
+  }
+});
+
+/* ---------------- AUDIO ---------------- */
+let itVoices=[], itVoice=null;
+function rankVoice(v){
+  const n=(v.name||"").toLowerCase(); let s=0;
+  if(/premium|enhanced|siri|neural/.test(n)) s+=40;
+  if(/alice|federica|luca|emma|paola|eloisa|carlo/.test(n)) s+=20;
+  if(v.localService) s+=10;
+  if(/^it[-_]IT$/i.test(v.lang)) s+=10;
+  return s;
+}
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return;
+  itVoices = speechSynthesis.getVoices().filter(v=>/^it\b|^it[-_]/i.test(v.lang)).sort((a,b)=>rankVoice(b)-rankVoice(a));
+  itVoice = itVoices.find(v=>v.name===S.voiceName) || itVoices[0] || null;
+}
+let voiceTries=0;
+function refreshVoices(){
+  try{ const had=itVoices.length; pickVoice(); if(itVoices.length!==had && $("voiceSel")) drawVoices(); }catch(e){}
+  return itVoices.length;
+}
+function pollVoices(){ if(refreshVoices() || ++voiceTries>40) return; setTimeout(pollVoices,250); }
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = ()=>{ voiceTries=0; refreshVoices(); };
+  setTimeout(pollVoices,0);
+  ["touchend","click","keydown"].forEach(ev=>
+    document.addEventListener(ev, ()=>{ voiceTries=0; pollVoices(); }, {passive:true, once:true}));
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshVoices(); });
+}
+function speak(text, quiet){
+  if(!("speechSynthesis" in window)) return;
+  if(!itVoice) pickVoice();
+  if(!itVoice){
+    if(quiet) return;
+    alert("No Italian voice has been detected yet.\n\n"+
+          "The voice list sometimes loads a moment late — tap this again in a few seconds.\n\n"+
+          "If it stays silent, add an Italian voice:\n"+
+          "iPhone / iPad: Settings › Accessibility › Spoken Content › Voices › Italian\n"+
+          "Mac: System Settings › Accessibility › Spoken Content › System Voice › Manage Voices…\n\n"+
+          "An English voice reading Italian sounds wrong, so audio stays off until one is available.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(String(text).replace(/___/g,"…"));
+  u.voice=itVoice; u.lang=itVoice.lang||"it-IT"; u.rate=0.92; u.pitch=1;
+  speechSynthesis.speak(u);
+}
+function drawVoices(){
+  const sel=$("voiceSel"); if(!sel) return;
+  sel.innerHTML = itVoices.length
+    ? itVoices.map(v=>'<option value="'+esc(v.name)+'"'+(itVoice&&v.name===itVoice.name?" selected":"")+'>'+esc(v.name)+' — '+esc(v.lang)+'</option>').join("")
+    : '<option>No Italian voice found on this device</option>';
+  $("voiceStat").textContent = itVoices.length
+    ? itVoices.length+" Italian voice"+(itVoices.length>1?"s":"")+" available. Enhanced or Premium voices sound markedly better."
+    : "Audio stays off until an Italian voice is installed — an English voice reading Italian sounds wrong.";
+}
+$("voiceSel").onchange = e=>{ S.voiceName=e.target.value; pickVoice(); save(); };
+$("autoSpk").onclick = ()=>{ S.speak=!S.speak; save(); drawChips(); };
+$("testSpk").onclick = ()=>{ speak("Ci vado spesso. Ne ho comprati tre. Ce la faccio!"); drawVoices(); };
+
+/* ---------------- SETTINGS ---------------- */
+const count = cat => CARDS.filter(c=>c.cat===cat).length;
+function drawChips(){
+  $("modeChips").innerHTML = MODES.map(m=>
+    '<button class="chip'+(S.mode===m.id?" sel":"")+'" data-m="'+m.id+'">'+m.label+'</button>').join("");
+  $("modeChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    S.mode=b.dataset.m; save(); drawChips(); syncModeBtn(); render();
+  });
+  $("modeHint").textContent = (MODES.find(m=>m.id===S.mode)||{}).hint || "";
+
+  $("catChips").innerHTML = CATS.map(c=>
+    '<button class="chip'+(S.cats.includes(c.id)?" sel":"")+'" data-c="'+c.id+'">'+c.label+
+    '<span class="n">'+count(c.id)+'</span></button>').join("");
+  $("catChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const id=b.dataset.c;
+    S.cats = S.cats.includes(id) ? S.cats.filter(x=>x!==id) : S.cats.concat(id);
+    save(); drawChips(); buildDeck();
+  });
+
+  $("ordChips").innerHTML = [["section","By section"],["random","Shuffled"]].map(([id,l])=>
+    '<button class="chip'+(S.order===id?" sel":"")+'" data-o="'+id+'">'+l+'</button>').join("");
+  $("ordChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{ S.order=b.dataset.o; save(); drawChips(); buildDeck(); });
+
+  $("autoSpk").classList.toggle("on", !!S.speak);
+  const inPool=pool().length, known=pool().filter(c=>S.known[cid(c)]).length;
+  $("progStat").textContent = known+" of "+inPool+" selected cards retired as known · "+
+    S.seen+" answers, "+(S.seen?Math.round(S.right/S.seen*100):0)+"% correct.";
+  drawVoices();
+}
+function syncModeBtn(){ $("modeBtn").textContent = (MODES.find(m=>m.id===S.mode)||MODES[0]).label; }
+
+$("setBtn").onclick   = ()=>{ drawChips(); $("sheet").classList.add("open"); };
+$("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
+$("sheet").onclick    = e=>{ if(e.target===$("sheet")){ $("sheet").classList.remove("open"); buildDeck(); } };
+$("allC").onclick    = ()=>{ S.cats=CATS.map(c=>c.id); save(); drawChips(); buildDeck(); };
+$("noneC").onclick   = ()=>{ S.cats=[]; save(); drawChips(); buildDeck(); };
+$("choiceC").onclick = ()=>{ S.cats=["scelta","ci","ne"]; save(); drawChips(); buildDeck(); };
+$("prepC").onclick   = ()=>{ S.cats=["prep"]; save(); drawChips(); buildDeck(); };
+$("verbC").onclick   = ()=>{ S.cats=["verbi"]; save(); drawChips(); buildDeck(); };
+$("idiC").onclick    = ()=>{ S.cats=["idiomi"]; save(); drawChips(); buildDeck(); };
+$("resetKnownBtn").onclick = ()=>{ S.known={}; save(); drawChips(); buildDeck(); };
+$("resetBtn").onclick = ()=>{
+  if(!confirm("Reset all progress — known cards, per-card stats, and the score?")) return;
+  S.known={}; S.stats={}; S.seen=0; S.right=0; save(); drawChips(); buildDeck();
+};
+$("modeBtn").onclick = ()=>{
+  const i=MODES.findIndex(m=>m.id===S.mode);
+  S.mode=MODES[(i+1)%MODES.length].id; save(); syncModeBtn(); render();
+};
+
+/* ---------------- REFERENCE ---------------- */
+let studyTab="ci";
+const rowEx = (it, gl) => '<div class="r" data-say="'+esc(it)+'"><div class="p" style="width:auto;flex:1">'+esc(it)+
+  '</div>'+(gl?'<div class="x">'+esc(gl)+'</div>':'')+'</div>';
+const rowVerb = (v, no, yes) => '<div class="r" data-say="'+esc(yes)+'"><div class="p">'+esc(v)+
+  '</div><div class="f">'+esc(no)+'</div><div class="x">'+esc(yes)+'</div></div>';
+
+function drawCi(){
+  $("studyTitle").textContent="The particle CI";
+  $("studyBody").innerHTML =
+    '<div class="wrap"><h3>CI = there, in that place</h3>'+
+      '<div class="plain">Ci replaces a place introduced by <b>a, in, su</b> or <b>da</b>. It is what keeps you from '+
+        'repeating the place name in every sentence.</div>'+
+      '<div class="plain" style="color:#6c7a89">— Vai spesso a Roma? — Sì, vado <b>a Roma</b> ogni mese. '+
+        '<span style="color:var(--accent)">→ Sì, <b>ci</b> vado ogni mese.</span></div>'+
+      rowEx("Sei mai stato in Giappone? — No, non ci sono mai stato.","in Giappone")+
+      rowEx("Vai spesso al cinema? — Ci vado una volta alla settimana.","al cinema")+
+      rowEx("Quando andate in vacanza? — Ci andiamo ad agosto.","in vacanza")+
+      rowEx("Resti a casa stasera? — Sì, ci resto.","a casa")+
+    '</div>'+
+    '<div class="wrap"><h3>CI with verbs that take A or SU</h3>'+
+      rowVerb("pensare a","Penso spesso a questo problema.","Ci penso spesso.")+
+      rowVerb("credere a / in","Credi ai fantasmi?","Ci credi?")+
+      rowVerb("riuscire a","Non riesco a capire.","Non ci riesco.")+
+      rowVerb("provare a","Hai provato a chiamarlo?","Ci hai provato?")+
+      rowVerb("rinunciare a","Non rinuncio a questo progetto.","Non ci rinuncio.")+
+      rowVerb("contare su","Conto sul tuo aiuto.","Ci conto.")+
+      '<div class="note">The verb\'s preposition is the whole test. A verb built on <b>a</b> or <b>su</b> takes '+
+        '<b>ci</b>; a verb built on <b>di</b> takes <b>ne</b>. Pensare a → ci penso · Parlare di → ne parlo.</div>'+
+    '</div>'+
+    '<div class="wrap"><h3>ESSERCI — to exist, to be there</h3>'+
+      '<div class="r"><div class="p">Presente</div><div class="f">c\'è (singular) · ci sono (plural)</div></div>'+
+      '<div class="r"><div class="p">Passato prossimo</div><div class="f">c\'è stato / a · ci sono stati / e</div></div>'+
+      '<div class="r"><div class="p">Imperfetto</div><div class="f">c\'era · c\'erano</div></div>'+
+      rowEx("C'è un problema.","")+rowEx("Ci sono molti turisti in città.","")+
+      rowEx("Non c'è nessuno in casa.","")+rowEx("Ieri c'è stata una festa.","")+
+      rowEx("Una volta c'erano meno macchine.","")+
+    '</div>'+
+    '<div class="wrap"><h3>VOLERCI — to be necessary, to take</h3>'+
+      '<div class="plain">Volerci agrees with the <b>time or quantity</b> that follows, never with a person, and it '+
+        'takes <b>essere</b> in compound tenses.</div>'+
+      '<div class="r"><div class="p">Singular</div><div class="f">Ci vuole un\'ora · Ci vuole pazienza · C\'è voluto tempo</div></div>'+
+      '<div class="r"><div class="p">Plural</div><div class="f">Ci vogliono due ore · Ci vogliono molti soldi · Ci sono voluti tre giorni</div></div>'+
+      rowEx("Quanto tempo ci vuole per arrivare? — Ci vuole mezz'ora.","")+
+      rowEx("Per fare la torta ci vogliono tre uova.","")+
+      rowEx("Ci vuole coraggio per fare questo!","")+
+      '<div class="note"><b>Do not confuse volerci with metterci.</b> Volerci is impersonal — the time something takes '+
+        'in general: <i>Ci vuole un\'ora per arrivare a Milano.</i> Metterci has a personal subject — the time a '+
+        'particular person takes: <i>Io ci metto un\'ora per arrivare a Milano.</i></div>'+
+    '</div>';
+  $("studyBody").querySelectorAll("[data-say]").forEach(el=> el.onclick=()=>speak(el.dataset.say));
+}
+function drawNe(){
+  $("studyTitle").textContent="The particle NE";
+  $("studyBody").innerHTML =
+    '<div class="wrap"><h3 class="n">NE = of it, of them — a quantity</h3>'+
+      '<div class="plain">Ne stands for a <b>part of a whole</b> already mentioned. English usually drops it '+
+        'altogether — "I have three" — which is exactly why it gets forgotten.</div>'+
+      '<div class="plain" style="color:#6c7a89">— Quanti libri hai? — Ho <b>tre libri</b>. '+
+        '<span style="color:var(--violet)">→ <b>Ne</b> ho tre.</span></div>'+
+      rowEx("Quante mele vuoi? — Ne vorrei due.","")+
+      rowEx("Hai fratelli? — Sì, ne ho uno. / No, non ne ho.","")+
+      rowEx("Bevi molto caffè? — Ne bevo tre al giorno.","")+
+      rowEx("Avete comprato dei fiori? — Sì, ne abbiamo comprati molti.","")+
+    '</div>'+
+    '<div class="wrap"><h3 class="n">NE with verbs that take DI</h3>'+
+      rowVerb("parlare di","Parliamo di politica.","Ne parliamo.")+
+      rowVerb("avere bisogno di","Ho bisogno di aiuto.","Ne ho bisogno.")+
+      rowVerb("avere voglia di","Ho voglia di gelato.","Ne ho voglia.")+
+      rowVerb("occuparsi di","Mi occupo di questo problema.","Me ne occupo.")+
+      rowVerb("essere sicuro di","Sei sicuro di questo?","Ne sei sicuro?")+
+      rowVerb("sapere di","Non so nulla di questa storia.","Non ne so nulla.")+
+    '</div>'+
+    '<div class="wrap"><h3 class="n">NE = from that place</h3>'+
+      '<div class="plain">Ne also covers motion <b>away from</b> a place — the mirror image of locative ci.</div>'+
+      rowEx("Sei appena uscito dal cinema? — Sì, ne sono appena uscito.","")+
+      rowEx("Sono andato in banca e ne sono uscito alle 12.","")+
+      rowEx("Roma è bella, ne sono tornato ieri.","")+
+    '</div>'+
+    '<div class="wrap"><h3 class="n">NE and the past participle</h3>'+
+      '<div class="plain">When ne is <b>partitive</b> — a quantity — the participle <b>agrees</b> with that quantity.</div>'+
+      '<div class="r"><div class="p">Quanti libri hai letto?</div><div class="x">Ne ho letti tre. (m. pl.)</div></div>'+
+      '<div class="r"><div class="p">Quante mele hai comprato?</div><div class="x">Ne ho comprate cinque. (f. pl.)</div></div>'+
+      '<div class="r"><div class="p">Quanto vino hai bevuto?</div><div class="x">Ne ho bevuto un bicchiere. (m. sing.)</div></div>'+
+      '<div class="r"><div class="p">Quanta pasta hai mangiato?</div><div class="x">Ne ho mangiata molta. (f. sing.)</div></div>'+
+      '<div class="note">When ne means simply <b>"of this"</b>, agreement is optional and it normally stays invariable: '+
+        '<i>Hai parlato del problema? — Sì, ne ho parlato.</i> With a reflexive verb the auxiliary is essere and it does '+
+        'agree: <i>Ti sei occupato della pratica? — Sì, me ne sono occupato.</i></div>'+
+    '</div>';
+  $("studyBody").querySelectorAll("[data-say]").forEach(el=> el.onclick=()=>speak(el.dataset.say));
+}
+function drawPos(){
+  $("studyTitle").textContent="Position in the sentence";
+  $("studyBody").innerHTML =
+    '<div class="wrap"><h3>General rule — before the verb</h3>'+
+      rowEx("Ci vado domani.","presente")+rowEx("Ne ho comprati tre.","passato prossimo")+
+      rowEx("Ci andavo spesso.","imperfetto")+rowEx("Ne parleremo domani.","futuro")+
+      '<div class="plain">In compound tenses they sit before the <b>auxiliary</b>, not the participle.</div>'+
+    '</div>'+
+    '<div class="wrap"><h3>With an infinitive — attached</h3>'+
+      '<div class="plain">The infinitive drops its final <b>-e</b> and the particle joins it.</div>'+
+      rowEx("Voglio andarci.","andare + ci")+rowEx("Devo parlarne con te.","parlare + ne")+
+      rowEx("È bello andarci in estate.","andare + ci")+rowEx("Preferisco non pensarci.","pensare + ci")+
+    '</div>'+
+    '<div class="wrap"><h3>With modal verbs — both positions</h3>'+
+      '<div class="r"><div class="p">Before</div><div class="f">Ci voglio andare.</div><div class="x">Voglio andarci.</div></div>'+
+      '<div class="r"><div class="p">Before</div><div class="f">Ne devo comprare tre.</div><div class="x">Devo comprarne tre.</div></div>'+
+      '<div class="r"><div class="p">Before</div><div class="f">Ci posso pensare?</div><div class="x">Posso pensarci?</div></div>'+
+      '<div class="r"><div class="p">Before</div><div class="f">Ne vorrei parlare.</div><div class="x">Vorrei parlarne.</div></div>'+
+    '</div>'+
+    '<div class="wrap"><h3>With the imperative</h3>'+
+      '<div class="r"><div class="p">Pensaci! (tu)</div><div class="x">Non pensarci! / Non ci pensare!</div></div>'+
+      '<div class="r"><div class="p">Parlane con lui! (tu)</div><div class="x">Non parlarne! / Non ne parlare!</div></div>'+
+      '<div class="r"><div class="p">Ci vada! (Lei)</div><div class="x">Non ci vada!</div></div>'+
+      '<div class="r"><div class="p">Andiamoci! (noi)</div><div class="x">Non andiamoci!</div></div>'+
+      '<div class="note"><b>Consonant doubling.</b> After the short imperatives <b>da\', di\', fa\', sta\', va\'</b> the '+
+        'particle doubles its consonant: <i>Vacci!</i> (va\' + ci) · <i>Danne un po\' a Marco!</i> (da\' + ne) · '+
+        '<i>Fanne due!</i> (fa\' + ne) · <i>Dicci la verità!</i> (di\' + ci).</div>'+
+    '</div>';
+  $("studyBody").querySelectorAll("[data-say]").forEach(el=> el.onclick=()=>speak(el.dataset.say));
+}
+function drawIdi(){
+  $("studyTitle").textContent="Idiomatic expressions";
+  const block = (title, list, cls) =>
+    '<div class="wrap"><h3'+(cls?' class="n"':'')+'>'+title+'</h3>'+
+      list.map(([e,m,ex])=>'<div class="r" data-say="'+esc(ex)+'"><div class="p">'+esc(e)+
+        '</div><div class="f">'+esc(m)+'</div><div class="x">'+esc(ex)+'</div></div>').join("")+'</div>';
+  $("studyBody").innerHTML =
+    block("Expressions with CI", IDI_CI, false)+
+    block("Expressions with NE", IDI_NE, true)+
+    '<div class="wrap"><h3>All of it in one conversation</h3>'+
+      '<div class="dlg" data-say="Allora, ci stai a venire al concerto sabato?"><b>Marco:</b> Allora, ci stai a venire al concerto sabato?</div>'+
+      '<div class="dlg" data-say="Non so, ci devo pensare. Quanto ci vuole per arrivare?"><b>Lucia:</b> Non so, ci devo pensare. Quanto ci vuole per arrivare?</div>'+
+      '<div class="dlg" data-say="In macchina ci mettiamo circa un\'ora. Dai, ne vale la pena!"><b>Marco:</b> In macchina ci mettiamo circa un\'ora. Dai, ne vale la pena!</div>'+
+      '<div class="dlg" data-say="Ok, ci sto! Ce la facciamo a tornare entro mezzanotte?"><b>Lucia:</b> Ok, ci sto! Ce la facciamo a tornare entro mezzanotte?</div>'+
+      '<div class="dlg" data-say="Certo! Ci penso io a organizzare tutto. Ci conto, eh!"><b>Marco:</b> Certo! Ci penso io a organizzare tutto. Ci conto, eh!</div>'+
+      '<div class="note">Six different ci-verbs and one ne-verb in five lines. This is the ordinary density of these '+
+        'particles in real speech — which is why leaving them out sounds so foreign.</div>'+
+    '</div>';
+  $("studyBody").querySelectorAll("[data-say]").forEach(el=> el.onclick=()=>speak(el.dataset.say));
+}
+function drawVerbs(){
+  $("studyTitle").textContent="Which preposition?";
+  const rows = list => list.map(([v,en,ex])=>
+    '<div class="r" data-say="'+esc(ex)+'"><div class="p">'+esc(v)+'</div>'+
+    '<div class="f">'+esc(en)+'</div><div class="x">'+esc(ex)+'</div></div>').join("");
+  $("studyBody").innerHTML =
+    '<div class="addhint">The preposition is part of the verb, the way <b>depend on</b> is in English — there is no '+
+      'rule that derives it from meaning. Learn the pair, and the particle follows by itself.</div>'+
+    '<div class="wrap"><h3>Verbs + A → ci</h3>'+
+      rows([["pensare a","to think about","Ci penso spesso."],
+            ["credere a","to believe (a claim)","Non ci credo!"],
+            ["riuscire a","to manage to","Non ci riesco."],
+            ["provare a","to try to","Ci ho provato."],
+            ["rinunciare a","to give up on","Non ci rinuncio."],
+            ["tenere a","to care about","Ci tengo molto."],
+            ["abituarsi a","to get used to","Mi ci sono abituato."],
+            ["partecipare a","to take part in","Ci partecipo."],
+            ["assistere a","to attend, to witness","Ci ho assistito."],
+            ["fare attenzione a","to pay attention to","Facci attenzione!"],
+            ["fare caso a","to notice","Non ci ho fatto caso."],
+            ["badare a","to mind, to look after","Ci bado io."],
+            ["giocare a","to play (a game)","Ci gioco."],
+            ["servire a","to be good for","Non ci serve a niente."]])+
+    '</div>'+
+    '<div class="wrap"><h3>Verbs + SU / IN → also ci</h3>'+
+      rows([["contare su","to count on","Ci conto!"],
+            ["riflettere su","to reflect on","Ci rifletto."],
+            ["scommettere su","to bet on","Ci scommetto."],
+            ["basarsi su","to be based on","Su questo ci si basa."],
+            ["concentrarsi su","to focus on","Mi ci concentro."],
+            ["insistere su","to insist on","Non ci insisto."],
+            ["credere in","to believe in","Ci credo."]])+
+    '</div>'+
+    '<div class="wrap"><h3 class="n">Verbs + DI → ne</h3>'+
+      rows([["parlare di","to talk about","Ne parliamo."],
+            ["avere bisogno di","to need","Ne ho bisogno."],
+            ["avere voglia di","to feel like","Ne ho voglia."],
+            ["avere paura di","to be afraid of","Ne ho paura."],
+            ["occuparsi di","to deal with","Me ne occupo."],
+            ["interessarsi di","to be interested in","Me ne interesso."],
+            ["ricordarsi di","to remember","Me ne ricordo."],
+            ["dimenticarsi di","to forget","Me ne sono dimenticato."],
+            ["accorgersi di","to notice","Me ne sono accorto."],
+            ["rendersi conto di","to realize","Me ne rendo conto."],
+            ["lamentarsi di","to complain about","Se ne lamenta sempre."],
+            ["pentirsi di","to regret","Me ne pento."],
+            ["vergognarsi di","to be ashamed of","Me ne vergogno."],
+            ["fidarsi di","to trust","Non me ne fido."],
+            ["essere sicuro di","to be sure of","Ne sono sicuro."],
+            ["essere stanco di","to be tired of","Ne sono stanco."],
+            ["essere capace di","to be capable of","Ne sono capace."],
+            ["sapere di","to know about","Non ne so nulla."],
+            ["soffrire di","to suffer from","Ne soffre da anni."],
+            ["discutere di","to discuss","Ne abbiamo discusso."],
+            ["fare a meno di","to do without","Non posso farne a meno."]])+
+      '<div class="note">Notice how many di-verbs are <b>reflexive</b> — occuparsi, ricordarsi, accorgersi, pentirsi, '+
+        'lamentarsi. A reflexive verb followed by a preposition is usually a di-verb, and the pronoun in front changes '+
+        'shape: mi + ne = <b>me ne</b>.</div>'+
+    '</div>'+
+    '<div class="wrap"><h3>No preposition in Italian → lo / la / li / le</h3>'+
+      '<div class="plain">These take a preposition in <b>English</b> and a bare direct object in <b>Italian</b>. '+
+        'They are the most expensive trap in the topic, because the English sentence keeps suggesting ci or ne.</div>'+
+      rows([["ascoltare qualcosa","listen TO","La ascolto."],
+            ["guardare qualcosa","look AT","Lo guardo."],
+            ["cercare qualcosa","look FOR","La cerco."],
+            ["aspettare qualcosa","wait FOR","Lo aspetto."],
+            ["pagare qualcosa","pay FOR","L'ho pagato."],
+            ["chiedere qualcosa","ask FOR","L'ho chiesto."],
+            ["seguire, sposare, ringraziare","follow, marry, thank","La seguo."]])+
+    '</div>'+
+    '<div class="wrap"><h3>Same verb, other preposition, other meaning</h3>'+
+      '<div class="r" data-say="Ci penso spesso. Che ne pensi?"><div class="p">pensare</div>'+
+        '<div class="f">a = to have on your mind · di = to have an opinion</div>'+
+        '<div class="x">Ci penso. / Che ne pensi?</div></div>'+
+      '<div class="r" data-say="Ne parliamo. Gli parlo."><div class="p">parlare</div>'+
+        '<div class="f">di a topic · a a person</div><div class="x">Ne parlo. / Gli parlo.</div></div>'+
+      '<div class="r" data-say="Ci provo. Lo provo."><div class="p">provare</div>'+
+        '<div class="f">a fare = to attempt · qualcosa = to taste, to try on</div>'+
+        '<div class="x">Ci provo. / Lo provo.</div></div>'+
+      '<div class="r" data-say="Ho finito di lavorare. L\'ho finito."><div class="p">finire</div>'+
+        '<div class="f">di fare = to stop doing · qualcosa = direct object</div>'+
+        '<div class="x">Ho finito di lavorare. / L\'ho finito.</div></div>'+
+    '</div>'+
+    '<div class="wrap"><h3>With people, not ci or ne</h3>'+
+      '<div class="r" data-say="Penso a lui."><div class="p">Penso a Marco.</div><div class="x">Penso a lui. (not ci penso)</div></div>'+
+      '<div class="r" data-say="Parlo di lei."><div class="p">Parlo di Maria.</div><div class="x">Parlo di lei. (not ne parlo)</div></div>'+
+      '<div class="r" data-say="Ho bisogno di te."><div class="p">Ho bisogno di te.</div><div class="x">stays as it is</div></div>'+
+      '<div class="r" data-say="Gli parlo."><div class="p">Parlo a Marco.</div><div class="x">Gli parlo. (indirect object)</div></div>'+
+      '<div class="note">Ci and ne are for things, places and topics. A person keeps a tonic pronoun after the '+
+        'preposition, or becomes an indirect object pronoun when the verb takes <b>a</b>.</div>'+
+    '</div>';
+  $("studyBody").querySelectorAll("[data-say]").forEach(el=> el.onclick=()=>speak(el.dataset.say));
+}
+function setTab(t){
+  studyTab=t;
+  $("tabCi").classList.toggle("on", t==="ci");
+  $("tabNe").classList.toggle("on", t==="ne");
+  $("tabVerbs").classList.toggle("on", t==="verbs");
+  $("tabPos").classList.toggle("on", t==="pos");
+  $("tabIdi").classList.toggle("on", t==="idi");
+  ({ci:drawCi, ne:drawNe, verbs:drawVerbs, pos:drawPos, idi:drawIdi})[t]();
+}
+$("tabCi").onclick    = ()=>setTab("ci");
+$("tabNe").onclick    = ()=>setTab("ne");
+$("tabVerbs").onclick = ()=>setTab("verbs");
+$("tabPos").onclick = ()=>setTab("pos");
+$("tabIdi").onclick = ()=>setTab("idi");
+$("studyBtn").onclick   = ()=>{ setTab(studyTab); $("studySheet").classList.add("open"); };
+$("studyClose").onclick = ()=> $("studySheet").classList.remove("open");
+
+/* ---------------- BOOT ---------------- */
+syncModeBtn();
+buildDeck();
+</script>
+</body>
+</html>

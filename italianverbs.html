@@ -64,6 +64,8 @@
   }
   .exit{font-size:17px;font-weight:600;line-height:1.4}
   .exen{font-size:13px;color:var(--dim);margin-top:5px}
+  .exnote{font-size:11.5px;color:var(--amber);margin-top:6px}
+  .exnote:empty{display:none}
   .spkrow{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
   .spk{
     background:var(--panel2);color:var(--accent2);border:1px solid var(--line);
@@ -134,6 +136,13 @@
     background:var(--accent);color:#06210f;font-weight:700;font-size:15px;cursor:pointer}
   .danger{background:transparent;color:var(--red);border:1px solid #4a2a2e}
   .stat{font-size:12px;color:var(--dim);margin-top:8px}
+  .btn.armed{background:#3a2226;color:var(--red);border-color:var(--red)}
+  /* in-page messages — browser alert()/confirm() pop-ups are silently blocked in many viewers */
+  #toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);
+    z-index:200;max-width:min(92vw,440px);background:#0b0f14;color:var(--txt);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.45;white-space:pre-line;
+    box-shadow:0 8px 24px rgba(0,0,0,.6);display:none}
+  #toast.show{display:block}
 
   /* study view */
   .sheet.full{align-items:stretch}
@@ -205,6 +214,7 @@
   <h1>Verbi <span>italiani</span></h1>
   <button class="btn" id="studyBtn">Study</button>
   <button class="btn" id="modeBtn">Recall</button>
+  <button class="btn" id="eaBtn">E/A</button>
   <button class="btn" id="setBtn">Deck</button>
 </header>
 <div class="bar"><i id="barFill"></i></div>
@@ -246,38 +256,59 @@
   </div>
 </div>
 
+<div class="sheet full" id="eaSheet">
+  <div class="sheetbox">
+    <div class="studyhead">
+      <b id="eaTitle">Essere &amp; Avere</b>
+      <button class="btn" id="eaShuffle">🔀</button>
+      <button class="btn" id="eaClose">Done</button>
+    </div>
+    <div class="meta" style="padding:0 0 10px">
+      <span id="eaCounter">—</span>
+    </div>
+    <div class="card" id="eaCard" style="min-height:38vh;margin-bottom:14px">
+      <div class="tag" id="eaTag">PASSATO PROSSIMO</div>
+      <div id="eaFront"></div>
+      <div class="answer" id="eaBack">
+        <div class="ex" style="margin-top:0">
+          <div class="exit" id="eaSentIt"></div>
+          <div class="exen" id="eaSentEn"></div>
+        </div>
+      </div>
+      <div class="hint" id="eaHint">tap to reveal</div>
+    </div>
+    <div class="row">
+      <button class="btn" id="eaPrev" style="flex:1">‹ Prev</button>
+      <button class="single" id="eaReveal" style="flex:2">Reveal</button>
+      <button class="btn" id="eaNext" style="flex:1">Next ›</button>
+    </div>
+  </div>
+</div>
+
 <div class="sheet" id="sheet">
   <div class="sheetbox">
     <h2>Tenses</h2>
-    <div class="row">
-      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Order</span>
-      <div class="chips" id="tenseOrdChips" style="flex:2"></div>
-    </div>
     <div class="chips" id="tenseChips"></div>
     <h2>Verbs</h2>
     <div class="row">
-      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Order</span>
-      <div class="chips" id="verbOrdChips" style="flex:2"></div>
-    </div>
-    <div class="row">
-      <button class="btn" id="convV">💬 Conversation</button>
-      <button class="btn" id="travV">✈︎ Travel pack</button>
+      <button class="btn" id="travV">✈︎ Travel</button>
       <button class="btn" id="allV">All verbs</button>
       <button class="btn" id="noneV">Clear</button>
     </div>
-    <div class="addhint">Conversation adds 41 everyday verbs to whatever's already selected, and switches
-      tenses to the 15 actually used in speech — dropping passato remoto, trapassato remoto, and futuro
-      progressivo (literary/unused register, not part of ordinary conversation).</div>
     <div class="row">
-      <button class="btn" id="regV">Regular only</button>
-      <button class="btn" id="irrV">Irregular only</button>
+      <button class="btn" id="regV">Regular</button>
+      <button class="btn" id="irrV">Irregular</button>
     </div>
+    <div class="row">
+      <button class="btn" id="essV">ⓔ Essere</button>
+      <button class="btn" id="aveV">Avere</button>
+    </div>
+    <div class="stat" id="filtStat"></div>
     <div class="legend">
       <span><i class="dot reg"></i>regular</span>
       <span><i class="dot irr"></i>irregular</span>
       <span><b class="essmark">ⓔ</b> takes essere</span>
       <span>✈︎ travel verb</span>
-      <span>💬 conversation verb</span>
     </div>
     <div class="chips" id="verbChips" style="margin-top:10px"></div>
 
@@ -308,38 +339,16 @@
       <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Repeat gap</span>
       <div class="chips" id="gapChips" style="flex:2"></div>
     </div>
-    <div class="addhint">Narrates verbs and tenses in the same order as the deck — set that above, under Tenses/Verbs.
-      Every person, in every tense, is followed by its English translation, in a different voice.</div>
+    <div class="row">
+      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">Order</span>
+      <div class="chips" id="ordChips" style="flex:2"></div>
+    </div>
     <div class="row">
       <button class="btn" id="audioDl" style="flex:2">⬇︎ Export audio script</button>
       <button class="btn" id="audioShow">Show text</button>
     </div>
     <textarea class="tin" id="audioOut" style="display:none;height:160px;font-size:12px" readonly></textarea>
-
-    <div class="addhint">
-      <b>Easiest:</b> double-click <b>Crea_audio.command</b> in Finder (it sits next to this html). It finds the
-      export automatically, lists your installed Italian voices, and runs render-audio.sh for you — no terminal typing.
-      English lines use Samantha by default; run render-audio.sh manually (below) to pick a different one.
-    </div>
-    <div class="addhint">
-      Prefer to type it yourself, or not on a Mac with Finder handy right now? A webpage can't launch a program
-      on its own — every browser blocks that — but this builds the exact command to paste instead:
-    </div>
-    <div class="row">
-      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">say voice</span>
-      <input class="tin" id="sayVoice" style="flex:2;margin:0" value="Paola (Enhanced)"
-             autocapitalize="off" autocorrect="off" spellcheck="false">
-    </div>
-    <div class="row">
-      <span class="btn" style="pointer-events:none;background:transparent;border:none;padding-left:0">English voice</span>
-      <input class="tin" id="enVoice" style="flex:2;margin:0" value="Samantha"
-             autocapitalize="off" autocorrect="off" spellcheck="false">
-    </div>
-    <div class="addhint" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#151a21;padding:8px 10px;border-radius:8px;white-space:pre-wrap;word-break:break-all" id="runCmd"></div>
-    <div class="row">
-      <button class="btn" id="copyCmd" style="flex:2">⧉ Copy command</button>
-    </div>
-    <div class="addhint" id="runHint">Uses the verbs and tenses selected above.</div>
+    <div class="addhint">Uses the verbs and tenses selected above. Export, then run <b>render-audio.sh</b> on the downloaded file to build the m4a.</div>
 
     <h2>Progress</h2>
     <div class="stat" id="progStat"></div>
@@ -2627,30 +2636,6 @@ const TRAVEL = ["bere","assaggiare","viaggiare","ordinare","pagare","prenotare",
                 "volere","potere","prendere","andare","mangiare","aspettare","capire","parlare",
                 "dire","sapere","trovare","tornare","partire","dormire","guardare","essere","avere"];
 
-/* Curated for everyday conversation, not just a raw frequency cutoff — the top
-   of FREQ_VERB (below) includes a few outliers that read more like narrative/
-   dramatic transcripts than small talk (uccidere, testimoniare, voltare, subire),
-   so those are deliberately left out here even though they rank highly. */
-const CONVERSATION = [
-  // the structural 15: auxiliaries, modals, and irregular hubs used in nearly every sentence
-  "essere","avere","fare","stare","dire","volere","potere","sapere","andare","dovere",
-  "vedere","dare","parlare","venire","pensare",
-  // the next 25: everyday actions — asking, routine, opinions, logistics
-  "capire","sentire","chiamare","chiedere","lavorare","ricordare","tornare","guardare","uscire","credere",
-  "prendere","piacere","trovare","mettere","lasciare","portare","aiutare","aspettare","cercare","arrivare",
-  "continuare","finire","pagare","partire","iniziare","decidere"
-];
-
-/* Tenses that essentially don't happen in spoken Italian — everything else here
-   (including the "compound past of past" tenses and both congiuntivo pasts) is
-   genuinely used in ordinary conversation, just less often than the core few:
-     - passatoRemoto / trapassatoRemoto: literary/narrative register — novels,
-       history, "C'era una volta…" — not something you'd say out loud outside
-       parts of the south
-     - futuroProgressivo: grammatically valid but essentially unused even in
-       writing; a native speaker reaches for futuro semplice instead */
-const NOT_SPOKEN = ["passatoRemoto","trapassatoRemoto","futuroProgressivo"];
-
 /* --- conjugation class + regularity --- */
 const META = {
   essere:  {g:"ere", reg:false, why:"Irregular everywhere: sono/sei/è…, future sar-, participle stato (aux essere)."},
@@ -3146,7 +3131,6 @@ VERBS.push(
 VERBS.forEach(v=>{
   Object.assign(v, META[v.inf]);
   v.travel = TRAVEL.includes(v.inf);
-  v.conv = CONVERSATION.includes(v.inf);
 });
 
 /* --- frequency of each verb across the two transcripts (all inflected forms counted) --- */
@@ -3162,14 +3146,14 @@ const GROUP_LABEL = {are:"-are", ere:"-ere", ire:"-ire", isc:"-ire (-isc-)", orr
 
 /* --- the rules, for the Study view --- */
 const RULES = [
-  {title:"Presente — endings", tenses:["presente"], rows:[
+  {title:"Presente — endings", rows:[
     ["-are (parl-are)","o · i · a · iamo · ate · ano","parlo, parli, parla, parliamo, parlate, parlano"],
     ["-ere (cred-ere)","o · i · e · iamo · ete · ono","credo, credi, crede, crediamo, credete, credono"],
     ["-ire (dorm-ire)","o · i · e · iamo · ite · ono","dormo, dormi, dorme, dormiamo, dormite, dormono"],
     ["-ire -isc- (fin-ire)","isco · isci · isce · iamo · ite · iscono","finisco, finisci, finisce, finiamo, finite, finiscono"]
   ], foot:"Drop the infinitive ending, add the endings to the stem. The -isc- group (capire, finire, preferire, pulire) inserts -isc- in all forms except noi and voi."},
 
-  {title:"Presente progressivo — stare + gerundio", tenses:["progressivo"], rows:[
+  {title:"Presente progressivo — stare + gerundio", rows:[
     ["Step 1 — conjugate stare","sto · stai · sta · stiamo · state · stanno","sto… stai… sta…"],
     ["Step 2 — gerundio of -are","stem + -ando","mangiare → mangiando · parlare → parlando"],
     ["Step 2 — gerundio of -ere / -ire","stem + -endo","credere → credendo · dormire → dormendo · finire → finendo"],
@@ -3177,7 +3161,7 @@ const RULES = [
     ["Irregular gerundi","only a few, from the old Latin stem","fare → facendo · dire → dicendo · bere → bevendo"]
   ], foot:"Use it only for an action happening right at this moment (sto mangiando = I'm eating right now). For everything else — habits, near future, ongoing situations — Italian just uses the presente. It is not used with essere, avere, stare or the modals (potere, volere, dovere, sapere)."},
 
-  {title:"Imperfetto — one stem, one set of endings", tenses:["imperfetto"], rows:[
+  {title:"Imperfetto — one stem, one set of endings", rows:[
     ["Step 1 — build the stem","drop the final -re from the infinitive","parlare → parla- · credere → crede- · dormire → dormi-"],
     ["-are endings","avo · avi · ava · avamo · avate · avano","parlavo, parlavi, parlava, parlavamo, parlavate, parlavano"],
     ["-ere endings","evo · evi · eva · evamo · evate · evano","credevo, credevi, credeva, credevamo, credevate, credevano"],
@@ -3186,13 +3170,13 @@ const RULES = [
     ["Old Latin stems (endings still regular)","fare → face- · dire → dice- · bere → beve-","facevo, facevi, faceva… · dicevo, dicevi, diceva… · bevevo, bevevi, beveva…"]
   ], foot:"The imperfetto is the most forgiving tense in Italian — potere, dovere, volere, sapere, stare, andare, dare, vedere and venire all just add the regular endings to the infinitive stem. Use it for background description, habitual past actions ('da bambino giocavo sempre'), and anything already in progress when something else happened."},
 
-  {title:"Futuro semplice — one set of endings for everything", tenses:["futuro"], rows:[
+  {title:"Futuro semplice — one set of endings for everything", rows:[
     ["Step 1 — build the stem","drop the final -e; in -are verbs the a becomes e","parlare → parler- · credere → creder- · dormire → dormir-"],
     ["Step 2 — add the endings","ò · ai · à · emo · ete · anno","parlerò, parlerai, parlerà, parleremo, parlerete, parleranno"],
     ["-isc- verbs","behave like plain -ire in the future","finirò, finirai, finirà, finiremo, finirete, finiranno"]
   ], foot:"The endings never change — not even for irregular verbs. Irregulars only alter the stem, then take the exact same ò/ai/à/emo/ete/anno."},
 
-  {title:"Irregular future stems — the 3 patterns", tenses:["futuro","condizionale"], rows:[
+  {title:"Irregular future stems — the 3 patterns", rows:[
     ["1. Syncopated: the stem vowel drops",
      "and(a)r- · av(e)r- · pot(e)r- · dov(e)r- · sap(e)r- · ved(e)r-",
      "andrò (not anderò) · avrò · potrò · dovrò · saprò · vedrò"],
@@ -3205,25 +3189,25 @@ const RULES = [
     ["Suppletive (one-off)","essere → sar-","sarò, sarai, sarà, saremo, sarete, saranno"]
   ], foot:"Nothing here is random: a double -rr- is always a swallowed consonant (berrò is really bev-r-ò). Every one of these stems then takes the same ò/ai/à/emo/ete/anno. Learn the stem once and the whole tense follows. Note that the future stem is also the conditional stem — andr- gives both andrò and andrei."},
 
-  {title:"Spelling quirks in -are verbs (still regular!)", tenses:["presente","futuro"], rows:[
+  {title:"Spelling quirks in -are verbs (still regular!)", rows:[
     ["-care / -gare","add an h before i and e to keep the hard sound","pagare → tu paghi, noi paghiamo, futuro pagherò · cercare → tu cerchi, cercherò"],
     ["-ciare / -giare","never double the i","mangiare → tu mangi, futuro mangerò · viaggiare → tu viaggi, viaggerò"]
   ], foot:"These are spelling adjustments, not irregularities — the endings are exactly the ones in the tables above."},
 
-  {title:"Futuro anteriore — two jobs, one form", tenses:["futuroAnteriore"], rows:[
+  {title:"Futuro anteriore — two jobs, one form", rows:[
     ["Build it","futuro of avere/essere + past participle","avrò parlato · sarò andato/a · avremo finito"],
     ["Job 1 — finished by a future point","the earlier of two future actions, usually after quando/appena/dopo che","Quando avrò finito, ti chiamo. — When I've finished (will have finished), I'll call you."],
     ["Job 2 — a guess about the past","English uses \"must have…\", not a future tense at all","Non risponde: sarà uscito. — He's not answering: he must have gone out."],
     ["Same swap as futuro semplice","the futuro semplice alone can guess about now; the futuro anteriore guesses about the past","Sarà stanco. — He's probably tired. · Sarà stato stanco. — He was probably tired."]
   ], foot:"Job 2 trips up English speakers because English has no future tense hiding inside a guess about the past — \"sarà andato via\" is literally \"he will-have gone away\" but means \"he must have left\"/\"he's probably left\". If you can mentally swap in \"must have\" and the sentence still makes sense, it's this job, not the literal one."},
 
-  {title:"Condizionale presente — futuro stem + its own endings", tenses:["condizionale"], rows:[
+  {title:"Condizionale presente — futuro stem + its own endings", rows:[
     ["Step 1 — take the futuro stem","same stem as the futuro semplice (io form minus -ò)","parlerò → parler- · sarò → sar- · andrò → andr-"],
     ["Step 2 — add the endings","ei · esti · ebbe · emmo · este · ebbero","parlerei, parleresti, parlerebbe, parleremmo, parlereste, parlerebbero"],
     ["Irregular stems carry over","every contracted/irregular futuro stem is reused as-is","sarò → sarei · avrò → avrei · vorrò → vorrei · verrò → verrei"]
   ], foot:"If you know the futuro stem, you already know the condizionale — same stem, different endings. Used for polite requests (vorrei un caffè), hypotheticals (sarebbe bello), and giving advice (dovresti riposare)."},
 
-  {title:"Passato prossimo — auxiliary + past participle", tenses:["passato"], rows:[
+  {title:"Passato prossimo — auxiliary + past participle", rows:[
     ["Participle: -are","→ -ato","parlare → parlato"],
     ["Participle: -ere","→ -uto","credere → creduto"],
     ["Participle: -ire","→ -ito","dormire → dormito · finire → finito"],
@@ -3231,41 +3215,41 @@ const RULES = [
     ["With essere","sono · sei · è · siamo · siete · sono + participle","sono tornato/a, siamo partiti/e"]
   ], foot:"Most verbs take avere and the participle never changes. Verbs of motion and change of state (andare, venire, tornare, partire, essere, stare) take essere — and then the participle agrees with the subject: -o (m. sing), -a (f. sing), -i (m. pl), -e (f. pl)."},
 
-  {title:"Passato prossimo vs imperfetto — which one?", tenses:["passato","imperfetto"], rows:[
+  {title:"Passato prossimo vs imperfetto — which one?", rows:[
     ["Passato prossimo","a completed action with a clear edge — it happened once and it's over","Ieri ho mangiato una pizza. — Yesterday I ate a pizza."],
     ["Imperfetto","an ongoing state, habit, or background scene — no defined endpoint","Mangiavo la pizza ogni venerdì. — I used to eat pizza every Friday."],
     ["Quick test","“at that moment / once” → passato prossimo · “used to / was …-ing” → imperfetto","Ha telefonato alle tre. — She called at three. · Mentre parlava, guardava fuori. — While she was talking, she was looking out."],
     ["The classic combo","imperfetto paints the backdrop, passato prossimo is the event that interrupts it","Mentre camminavo, ho visto un cane. — While I was walking, I saw a dog."]
   ], foot:"Same weather, different focus: “Ha piovuto tutto il giorno” (it rained all day — the whole day is one finished block, passato prossimo) vs “Pioveva quando sono uscito” (it was raining when I went out — the rain is backdrop, imperfetto, and my leaving is the one-time event, passato prossimo)."},
 
-  {title:"Passato remoto — endings", tenses:["passatoRemoto"], rows:[
+  {title:"Passato remoto — endings", rows:[
     ["-are (parl-are)","ai · asti · ò · ammo · aste · arono","parlai, parlasti, parlò, parlammo, parlaste, parlarono"],
     ["-ere (cred-ere)","ei · esti · é · emmo · este · erono","credei, credesti, credé, credemmo, credeste, crederono"],
     ["-ire (dorm-ire)","ii · isti · ì · immo · iste · irono","dormii, dormisti, dormì, dormimmo, dormiste, dormirono"]
   ], foot:"Same job as the passato prossimo — a finished, one-time past action — but literary and narrative: novels, history, fairy tales, not everyday speech (outside parts of the south, where it's still spoken). You'll meet it reading far more than you'll need it writing."},
 
-  {title:"Irregular passato remoto — the 1-3-6 pattern", tenses:["passatoRemoto"], rows:[
+  {title:"Irregular passato remoto — the 1-3-6 pattern", rows:[
     ["What changes","only io, lui/lei, and loro (persons 1, 3, and 6)","mettere → misi, mise, misero"],
     ["What stays regular","tu, noi, voi — always the plain infinitive stem + esti/emmo/este or isti/immo/iste","mettere → mettesti, mettemmo, metteste"],
     ["-ere is the danger zone","most -are and -ire verbs are fully regular; most -ere verbs are not","scrivere → scrissi · chiudere → chiusi · prendere → presi"],
     ["A handful are irregular everywhere","essere, avere, dare, stare, fare, dire, bere — no regular tu/noi/voi to lean on","fui, fosti, fu, fummo, foste, furono · feci, facesti, fece…"]
   ], foot:"Learn the io form and you basically know lui/lei and loro too, by ear: -si → -se → -sero (misi/mise/misero), -qui → -que → -quero (piacqui/piacque/piacquero), -ssi → -sse → -ssero (scrissi/scrisse/scrissero). Compounds inherit their base verb's irregularity — mettere, mettere, mettere: commettere, ammettere, promettere, smettere all conjugate exactly like mettere."},
 
-  {title:"Presente vs condizionale presente — which one?", tenses:["presente","condizionale"], rows:[
+  {title:"Presente vs condizionale presente — which one?", rows:[
     ["Presente","a real, current fact, action, or ability","Posso aiutarti. — I can help you."],
     ["Condizionale","hypothetical, dependent on a condition, or just softened","Potrei aiutarti. — I could help you."],
     ["Quick test","plain statement → presente · “I would / could / should …” → condizionale","Voglio un caffè. — I want a coffee. · Vorrei un caffè. — I would like a coffee."],
     ["Where it matters most","politeness and softened advice — the condizionale is what you'll actually use out loud","Devi riposare. — You must rest. (blunt) · Dovresti riposare. — You should rest. (gentle)"]
   ], foot:"“Vorrei” instead of “voglio” is the single most useful swap for sounding polite in Italian — ordering food, asking for something, or making a request all default to the condizionale, not the presente."},
 
-  {title:"Congiuntivo presente — endings", tenses:["congiuntivo"], rows:[
+  {title:"Congiuntivo presente — endings", rows:[
     ["-are (parl-are)","i · i · i · iamo · iate · ino","parli, parli, parli, parliamo, parliate, parlino"],
     ["-ere (cred-ere)","a · a · a · iamo · iate · ano","creda, creda, creda, crediamo, crediate, credano"],
     ["-ire (dorm-ire)","a · a · a · iamo · iate · ano","dorma, dorma, dorma, dormiamo, dormiate, dormano"],
     ["-ire -isc- (fin-ire)","isca · isca · isca · iamo · iate · iscano","finisca, finisca, finisca, finiamo, finiate, finiscano"]
   ], foot:"The one thing to memorize: io, tu, and lui/lei are always identical, in every verb, no exceptions — so a subject pronoun (io, tu, lui, Lei) is often kept even though Italian normally drops it, just to avoid ambiguity. Noi and voi also match the presente indicativo noi/voi forms almost every time, even for irregular verbs."},
 
-  {title:"Irregular congiuntivo presente stems", tenses:["congiuntivo"], rows:[
+  {title:"Irregular congiuntivo presente stems", rows:[
     ["essere / avere","sia… siamo, siate, siano · abbia… abbiamo, abbiate, abbiano","Che io sia pronto. · Che tu abbia ragione."],
     ["fare / dire / dare / stare","facci- / dic- / di- / sti- + a, a, a, amo, ate, ano","faccia, faccia… facciano · dica… dicano · dia… diano · stia… stiano"],
     ["potere / volere / dovere / sapere","possa / voglia / debba / sappia + a, a, a, -iamo/-obbiamo, -iate/-obbiate, -ano/-abbiano","possa, possa… possano · voglia… vogliano"],
@@ -3273,7 +3257,7 @@ const RULES = [
     ["tenere / rimanere / bere","stressed stem teng- / rimang- / bev-, regular noi/voi","tenga… tengano · rimanga… rimangano · beva… bevano"]
   ], foot:"Most of these irregular stems are the same stressed stem the presente indicativo already uses for io (tengo→tenga, vengo→venga, esco→esca) — if you know the presente io form, you can usually guess the congiuntivo stem."},
 
-  {title:"Imperativo — no stem of its own, and no io", tenses:["imperativo"], rows:[
+  {title:"Imperativo — no stem of its own, and no io", rows:[
     ["io","doesn't exist","you can't command yourself"],
     ["tu","its own form — -are swaps presente's -i for -a; -ere/-ire is identical to presente tu","parla! (not parli!) · credi! · dormi! · finisci!"],
     ["Lei (formal)","borrowed from congiuntivo presente, 3rd singular","parli! · creda! · dorma! · finisca!"],
@@ -3282,13 +3266,13 @@ const RULES = [
     ["Loro (formal, rare)","borrowed from congiuntivo presente, 3rd plural","parlino! · credano! · dormano!"]
   ], foot:"Only tu has a form that truly belongs to the imperativo — every other person is on loan from a tense you already know. That's why lui/lei doesn't exist here at all: the formal command uses Lei (borrowed from congiuntivo presente), not lui or lei as such."},
 
-  {title:"Imperativo negativo — tu doesn't conjugate", tenses:["imperativo"], rows:[
+  {title:"Imperativo negativo — tu doesn't conjugate", rows:[
     ["Affirmative tu","its own imperativo form","Parla! · Aspetta! · Vai!"],
     ["Negative tu","non + infinitive, always — never the affirmative form with non in front","Non parlare! · Non aspettare! · Non andare!"],
     ["Every other person","just add non — the form itself doesn't change","Non parli! · Non parliamo! · Non parlate! · Non parlino!"]
   ], foot:"This trips everyone up at least once: \"Non parla!\" is simply wrong — the negative tu command borrows the infinitive instead of conjugating, full stop, even for irregular verbs (non andare!, not \"non va'!\"). Every other person keeps its normal (borrowed) form and just adds non in front."},
 
-  {title:"Irregular imperativo — the short tu forms", tenses:["imperativo"], rows:[
+  {title:"Irregular imperativo — the short tu forms", rows:[
     ["andare / dare / fare / stare","va' / da' / fa' / sta' — apocopated, one syllable (vai/dai/fai/stai also acceptable)","Va' via! · Dammi un minuto! · Fa' presto! · Sta' zitto!"],
     ["dire","di' — the only form, no long alternative in everyday use","Di' la verità!"],
     ["essere / avere","sii / abbi — irregular, learn as a pair","Sii gentile! · Abbi pazienza!"],
@@ -3296,7 +3280,7 @@ const RULES = [
     ["voi of essere / avere / sapere / volere","irregular — borrowed from congiuntivo voi, not presente indicativo","Siate pazienti! (not \"siete\") · Abbiate cura! (not \"avete\") · Sappiate che… · Vogliate accomodarvi."]
   ], foot:"Those apostrophed tu forms (va', da', fa', sta', di') are truncated versions of vai/dai/fai/stai/dici — both are heard, but the short form is what you'll see written. Doubling the following consonant when a pronoun is attached is the other classic trap: dammi (da' + mi), dimmi (di' + mi), fallo (fa' + lo). sapere and volere are rare in the tu imperativo (you don't often command someone to \"know\" or \"want\"), but when they appear, sappi/vogli — not sai/vuoi — are correct."},
 
-  {title:"When to use the congiuntivo — after che", tenses:["congiuntivo"], rows:[
+  {title:"When to use the congiuntivo — after che", rows:[
     ["Opinion / belief","credo che, penso che, mi sembra che","Penso che sia una buona idea. — I think it's a good idea."],
     ["Wish / desire","voglio che, spero che, preferisco che","Spero che tu venga. — I hope you come."],
     ["Doubt / emotion","dubito che, ho paura che, mi dispiace che, sono felice che","Ho paura che piova. — I'm afraid it will rain."],
@@ -3304,19 +3288,19 @@ const RULES = [
     ["After certain conjunctions","benché, sebbene, affinché, prima che, a meno che","Benché sia tardi, usciamo. — Even though it's late, let's go out."]
   ], foot:"If the che-clause states a plain fact (so che parli italiano — I know that you speak Italian), stay in the presente indicativo. The congiuntivo signals that what follows che is filtered through someone's mind — a wish, doubt, opinion, or feeling — not a fact anyone is claiming to know for certain."},
 
-  {title:"Congiuntivo imperfetto — endings", tenses:["congiuntivoImpf"], rows:[
+  {title:"Congiuntivo imperfetto — endings", rows:[
     ["-are (parl-are)","assi · assi · asse · assimo · aste · assero","parlassi, parlassi, parlasse, parlassimo, parlaste, parlassero"],
     ["-ere (cred-ere)","essi · essi · esse · essimo · este · essero","credessi, credessi, credesse, credessimo, credeste, credessero"],
     ["-ire (dorm-ire)","issi · issi · isse · issimo · iste · issero","dormissi, dormissi, dormisse, dormissimo, dormiste, dormissero"]
   ], foot:"Formed straight off the infinitive stem, and far more regular than the congiuntivo presente: even the -isc- verbs (capire → capissi, not capiscissi) and the stem-changing presente verbs (tenere → tenessi, not tenga-; andare → andassi, not vada-) drop their irregularities entirely here. io and tu are always identical."},
 
-  {title:"Irregular congiuntivo imperfetto stems", tenses:["congiuntivoImpf"], rows:[
+  {title:"Irregular congiuntivo imperfetto stems", rows:[
     ["essere","fossi, fossi, fosse, fossimo, foste, fossero","the one true exception — from Latin fuissem"],
     ["dare / stare","dessi, dessi, desse… · stessi, stessi, stesse…","the same irregular pattern, shared by both"],
     ["fare / dire / bere","facessi… · dicessi… · bevessi…","keep the old Latin infinitive stem (facere, dicere, bevere)"]
   ], foot:"Every other verb in this deck — including potere, volere, dovere, sapere, andare, venire, uscire, tenere, rimanere, and piacere — is completely regular here: just the infinitive stem plus the endings above."},
 
-  {title:"Congiuntivo imperfetto — used with se", tenses:["congiuntivoImpf"], rows:[
+  {title:"Congiuntivo imperfetto — used with se", rows:[
     ["Hypothetical “if” clauses","se + congiuntivo imperfetto, + condizionale presente","Se avessi tempo, verrei. — If I had time, I would come."],
     ["Sequence after a past-tense che","when the main verb is already in a past tense","Pensavo che fosse tardi. — I thought it was late."],
     ["Polite wish","vorrei che + congiuntivo imperfetto","Vorrei che tu venissi. — I wish you would come."]
@@ -3398,39 +3382,6 @@ const TENSES = [
   {id:"imperfettoProgressivo", label:"Imperfetto progressivo"},
   {id:"futuroProgressivo",  label:"Futuro progressivo"}
 ];
-
-/* TENSES above is grouped by STEM FAMILY — what a tense is built from — which is
-   the right lens for understanding *why* things are related (see the Rules tab).
-   It is the wrong lens for *learning order*: passato prossimo is a compound tense
-   by construction, but you need it in week one; passato remoto has its own simple
-   stem, but is essentially unused outside literature. TEACHING_ORDER instead
-   follows a dependency graph (a compound tense can't be learned before the aux
-   tense and participle/gerundio it's built from) blended with real communicative
-   frequency, roughly matching how Italian courses actually sequence things:
-     1. presente, passato prossimo, imperfetto, futuro — the everyday backbone
-     2. condizionale (reuses the futuro stem) and congiuntivo presente
-     3. imperativo — genuinely depends on BOTH of those (tu/noi/voi ← presente,
-        Lei/Loro ← congiuntivo presente), so it lands later than it "feels" like it should
-     4. presente progressivo, then every remaining "aux tense you know + participle
-        you already know" compound tense
-     5. passato remoto / trapassato remoto / futuro progressivo — literary or rare,
-        learned last regardless of how simple their construction is */
-const TEACHING_ORDER = [
-  "presente","passato","imperfetto","futuro","condizionale","congiuntivo","imperativo",
-  "progressivo","trapassatoProssimo","futuroAnteriore","condizionalePassato","congiuntivoPassato",
-  "congiuntivoImpf","congiuntivoTrapassato","imperfettoProgressivo",
-  "passatoRemoto","trapassatoRemoto","futuroProgressivo"
-];
-/* Both toggleable from Deck settings. "az" mirrors TENSES/VERBS' own built-in
-   order, so it costs nothing; "learn"/"freq" build a fresh array each call —
-   cheap at 18 tenses and a few hundred verbs, and always reflects the live S. */
-function orderedTenses(){
-  return (S.tenseOrder||"learn")==="family" ? TENSES : TEACHING_ORDER.map(id=>TENSES.find(t=>t.id===id));
-}
-function orderedVerbs(){
-  return (S.verbOrder||"freq")==="az" ? VERBS
-    : [...VERBS].sort((a,b)=> (b.freq||0)-(a.freq||0) || a.inf.localeCompare(b.inf,"it"));
-}
 
 /* gerundio: -are → -ando · -ere/-ire → -endo (a handful of irregular stems) */
 const GER_IRR = {fare:"facendo", dire:"dicendo", stare:"stando", essere:"essendo", dare:"dando", bere:"bevendo"};
@@ -4367,11 +4318,9 @@ function sentenceIt(v,t,i){
     return "Dopo che "+SUBJ_IT[i].toLowerCase()+" "+f+" "+COMP[v.inf][0]+", …";
   return SUBJ_IT[i]+" "+f+" "+COMP[v.inf][0]+".";
 }
-function sentenceEn(v,t,i,fem){
+function sentenceEn(v,t,i){
   const o = SENT_V[v.inf] || {};
-  // fem only matters for i===2 (lui/lei share a slot) — every other call site
-  // omits it and gets the exact same "he" fallback as before, unchanged.
-  const s = (fem && i===2) ? "she" : EN_SUBJ[i].replace("he / she","he").replace("you (pl)","you all");
+  const s = EN_SUBJ[i].replace("he / she","he").replace("you (pl)","you all");
   if(t==="imperativo"){                               // no subject pronoun in English either
     if(i===0) return "";
     const w = o.b || cut(baseForm(v));
@@ -4411,6 +4360,362 @@ function sentenceEn(v,t,i,fem){
   return s.charAt(0).toUpperCase()+s.slice(1)+" "+vp+" "+COMP[v.inf][1]+end;
 }
 
+/* ---------------- SENTENCE GENERATOR ----------------
+   The 🎲 button on a card builds a fresh sentence around the card's exact
+   conjugation (verb + tense + person), with a matching English translation.
+   Every piece is chosen so the result is grammatical whatever gets picked:
+     · subjects: pronoun, dropped pronoun, or a name/noun of the same person —
+       essere participles agree with it (Giulia è andata, le mie amiche sono andate)
+     · frames match the tense: time words for the indicative, "che"-clauses with
+       the right sequence of tenses for the congiuntivo, "se"/"con più tempo" for
+       the conditional, "già / non … ancora" for the compound tenses
+     · negation where it reads naturally (never inside "dopo che …")
+     · the sentence-complement per verb comes from COMP, with the fixes below
+------------------------------------------------------- */
+
+/* complements that don't work in every tense/person, replaced for generated sentences.
+   {o}/{e} = adjective ending that agrees with the subject; {poss} = my/your/his/… */
+const GEN_COMP = {
+  peggiorare:["di giorno in giorno","day by day"],     // transitive use needs avere; this is the essere use
+  risalire:["in camera","to the room"],                // "le scale" is transitive → would need avere
+  salire:["sul treno","on the train"],
+  scendere:["dal treno","off the train"],
+  valere:["molto","a lot"],
+  convenire:["su questo punto","on this point"],
+  importare:["vino dalla Francia","wine from France"],
+  costringere:["tutti a partire","everyone to leave"],
+  obbligare:["tutti a partire","everyone to leave"],
+  ridere:["in faccia al giudice","in the judge's face"],
+  litigare:["con il vicino","with the neighbor"],
+  diventare:["famos{o}","famous"],
+  risultare:["innocent{e}","innocent"],
+  muovere:["un passo","a step"],
+  intervenire:["in aula","in court"],
+  alzare:["la mano","{poss} hand"],
+  mettere:["la giacca","on {poss} jacket"],
+  togliere:["le scarpe","off {poss} shoes"],
+  cambiare:["idea","{poss} mind"],
+  abbassare:["la voce","{poss} voice"],
+  prostituire:["il proprio talento","{poss} talent"],
+  mancare:["da casa","from home"],
+  ascoltare:["la radio","to the radio"],
+  aspettare:["l'autobus","for the bus"],
+  chiedere:["il menù","for the menu"],
+  entrare:["in casa","the house"],
+  arrivare:["in stazione","at the station"],
+  smettere:["di lavorare","working"],
+  mentire:["a tutti","to everyone"],
+  funzionare:["bene","well"],
+  squillare:["a mezzanotte","at midnight"],
+  interessare:["a tutti","everyone"],
+  riguardare:["tutti","everyone"],
+  sbagliare:["strada","the wrong road"],
+  esistere:["in questo mondo","in this world"],
+  addormentare:["il bambino","the baby to sleep"],
+  sbattere:["contro il muro","into the wall"],
+  tentare:["il tutto per tutto",""]
+};
+/* one-time events: no "every day" / "every summer" frames */
+const GEN_ONCE = ["nascere"];
+/* verbs that only work reflexively here: mi/ti/si… + essere in compound tenses */
+const GEN_REFL = {
+  accorgere:["dell'errore","the mistake"],
+  attenere:["ai fatti","to the facts"],
+  fidare:["del medico","the doctor"],
+  arrabbiare:["con il vicino","at the neighbor"],
+  incazzare:["con i vicini","at the neighbors"]
+};
+/* English verb overrides where the card's first gloss doesn't fit the complement */
+const GEN_EN = {
+  fare:{b:"take",t3:"takes",p:"took",pp:"taken",g:"taking"},
+  stare:{b:"stay",t3:"stays",p:"stayed",pp:"stayed",g:"staying"},
+  perdere:{b:"miss",t3:"misses",p:"missed",pp:"missed",g:"missing"},
+  sapere:{b:"know",t3:"knows",p:"knew",pp:"known",g:"knowing"},
+  dovere:{b:"have to",t3:"has to",p:"had to",pp:"had to",g:"having to",cond:"should"},
+  volere:{b:"want",t3:"wants",p:"wanted",pp:"wanted",g:"wanting",cond:"would like"},
+  avere:{b:"have",t3:"has",p:"had",pp:"had",g:"having"},
+  attenere:{b:"stick",t3:"sticks",p:"stuck",pp:"stuck",g:"sticking"},
+  arrabbiare:{b:"get angry",t3:"gets angry",p:"got angry",pp:"gotten angry",g:"getting angry"},
+  incazzare:{b:"get mad",t3:"gets mad",p:"got mad",pp:"gotten mad",g:"getting mad"},
+  fidare:{b:"trust",t3:"trusts",p:"trusted",pp:"trusted",g:"trusting"},
+  convenire:{b:"agree",t3:"agrees",p:"agreed",pp:"agreed",g:"agreeing"},
+  importare:{b:"import",t3:"imports",p:"imported",pp:"imported",g:"importing"},
+  mancare:{be:"away"},
+  valere:{b:"be worth",be:"worth"},
+  girare:{b:"go around",t3:"goes around",p:"went around",pp:"gone around",g:"going around"},
+  risultare:{be:""},  diventare:{b:"become",t3:"becomes",p:"became",pp:"become",g:"becoming"},
+  piacere:{b:"please",t3:"pleases",p:"pleased",pp:"pleased",g:"pleasing"},
+  mollare:{b:"quit",t3:"quits",p:"quit",pp:"quit",g:"quitting"},
+  sbagliare:{b:"take",t3:"takes",p:"took",pp:"taken",g:"taking"},
+  togliere:{b:"take",t3:"takes",p:"took",pp:"taken",g:"taking"},
+  salire:{b:"get",t3:"gets",p:"got",pp:"gotten",g:"getting"},
+  scendere:{b:"get",t3:"gets",p:"got",pp:"gotten",g:"getting"},
+  addormentare:{b:"lull",t3:"lulls",p:"lulled",pp:"lulled",g:"lulling"},
+  commentare:{b:"comment on",t3:"comments on",p:"commented on",pp:"commented on",g:"commenting on"},
+  desiderare:{b:"wish",t3:"wishes",p:"wished",pp:"wished",g:"wishing"},
+  guadagnare:{b:"gain",t3:"gains",p:"gained",pp:"gained",g:"gaining"},
+  percepire:{b:"collect",t3:"collects",p:"collected",pp:"collected",g:"collecting"},
+  opporre:{b:"put up",t3:"puts up",p:"put up",pp:"put up",g:"putting up"},
+  ritrovare:{b:"find",t3:"finds",p:"found",pp:"found",g:"finding"},
+  rivedere:{b:"review",t3:"reviews",p:"reviewed",pp:"reviewed",g:"reviewing"},
+  tacere:{b:"hide",t3:"hides",p:"hid",pp:"hidden",g:"hiding"},
+  sbattere:{b:"crash",t3:"crashes",p:"crashed",pp:"crashed",g:"crashing"},
+  tirare:{b:"throw",t3:"throws",p:"threw",pp:"thrown",g:"throwing"},
+  muovere:{b:"take",t3:"takes",p:"took",pp:"taken",g:"taking"},
+  tentare:{b:"go all out",t3:"goes all out",p:"went all out",pp:"gone all out",g:"going all out"},
+  spiare:{b:"spy on",t3:"spies on",p:"spied on",pp:"spied on",g:"spying on"},
+  frequentare:{b:"frequent",t3:"frequents",p:"frequented",pp:"frequented",g:"frequenting"}
+};
+const REFL = ["mi","ti","si","ci","vi","si"];
+
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const cap1 = s => s.charAt(0).toUpperCase()+s.slice(1);
+
+/* ---- subjects: same grammatical person as the card, sometimes a name/noun ---- */
+function genSubject(i, allowDrop){
+  const P = [
+    [{it:"io",en:"I",g:"m",poss:"my"}],
+    [{it:"tu",en:"you",g:"m",poss:"your"}],
+    [{it:"lui",en:"he",g:"m",poss:"his"},{it:"lei",en:"she",g:"f",poss:"her"},
+     {it:"Marco",en:"Marco",g:"m",poss:"his"},{it:"Giulia",en:"Giulia",g:"f",poss:"her"},
+     {it:"il cameriere",en:"the waiter",g:"m",poss:"his"},{it:"la guida",en:"the guide",g:"f",poss:"her"}],
+    [{it:"noi",en:"we",g:"m",poss:"our"},{it:"Marco e io",en:"Marco and I",g:"m",poss:"our"},
+     {it:"Giulia e io",en:"Giulia and I",g:"m",poss:"our"}],
+    [{it:"voi",en:"you",g:"m",poss:"your"},{it:"tu e Marco",en:"you and Marco",g:"m",poss:"your"}],
+    [{it:"loro",en:"they",g:"m",poss:"their"},{it:"i miei amici",en:"my friends",g:"m",poss:"their"},
+     {it:"le mie amiche",en:"my friends",g:"f",poss:"their"},{it:"Marco e Giulia",en:"Marco and Giulia",g:"m",poss:"their"}]
+  ];
+  const s = Object.assign({i:i, pl:i>=3}, pick(P[i]));
+  // mixed-gender groups ("Giulia e io", with a masculine io) agree in the masculine plural
+  s.drop = allowDrop && (i===0||i===1||i===3||i===4) && s.it===["io","tu",0,"noi","voi"][i] && Math.random()<0.5;
+  return s;
+}
+
+/* ---- Italian verb group for this card, with agreement, clitic, negation ---- */
+function genVerbIt(v,t,i,subj,o){
+  o = o || {};
+  const refl = !!GEN_REFL[v.inf];
+  const vv = refl ? Object.assign({}, v, {aux:"essere"}) : v;
+  let f = form(vv,t,i).replace(/!$/,"");
+  // participle agreement with the actual subject
+  f = f.replace(/(\S+)[oi]\/[ae](?=\s|$)/g, (m,stem)=> stem + (subj.pl ? (subj.g==="f"?"e":"i") : (subj.g==="f"?"a":"o")));
+  let w = f.split(" ");
+  if(o.adv && w.length>1) w.splice(1,0,o.adv);          // già / ancora sit between auxiliary and participle
+  if(refl) w.unshift(REFL[i]);
+  if(o.neg) w.unshift("non");
+  return w.join(" ");
+}
+function genImperIt(v,i,neg){
+  const refl = !!GEN_REFL[v.inf];
+  let f = form(v,"imperativo",i).replace(/!$/,"");
+  if(neg && i===1){                                        // tu: non + infinitive
+    return "non " + (refl ? v.inf.slice(0,-1)+"ti" : v.inf);
+  }
+  if(refl){
+    if(i===2||i===5) f = "si "+f;                          // Lei/Loro: proclitic
+    else f = f + REFL[i];                                  // tu/noi/voi: attached (fidati, fidiamoci, fidatevi)
+  }
+  return (neg ? "non " : "") + f;
+}
+function genComp(v,subj){
+  const c = GEN_REFL[v.inf] || GEN_COMP[v.inf] || COMP[v.inf] || ["",""];
+  let it = c[0], en = c[1] || "";
+  if(v.custom && it==="spesso") { it=""; en=""; }         // the placeholder adverb clashes with time frames
+  it = it.replace("{o}", subj.pl ? (subj.g==="f"?"e":"i") : (subj.g==="f"?"a":"o"))
+         .replace("{e}", subj.pl ? "i" : "e");
+  en = en.replace("{poss}", subj.poss);
+  return {it:it, en:en};
+}
+
+/* ---- English verb phrase ---- */
+function genEnVerb(v){
+  const o = GEN_EN[v.inf] || {};
+  const c = s => cut(String(s||"")).replace(/\s*\([^)]*\)/g,"").trim();
+  if(v.inf==="essere") return {be:""};
+  if(o.be!==undefined && !o.b) return {be:o.be};
+  if(v.inf==="potere") return {modal:true, b:"be able to", pp:"been able to"};
+  const b  = o.b  || c(v.enBase) || c(baseForm(v));
+  if(/^be /.test(b)) return {be:b.slice(3)};              // "be born", "be worth" conjugate like to be
+  return {
+    b: b,
+    t3: o.t3 || c(v.en3) || b,
+    p:  o.p  || c(v.enPast) || c(v.enPastArr && v.enPastArr[0]),
+    pp: o.pp || c(v.enPart),
+    g:  o.g  || c(ING[v.inf]) || (b+"ing"),
+    cond: o.cond || (COND_EN[v.inf] && !o.b ? COND_EN[v.inf] : null)
+  };
+}
+const BE_PRES = s => s.en==="I" ? "am" : (s.i===2 ? "is" : "are");
+const BE_PAST = s => (s.i===0||s.i===2) ? "was" : "were";
+const HAVE    = s => s.i===2 ? "has" : "have";
+/* kind: pres | past | wish | fut | cond | presPerf | pastPerf | futPerf | condPerf |
+         prog | pastProg | futProg | usedTo ; o.adv = "already" (placed after first auxiliary) */
+function genEnVP(E, kind, s, neg, adv){
+  const be = E.be!==undefined;
+  const tail = be ? (E.be ? " "+E.be : "") : "";
+  const b  = be ? "be"+tail   : E.b;
+  const pp = be ? "been"+tail : E.pp;
+  const g  = be ? "being"+tail : E.g;
+  // "be worth / away / late" has no natural -ing form: use the simple tense ("being born" is fine)
+  if(be && /^born/.test(E.be) && kind==="presPerf") kind = "past";   // "we were born", not "have been born"
+  if(be && !/^born/.test(E.be)) kind = {prog:"pres", pastProg:"past", futProg:"fut"}[kind] || kind;
+  const A = (aux, rest) => aux + (neg ? " not" : "") + (adv ? " "+adv : "") + " " + rest;
+  let out;
+  switch(kind){
+    case "pres":
+      if(be) out = A(BE_PRES(s), tail.trim());
+      else if(E.modal) out = neg ? "cannot" : "can";
+      else if(neg) out = (s.i===2 ? "does not " : "do not ") + E.b;
+      else out = (s.i===2 ? E.t3 : E.b);
+      break;
+    case "past": case "wish":
+      if(be) out = A(kind==="wish" ? "were" : BE_PAST(s), tail.trim());
+      else if(E.modal) out = neg ? "could not" : "could";
+      else if(neg) out = "did not " + E.b;
+      else out = E.p;
+      break;
+    case "fut":      out = A("will", b); break;
+    case "cond":     out = E.modal ? A("could","") : E.cond ? (neg ? E.cond.replace(/^(\w+)/,"$1 not") : E.cond) : A("would", b); break;
+    case "presPerf": out = A(HAVE(s), pp); break;
+    case "pastPerf": out = A("had", pp); break;
+    case "futPerf":  out = neg ? "will not have "+pp : "will "+(adv?adv+" ":"")+"have "+pp; adv=null; break;
+    case "condPerf": out = A("would", "have "+pp); break;
+    case "prog":     out = A(BE_PRES(s), g); break;
+    case "pastProg": out = A(BE_PAST(s), g); break;
+    case "futProg":  out = A("will", "be "+g); break;
+    case "usedTo":   out = neg ? "did not use to "+b : "used to "+b; break;
+  }
+  out = out.replace(/\s+/g," ").trim();
+  // everyday contractions
+  return out.replace(/\bdo not\b/,"don't").replace(/\bdoes not\b/,"doesn't").replace(/\bdid not\b/,"didn't")
+            .replace(/\bwill not\b/,"won't").replace(/\bwould not\b/,"wouldn't").replace(/\bcould not\b/,"couldn't")
+            .replace(/\bhave not\b/,"haven't").replace(/\bhas not\b/,"hasn't").replace(/\bhad not\b/,"hadn't")
+            .replace(/\bis not\b/,"isn't").replace(/\bare not\b/,"aren't").replace(/\bwas not\b/,"wasn't")
+            .replace(/\bwere not\b/,"weren't").replace(/\bshould not\b/,"shouldn't");
+}
+
+/* ---- frames per tense ----
+   it(S,V,C) / en(S,V,C): S = subject text ("" if dropped), V = verb group, C = complement.
+   kind = English tense; neg = negation allowed; drop = pronoun may be dropped;
+   noIo = main clause is "I …", so an io subject would clash (Italian needs di + infinitive there) */
+const GEN_FRAMES = {
+  presente:[
+    {pre:["Ogni giorno","every day"],endEn:true},{pre:["A volte","Sometimes"]},
+    {pre:["La domenica","on Sundays"],endEn:true},{pre:null}
+  ].map(x=>({kind:"pres", neg:true, drop:true, pre:x.pre, endEn:!!x.endEn})),
+  progressivo:[["Adesso","Right now"],["In questo momento","At the moment"]]
+    .map(p=>({kind:"prog", neg:true, drop:true, pre:p})),
+  imperfetto:[["Ogni estate","Every summer"],["A quei tempi","Back then"],["Quando abitavamo a Roma","When we lived in Rome"]]
+    .map(p=>({kind:"usedTo", neg:true, drop:true, pre:p})),
+  imperfettoProgressivo:[["Quando hanno bussato alla porta","When someone knocked at the door"],
+                         ["Quando è suonato il telefono","When the phone rang"]]
+    .map(p=>({kind:"pastProg", neg:true, drop:true, pre:p})),
+  passato:[
+    {kind:"past", neg:true, drop:true, pre:["Ieri","Yesterday"]},
+    {kind:"past", neg:true, drop:true, pre:["La settimana scorsa","Last week"]},
+    {kind:"past", neg:true, drop:true, pre:["Stamattina","This morning"]},
+    {kind:"presPerf", neg:true, drop:true, pre:null, gia:true}
+  ],
+  passatoRemoto:[["Nel 1990","In 1990"],["Molti anni fa","Many years ago"],["Quella sera","That evening"]]
+    .map(p=>({kind:"past", neg:true, drop:false, pre:p})),
+  trapassatoProssimo:[
+    {kind:"pastPerf", neg:true, drop:false, pre:["Quando il treno è arrivato","When the train arrived"], gia:true},
+    {kind:"pastPerf", neg:true, drop:false, pre:["Alle otto","By eight o'clock"], gia:true}
+  ],
+  trapassatoRemoto:[
+    {kind:"pastPerf", neg:false, drop:false, sub:["Dopo che","After"], post:["il treno partì","the train left"]},
+    {kind:"pastPerf", neg:false, drop:false, sub:["Appena","As soon as"], post:["tutti tacquero","everyone fell silent"]}
+  ],
+  futuro:[["Domani","Tomorrow"],["La settimana prossima","Next week"],["Fra un mese","In a month"]]
+    .map(p=>({kind:"fut", neg:true, drop:true, pre:p})),
+  futuroAnteriore:[
+    {kind:"futPerf", neg:true, drop:false, pre:["Quando il treno arriverà","When the train arrives"], gia:true},
+    {kind:"futPerf", neg:true, drop:true,  pre:["Entro domani","By tomorrow"]}
+  ],
+  futuroProgressivo:[{kind:"futProg", neg:true, drop:true, pre:["Domani a quest'ora","This time tomorrow"]}],
+  condizionale:[["Con più tempo","With more time"],["Se fosse possibile","If it were possible"],["In quel caso","In that case"]]
+    .map(p=>({kind:"cond", neg:true, drop:true, pre:p})),
+  condizionalePassato:[["Con più tempo","With more time"],["Senza la pioggia","Without the rain"],["In quel caso","In that case"]]
+    .map(p=>({kind:"condPerf", neg:true, drop:true, pre:p})),
+  congiuntivo:[
+    {kind:"pres", neg:true, sub:["È possibile che","It's possible that"]},
+    {kind:"pres", neg:true, sub:["Sembra che","It seems that"]},
+    {kind:"pres", neg:true, sub:["Spero che","I hope that"], noIo:true},
+    {kind:"pres", neg:false, sub:["Non credo che","I don't think that"], noIo:true}
+  ],
+  congiuntivoPassato:[
+    {kind:"presPerf", neg:true, sub:["È possibile che","It's possible that"]},
+    {kind:"presPerf", neg:true, sub:["Sembra che","It seems that"]},
+    {kind:"presPerf", neg:false, sub:["Non credo che","I don't think that"], noIo:true}
+  ],
+  congiuntivoImpf:[
+    {kind:"wish", neg:true, sub:["Se","If"], post:["sarebbe bello","it would be nice"]},
+    {kind:"past", neg:true, sub:["Pensavo che","I thought that"], noIo:true},
+    {kind:"wish", neg:true, sub:["Vorrei che","I wish"], noIo:true},
+    {kind:"past", neg:true, sub:["Era possibile che","It was possible that"]}
+  ],
+  congiuntivoTrapassato:[
+    {kind:"pastPerf", neg:true, sub:["Se","If"], post:["sarebbe stato meglio","it would have been better"]},
+    {kind:"pastPerf", neg:false, sub:["Pensavo che","I thought that"], noIo:true, gia:true},
+    {kind:"pastPerf", neg:true, sub:["Era possibile che","It was possible that"]}
+  ]
+};
+
+/* build one sentence for card (v,t,i) → {it, en, note} */
+function genSentence(v,t,i){
+  const E = genEnVerb(v);
+  if(t==="imperativo"){
+    const neg = Math.random()<0.35;
+    const subj = {i:i, pl:i>=3, g:"m", poss:["","your","your","our","your","your"][i]};
+    const C = genComp(v,subj);
+    const end = pick(neg ? [[", per favore","please"],["",""]] : [[", per favore","please"],[" subito","right away"],["",""]]);
+    const it = cap1(genImperIt(v,i,neg)) + (C.it?" "+C.it:"") + end[0] + "!";
+    const base = E.be!==undefined ? "be"+(E.be?" "+E.be:"") : E.modal ? "be able to" : E.b;
+    let en = i===3 ? (neg ? "Let's not " : "Let's ") + base : (neg ? "Don't " + base : cap1(base));
+    en += (C.en?" "+C.en:"").replace(new RegExp("^ ("+(base.split(" ").pop())+") "), " ") + (end[1] ? (end[1]==="please" ? ", please" : " "+end[1]) : "") + "!";
+    const tag = i===2 ? " (formal)" : i===4 ? " (you all)" : i===5 ? " (formal, pl.)" : "";
+    return {it:it, en:en+tag, note:genNote(v)};
+  }
+  let frames = (GEN_FRAMES[t]||[{kind:"pres",neg:true,drop:true,pre:null}]).filter(f=>!(f.noIo && i===0));
+  if(GEN_ONCE.includes(v.inf)){
+    if(t==="presente")   frames = [{kind:"pres", neg:true, drop:true, pre:null}];
+    if(t==="imperfetto") frames = [{kind:"pastProg", neg:false, drop:true, pre:["In quel momento","At that moment"]}];
+    frames = frames.filter(f=>!f.gia);                  // "già nato" makes no sense
+  }
+  const F = pick(frames);
+  const subj = genSubject(i, !!F.drop);
+  let neg = F.neg && Math.random()<0.3;
+  // "già" in the affirmative, "non … ancora" in the negative
+  const adv = F.gia ? (neg ? "ancora" : "già") : null;
+  const V = genVerbIt(v,t,i,subj,{neg:neg, adv:adv});
+  const C = genComp(v,subj);
+  const clauseIt = [subj.drop ? "" : subj.it, V, C.it].filter(Boolean).join(" ");
+  const vpEn = genEnVP(E, F.kind, subj, neg, F.gia && !neg ? "already" : null);
+  let clauseEn = [subj.en, vpEn, C.en].filter(Boolean).join(" ");
+  if(F.gia && neg) clauseEn += " yet";
+
+  let it, en;
+  if(F.sub){
+    it = F.sub[0]+" "+clauseIt + (F.post ? ", "+F.post[0]+"." : ".");
+    en = F.sub[1]+" "+clauseEn + (F.post ? ", "+F.post[1]+"." : ".");
+  }else if(F.pre){
+    it = F.pre[0]+(/^(Quando|Se|Con|Senza|In quel|Entro|Alle|Domani a)\b/.test(F.pre[0]) ? ", " : " ")+clauseIt+".";
+    en = F.endEn ? cap1(clauseEn)+" "+F.pre[1]+"." : F.pre[1]+", "+clauseEn+".";
+  }else{
+    it = cap1(clauseIt)+".";
+    en = cap1(clauseEn)+".";
+  }
+  it = it.replace(/\s+/g," ").replace(/\s([,.!…])/g,"$1");
+  en = en.replace(/\s+/g," ").replace(/\s([,.!…])/g,"$1")
+         .replace(/\b(to|for|on|at|with|about|into|of|in|around|off|up|down|back|away) \1\b/g,"$1");   // "listening to" + "to the radio"
+  return {it:cap1(it), en:cap1(en), note:genNote(v)};
+}
+function genNote(v){
+  if(GEN_REFL[v.inf])
+    return "used reflexively here — "+v.inf.slice(0,-1)+"si: mi/ti/si… before the verb, and essere in compound tenses";
+  return "";
+}
+
 /* ---------------- AUDIO SCRIPT EXPORT ----------------
    Builds a narration script for the `say` command from the current
    verb + tense selection. Differences from the on-screen cards:
@@ -4419,6 +4724,7 @@ function sentenceEn(v,t,i,fem){
      · tenses run in TENSES order — grouped by shared stem.
      · [[slnc N]] is `say`'s pause directive, in milliseconds.
 ------------------------------------------------------- */
+const AUDIO_TSEQ = TENSES.map(t=>t.id);   // narrate in the same stem-family order as the deck
 const AUDIO_SLOTS = [
   {i:0, pn:"io",   subj:"Io",   fem:false},
   {i:1, pn:"tu",   subj:"Tu",   fem:false},
@@ -4448,16 +4754,17 @@ function audioSlotsFor(t){
   if(t!=="imperativo") return AUDIO_SLOTS;
   return AUDIO_SLOTS.filter(s => s.i!==0 && s.pn!=="lui");
 }
-/* the selected tenses this verb actually has forms in, in the shared deck order
-   (S.tenseOrder — learning order by default, or grouped-by-stem) */
+/* the selected tenses this verb actually has forms in, in narration order */
 function audioTensesFor(v){
-  return orderedTenses().map(t=>t.id).filter(t=>S.tenses.includes(t) && hasTense(v,t));
+  return AUDIO_TSEQ.filter(t=>S.tenses.includes(t) && hasTense(v,t));
 }
 function audioSelection(){
   // A verb with nothing left after the tense filter is dropped outright —
   // otherwise the track announces an infinitive and then falls silent.
-  const verbs = orderedVerbs().filter(v=>S.verbs.includes(v.inf) && audioTensesFor(v).length);
-  return { verbs:verbs, tenses: orderedTenses().map(t=>t.id).filter(t=>S.tenses.includes(t)) };
+  const verbs = VERBS.filter(v=>S.verbs.includes(v.inf) && audioTensesFor(v).length);
+  if(S.audioOrder === "freq")            // most-used first; ties fall back to alphabetical
+    verbs.sort((a,b)=> (b.freq||0)-(a.freq||0) || (a.inf < b.inf ? -1 : 1));
+  return { verbs:verbs, tenses: AUDIO_TSEQ.filter(t=>S.tenses.includes(t)) };
 }
 function buildAudioScript(){
   const gap = S.audioGap || 2000;
@@ -4471,19 +4778,7 @@ function buildAudioScript(){
         const f  = audioAgree(form(v,t,s.i), s.fem);
         const ex = audioSent(v,t,f,s.subj);
         const end = t==="imperativo" ? "" : ".";       // the form already ends in "!" for a command
-        const base = s.pn+" "+f+end+(ex ? " [[slnc 400]] "+ex : "");
-        const en = sentenceEn(v,t,s.i,s.fem);     // every person now, not just io — s.fem makes lei say "she"
-        if(en){
-          // The English line gets rendered as a completely separate `say` pass by
-          // render-audio.sh — not an embedded [[voice ...]] switch, which chokes on
-          // compound names like "Paola (Enhanced)" and can end up read aloud instead
-          // of acted on. ¶EN¶ is a marker render-audio.sh splits on; never spoken.
-          lines.push(base+" [[slnc 500]]");
-          lines.push("¶EN¶ "+en);
-          lines.push("[[slnc "+gap+"]]");
-        } else {
-          lines.push(base+" [[slnc "+gap+"]]");
-        }
+        lines.push(s.pn+" "+f+end+(ex ? " [[slnc 400]] "+ex : "")+" [[slnc "+gap+"]]");
       });
     });
   });
@@ -4495,7 +4790,7 @@ function audioEstimate(){
   let items = 0, blocks = 0;
   sel.verbs.forEach(v=>{ const ts = audioTensesFor(v); blocks += ts.length;
     items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0); });
-  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5 + items*2.8;   // every slot gets an English line too
+  const secs = items*(3.75+gap) + blocks*2.3 + sel.verbs.length*3.5;
   return {verbs:sel.verbs.length, tenses:sel.tenses.length, items:items, secs:secs};
 }
 
@@ -4550,17 +4845,24 @@ if("speechSynthesis" in window){
     document.addEventListener(ev, ()=>{ voiceTries = 0; pollVoices(); }, {passive:true, once:true}));
   document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshVoices(); });
 }
+function toast(msg, ms){
+  let el = document.getElementById("toast");
+  if(!el){ el = document.createElement("div"); el.id = "toast"; document.body.appendChild(el);
+           el.onclick = ()=>el.classList.remove("show"); }
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove("show"), ms || 3000);
+}
 function speak(text, quiet){
   if(!("speechSynthesis" in window)) return;
   if(!itVoice) pickVoice();
   if(!itVoice){                              // no Italian voice installed: stay silent, say why
     if(quiet) return;
-    alert("No Italian voice has been detected yet.\n\n"+
+    toast("No Italian voice has been detected yet.\n\n"+
           "The voice list sometimes loads a moment late — tap this again in a few seconds.\n\n"+
           "If it stays silent, add an Italian voice:\n"+
           "iPhone / iPad: Settings › Accessibility › Spoken Content › Voices › Italian\n"+
           "Mac: System Settings › Accessibility › Spoken Content › System Voice › Manage Voices…\n\n"+
-          "An English voice reading Italian sounds wrong, so audio stays off until one is available.");
+          "An English voice reading Italian sounds wrong, so audio stays off until one is available.", 9000);
     return;
   }
   speechSynthesis.cancel();
@@ -5036,7 +5338,7 @@ function genVerb(spec, r){
   const v = {
     inf: r.inf, en: meaning ? (/^to\s+/i.test(meaning) ? meaning : ("to " + base)) : "",
     pres: r.pres, fut: r.fut, pp: r.pp, aux,
-    reg: r.reg, g: r.g, travel: false, conv: false, custom: true
+    reg: r.reg, g: r.g, travel: false, custom: true
   };
   if (r.latin) v.latin = r.latin;
   if (base){
@@ -5077,14 +5379,12 @@ function saveUserSpecs(){ try { localStorage.setItem(USER_KEY, JSON.stringify(US
 
 /* ---------------- STATE ---------------- */
 const KEY = "verbi_v1";
-const VER = 18;
+const VER = 17;
 let S = {
   ver:VER,
   mode:"recall",                                  // recall | translate
   verbs:VERBS.map(v=>v.inf),
   tenses:TENSES.map(t=>t.id),
-  verbOrder:"freq",                               // freq | az — drives buildDeck() + the verb chip list
-  tenseOrder:"learn",                             // learn | family — drives buildDeck() + the tense chip list
   stats:{},                                       // cardId -> {r:right, w:wrong}
   known:{},                                       // cardId -> true (answered correctly, retired)
   seen:0, right:0
@@ -5100,30 +5400,34 @@ if(S.ver !== VER){                                // migrate: switch on the new 
                                                 "imperativo")));
   S.ver = VER;
 }
+if(!S.filt || typeof S.filt!=="object") S.filt = {travel:false, reg:null, aux:null};
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
 
-let deck=[], pos=0, flipped=false;
+let deck=[], pos=0, flipped=false, curPhrase="";
 
 function cardId(vi,t,i){ return vi+"|"+t+"|"+i; }
 
 function buildDeck(){
   const groups = new Map();          // key: "verb|tense" -> its 6 cards, persons in order
-  orderedVerbs().forEach(v=>{
+  VERBS.forEach(v=>{
     if(!S.verbs.includes(v.inf)) return;
-    // iterate in the chosen tense order (learning-sequence by default), not S.tenses,
-    // so the card sequence always follows a sensible order regardless of saved settings
-    orderedTenses().forEach(tt=>{
+    // iterate TENSES (stem-family order), not S.tenses, so the card sequence
+    // always follows the sorted tense order regardless of saved settings
+    TENSES.forEach(tt=>{
       const t = tt.id;
       if(!S.tenses.includes(t)) return;
       if(!hasTense(v,t)) return;          // stare+gerundio isn't used with stative verbs, etc.
+      if(S.filt && S.filt.reg==="irr" && !irregularIn(v,t)) return;   // Irregular on: only the tenses where it IS irregular
+      if(S.filt && S.filt.reg==="reg" &&  irregularIn(v,t)) return;
       const cards = [];
       for(const i of personIdxs(t)){ const id=cardId(v.inf,t,i); if(S.known[id]) continue; cards.push({v, t, i, id}); }
       if(cards.length) groups.set(v.inf+"|"+t, cards);   // fully-known verb+tense drops out
     });
   });
-  // Deck order: verbs play in whichever order orderedVerbs() returned (frequency
-  // by default), and within a verb, tenses play in the chosen tense order too.
-  // Within a verb+tense group the six cards still cycle io → tu → lui → noi → voi → loro.
+  // Alphabetical order: VERBS is sorted a-z by infinitive, and the Map
+  // preserves that insertion order (verb, then tense), so the deck plays
+  // verbs alphabetically. Within a group the six cards still cycle
+  // io → tu → lui → noi → voi → loro.
   const out = [];
   Array.from(groups.values()).forEach(cards=>out.push(...cards));
   deck=out; pos=0;
@@ -5155,11 +5459,14 @@ function render(){
 
   $("tag").textContent = tenseLabel + " · " + personLabel(c.t,c.i);
 
+  curPhrase = sentenceIt(c.v,c.t,c.i);
   const ex  = '<div class="ex">'+
-                '<div class="exit">'+sentenceIt(c.v,c.t,c.i)+'</div>'+
-                '<div class="exen">'+sentenceEn(c.v,c.t,c.i)+'</div>'+
+                '<div class="exit" id="exIt">'+curPhrase+'</div>'+
+                '<div class="exen" id="exEn">'+sentenceEn(c.v,c.t,c.i)+'</div>'+
+                '<div class="exnote" id="exNote"></div>'+
               '</div>';
   const spk = '<div class="spkrow">'+
+                '<button class="spk" id="genBtn">🎲 nuova frase</button>'+
                 '<button class="spk" id="spkBtn">🔊 frase</button>'+
                 '<button class="spk alt" id="spkWord">🔊 solo il verbo</button>'+
               '</div>';
@@ -5266,10 +5573,18 @@ function flip(){
   flipped=true;
   $("card").classList.add("flipped");
   const c = deck[pos];
-  const phrase = sentenceIt(c.v,c.t,c.i);
+  const phrase = curPhrase;
   const word   = form(c.v,c.t,c.i);
-  const b = $("spkBtn"), w = $("spkWord");
-  if(b) b.onclick = e =>{ e.stopPropagation(); speak(phrase); };
+  const b = $("spkBtn"), w = $("spkWord"), gb = $("genBtn");
+  if(b) b.onclick = e =>{ e.stopPropagation(); speak(curPhrase); };
+  if(gb) gb.onclick = e =>{                       // fresh sentence around this exact conjugation
+    e.stopPropagation();
+    const g = genSentence(c.v,c.t,c.i);
+    curPhrase = g.it;
+    $("exIt").textContent = g.it;
+    $("exEn").textContent = g.en;
+    $("exNote").textContent = g.note;
+  };
   if(w) w.onclick = e =>{ e.stopPropagation(); speak(word); };
   if(S.speak) speak(phrase, true);      // auto-speak reads the whole sentence
   $("controls").innerHTML =
@@ -5318,16 +5633,14 @@ function drawRules(){
   $("studyTitle").textContent = "Rules";
   $("navrow").style.display = "none";
   $("pickList").classList.remove("open");
-  const rules = S.tenses.length ? RULES.filter(r=>r.tenses.some(t=>S.tenses.includes(t))) : RULES;
-  $("studyBody").innerHTML = rules.length ? rules.map(r=>
+  $("studyBody").innerHTML = RULES.map(r=>
     '<div class="rulebox"><h3>'+r.title+'</h3>'+
       r.rows.map(row=>
         '<div class="rr"><div class="k">'+row[0]+'</div>'+
         '<div class="v">'+row[1]+'</div>'+
         '<div class="x">'+row[2]+'</div></div>').join("")+
       '<div class="rfoot">'+r.foot+'</div>'+
-    '</div>').join("")
-    : '<div class="note" style="margin:16px">No grammar notes for the tenses currently selected in Deck settings — select more tenses there to see their rules here.</div>';
+    '</div>').join("");
   $("studySheet").querySelector(".sheetbox").scrollTop = 0;
 }
 function drawStudy(){
@@ -5347,22 +5660,21 @@ function drawStudy(){
       '<i class="dot '+(x.reg?'reg':'irr')+'"></i>'+x.inf+
       '<span style="opacity:.55;margin-left:5px">×'+x.freq+'</span>'+
       (x.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (x.travel?' ✈︎':'')+(x.conv?' 💬':'')+'</div>').join("");
+      (x.travel?' ✈︎':'')+'</div>').join("");
   $("pickList").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     studyIdx = +el.dataset.i;
     $("pickList").classList.remove("open");
     drawStudy();
   });
 
-  const tenses = orderedTenses().filter(t=>S.tenses.includes(t.id));
-  const show = tenses.length ? tenses : orderedTenses();
+  const tenses = TENSES.filter(t=>S.tenses.includes(t.id));
+  const show = tenses.length ? tenses : TENSES;
 
   let html = '<div class="vhead">'+v.inf+'<em>'+v.en+'</em></div>';
   html += '<div><span class="badge '+(v.reg?'reg':'irr')+'">'+
             (v.reg?'regular':'irregular')+' · '+GROUP_LABEL[v.g]+'</span>'+
             (v.aux==="essere"?'<span class="badge ess">essere</span>':'')+
             (v.travel?'<span class="badge trv">✈︎ travel</span>':'')+
-            (v.conv?'<span class="badge trv">💬 conversation</span>':'')+
             '<span class="badge" style="background:#20262f;color:var(--dim)">used '+v.freq+'× in your transcripts</span>'+'</div>';
   html += '<div class="why">'+ (v.why ? v.why :
             (v.reg ? 'Follows the '+GROUP_LABEL[v.g]+' pattern exactly across every tense — see the Rules tab.'
@@ -5515,29 +5827,19 @@ $("tabVerbs").onclick = ()=>setTab("verbs");
 $("tabRules").onclick = ()=>setTab("rules");
 
 function drawChips(){
-  $("tenseOrdChips").innerHTML = [["learn","Learning order"],["family","Grouped by stem"]].map(o=>
-    '<div class="chip '+((S.tenseOrder||"learn")===o[0]?'sel':'')+'" data-o="'+o[0]+'">'+o[1]+'</div>').join("");
-  $("tenseOrdChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
-    S.tenseOrder = el.dataset.o; save(); drawChips();
-  });
-  $("tenseChips").innerHTML = orderedTenses().map(t=>
+  $("tenseChips").innerHTML = TENSES.map(t=>
     '<div class="chip '+(S.tenses.includes(t.id)?'sel':'')+'" data-t="'+t.id+'">'+t.label+'</div>').join("");
-
-  $("verbOrdChips").innerHTML = [["freq","Most used first"],["az","A–Z"]].map(o=>
-    '<div class="chip '+((S.verbOrder||"freq")===o[0]?'sel':'')+'" data-o="'+o[0]+'">'+o[1]+'</div>').join("");
-  $("verbOrdChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
-    S.verbOrder = el.dataset.o; save(); drawChips();
-  });
-  $("verbChips").innerHTML = orderedVerbs().map(v=>
+  $("verbChips").innerHTML = VERBS.map(v=>
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
-      '<i class="dot '+(v.reg?'reg':'irr')+'"></i>'+v.inf+
+      '<i class="dot '+(irrInSelection(v)?'irr':'reg')+'"></i>'+v.inf+
       (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (v.travel?' ✈︎':'')+(v.conv?' 💬':'')+'</div>').join("");
+      (v.travel?' ✈︎':'')+'</div>').join("");
 
   $("tenseChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     const id=el.dataset.t;
     S.tenses = S.tenses.includes(id) ? S.tenses.filter(x=>x!==id) : S.tenses.concat(id);
-    save(); drawChips();
+    if(S.filt && S.filt.reg) applyFilters();       // regular/irregular depends on the tenses chosen
+    else { save(); drawChips(); }
   });
   $("verbChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     const id=el.dataset.v;
@@ -5545,6 +5847,7 @@ function drawChips(){
     save(); drawChips();
   });
 
+  drawFilters();
   $("autoSpk").classList.toggle("on", !!S.speak);
   drawVoices();
   drawAudio();
@@ -5561,16 +5864,145 @@ function drawChips(){
 $("setBtn").onclick   = ()=>{ drawChips(); drawUserVerbs(); $("sheet").classList.add("open"); };
 $("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
 $("sheet").onclick    = e =>{ if(e.target.id==="sheet"){ $("sheet").classList.remove("open"); buildDeck(); } };
-$("allV").onclick  = ()=>{ S.verbs=VERBS.map(v=>v.inf); save(); drawChips(); };
-$("convV").onclick = ()=>{
-  S.verbs = Array.from(new Set(S.verbs.concat(VERBS.filter(v=>v.conv).map(v=>v.inf))));
-  S.tenses = TENSES.map(t=>t.id).filter(id=>!NOT_SPOKEN.includes(id));
+/* ---- tense-by-tense regularity ----
+   A verb counts as irregular IN A TENSE when any of its forms there differ from what the
+   plain -are / -ere / -ire rule produces. Spelling-only adjustments are regular
+   (cerchi, paghi, mangi, studi / invii), and so are both -ire patterns (dormo, finisco).
+     · simple tenses: every person compared with the rule
+     · compound tenses (passato prossimo, trapassato, futuro anteriore…): irregular only
+       if the participle is (fatto, messo, rimasto…) — the auxiliary never counts
+     · stare + gerundio tenses: irregular only if the gerundio is (facendo, dicendo…) */
+const IRR_T = {};
+const COMPOUND_T = ["passato","trapassatoProssimo","trapassatoRemoto","futuroAnteriore",
+                    "condizionalePassato","congiuntivoPassato","congiuntivoTrapassato"];
+function rJoinAre(st,e,merge){
+  // -iare: noi/voi always merge (studiamo, inviamo); tu / congiuntivo merge only when the i is
+  // unstressed (studi) and keep it when stressed (invii, spii, inviino)
+  if(/i$/.test(st) && e[0]==="i" && (merge || e.startsWith("ia"))) return st+e.slice(1);
+  if(/[cg]$/.test(st) && (e[0]==="i"||e[0]==="e")) return st+"h"+e;        // pag+i → paghi
+  return st+e;
+}
+function rFutStem(inf){
+  const st=inf.slice(0,-3);
+  if(inf.endsWith("are")){
+    if(/[cg]$/.test(st)) return [st+"her"];
+    if(/[cg]i$/.test(st) && !/(gl|ch|gh)i$/.test(st)) return [st.slice(0,-1)+"er"];   // mangerò, comincerò
+    return [st+"er"];
+  }
+  return [st+(inf.endsWith("ere")?"er":"ir")];
+}
+/* every regular way to conjugate this infinitive in tense t → array of 6-form candidates */
+function regCandidates(inf,t){
+  const st=inf.slice(0,-3), are=inf.endsWith("are"), ere=inf.endsWith("ere");
+  const M = are ? [true,false] : [true];                  // -iare: studi (merged) or invii (not)
+  const G = are ? ["are"] : ere ? ["ere"] : ["ire","isc"];
+  const pres=(g,m)=> g==="are" ? ["o","i","a","iamo","ate","ano"].map(e=>rJoinAre(st,e,m))
+                   : g==="ere" ? ["o","i","e","iamo","ete","ono"].map(e=>st+e)
+                   : g==="isc" ? ["isco","isci","isce","iamo","ite","iscono"].map(e=>st+e)
+                   :             ["o","i","e","iamo","ite","ono"].map(e=>st+e);
+  const cong=(g,m)=> g==="are" ? ["i","i","i","iamo","iate","ino"].map(e=>rJoinAre(st,e,m))
+                   : g==="isc" ? ["isca","isca","isca","iamo","iate","iscano"].map(e=>st+e)
+                   :             ["a","a","a","iamo","iate","ano"].map(e=>st+e);
+  const out=[];
+  G.forEach(g=>M.forEach(m=>{
+    const P=pres(g,m), C=cong(g,m);
+    if(t==="presente")    out.push(P);
+    if(t==="congiuntivo") out.push(C);
+    if(t==="imperativo")  out.push([null, are ? rJoinAre(st,"a",m) : P[1], C[2], P[3], P[4], C[5]]);
+  }));
+  if(t==="futuro")       rFutStem(inf).forEach(f=>out.push(["ò","ai","à","emo","ete","anno"].map(e=>f+e)));
+  if(t==="condizionale") rFutStem(inf).forEach(f=>out.push(COND_END.map(e=>f+e)));
+  if(t==="imperfetto")   out.push((are?["avo","avi","ava","avamo","avate","avano"]
+                               :ere?["evo","evi","eva","evamo","evate","evano"]
+                               :    ["ivo","ivi","iva","ivamo","ivate","ivano"]).map(e=>st+e));
+  if(t==="congiuntivoImpf") out.push((are?["assi","assi","asse","assimo","aste","assero"]
+                               :ere?["essi","essi","esse","essimo","este","essero"]
+                               :    ["issi","issi","isse","issimo","iste","issero"]).map(e=>st+e));
+  if(t==="passatoRemoto"){
+    if(are) out.push(["ai","asti","ò","ammo","aste","arono"].map(e=>st+e));
+    else if(ere){ out.push(["ei","esti","é","emmo","este","erono"].map(e=>st+e));
+                  out.push(["etti","esti","ette","emmo","este","ettero"].map(e=>st+e)); }   // credetti: regular variant
+    else out.push(["ii","isti","ì","immo","iste","irono"].map(e=>st+e));
+  }
+  return out;
+}
+function calcIrregular(v,t){
+  const inf=v.inf;
+  if(!/(are|ere|ire)$/.test(inf) || v.latin) return true;   // -urre, -arre, -orre: old Latin stems
+  const st=inf.slice(0,-3);
+  if(COMPOUND_T.includes(t)){
+    const reg = st + (inf.endsWith("are") ? "ato" : inf.endsWith("ere") ? "uto" : "ito");
+    // -cere / -scere keep the soft sound with an i: conosciuto, cresciuto, piaciuto, taciuto (spelling, not irregular)
+    const soft = /c$/.test(st) && inf.endsWith("ere") ? st+"iuto" : null;
+    return v.pp !== reg && v.pp !== soft;
+  }
+  if(PROGRESSIVE.includes(t)) return gerund(v) !== st + (inf.endsWith("are") ? "ando" : "endo");
+  const C = regCandidates(inf,t);
+  if(!C.length) return !v.reg;
+  const idx = personIdxs(t);
+  const actual = idx.map(i=>String(form(v,t,i)).replace(/!$/,""));
+  return !C.some(c=>idx.every((i,k)=>c[i]===actual[k]));
+}
+function irregularIn(v,t){
+  const k=v.inf+"|"+t;
+  if(!(k in IRR_T)){ try{ IRR_T[k]=calcIrregular(v,t); }catch(e){ IRR_T[k]=!v.reg; } }
+  return IRR_T[k];
+}
+/* regular / irregular judged over the selected tenses (whole verb if none selected) */
+function selTensesFor(v){ return S.tenses.filter(t=>hasTense(v,t)); }
+function irrInSelection(v){
+  if(!S.tenses.length) return !v.reg;
+  return selTensesFor(v).some(t=>irregularIn(v,t));
+}
+function regInSelection(v){
+  if(!S.tenses.length) return v.reg;
+  const ts=selTensesFor(v);
+  return ts.length>0 && ts.every(t=>!irregularIn(v,t));
+}
+
+/* ---- verb filters ----
+   Travel, Regular/Irregular and Essere/Avere are toggles that stack as an
+   INTERSECTION: e.g. Travel + Irregular + Essere selects only verbs that are
+   all three. Within a pair (Regular/Irregular, Essere/Avere) the two options
+   are mutually exclusive — tapping the active one switches it off. */
+function verbPasses(v){
+  const f = S.filt;
+  if(f.travel && !v.travel) return false;
+  // regular / irregular IN THE SELECTED TENSES (e.g. only Passato remoto → only verbs irregular there)
+  if(f.reg==="reg" && !regInSelection(v)) return false;
+  if(f.reg==="irr" && !irrInSelection(v)) return false;
+  if(f.aux && v.aux!==f.aux) return false;
+  return true;
+}
+function applyFilters(){
+  S.verbs = VERBS.filter(verbPasses).map(v=>v.inf);
   save(); drawChips();
-};
-$("travV").onclick = ()=>{ S.verbs=VERBS.filter(v=>v.travel).map(v=>v.inf); save(); drawChips(); };
-$("regV").onclick  = ()=>{ S.verbs=VERBS.filter(v=>v.reg).map(v=>v.inf);  save(); drawChips(); };
-$("irrV").onclick  = ()=>{ S.verbs=VERBS.filter(v=>!v.reg).map(v=>v.inf); save(); drawChips(); };
-$("noneV").onclick = ()=>{ S.verbs=[]; save(); drawChips(); };
+}
+function drawFilters(){
+  const f = S.filt;
+  $("travV").classList.toggle("on", !!f.travel);
+  $("regV").classList.toggle("on", f.reg==="reg");
+  $("irrV").classList.toggle("on", f.reg==="irr");
+  $("essV").classList.toggle("on", f.aux==="essere");
+  $("aveV").classList.toggle("on", f.aux==="avere");
+  const parts = [];
+  if(f.travel) parts.push("travel");
+  if(f.reg){
+    const names = S.tenses.map(id=>TENSES.find(t=>t.id===id).label);
+    const where = !names.length ? "" : names.length<=3 ? " in "+names.join(", ") : " in the selected tenses";
+    parts.push((f.reg==="reg" ? "regular" : "irregular") + where);
+  }
+  if(f.aux) parts.push("takes "+f.aux);
+  $("filtStat").innerHTML = "<b>"+S.verbs.length+"</b> of "+VERBS.length+" verbs selected" +
+    (parts.length ? " — filter: "+parts.join(" ∩ ") : "");
+}
+$("allV").onclick  = ()=>{ S.filt={travel:false,reg:null,aux:null}; applyFilters(); };
+$("noneV").onclick = ()=>{ S.filt={travel:false,reg:null,aux:null}; S.verbs=[]; save(); drawChips(); };
+$("travV").onclick = ()=>{ S.filt.travel = !S.filt.travel; applyFilters(); };
+$("regV").onclick  = ()=>{ S.filt.reg = S.filt.reg==="reg" ? null : "reg"; applyFilters(); };
+$("irrV").onclick  = ()=>{ S.filt.reg = S.filt.reg==="irr" ? null : "irr"; applyFilters(); };
+$("essV").onclick  = ()=>{ S.filt.aux = S.filt.aux==="essere" ? null : "essere"; applyFilters(); };
+$("aveV").onclick  = ()=>{ S.filt.aux = S.filt.aux==="avere"  ? null : "avere";  applyFilters(); };
 
 /* ---- hover gloss ----
    One shared tooltip on <body>. It has to be position:fixed and outside the
@@ -5613,6 +6045,11 @@ function drawAudio(){
   $("gapChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     S.audioGap = +el.dataset.g; save(); drawAudio();
   });
+  $("ordChips").innerHTML = [["az","A–Z"],["freq","Most used first"]].map(o=>
+    '<div class="chip '+((S.audioOrder||"az")===o[0]?'sel':'')+'" data-o="'+o[0]+'">'+o[1]+'</div>').join("");
+  $("ordChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
+    S.audioOrder = el.dataset.o; save(); drawAudio();
+  });
 
   const e = audioEstimate();
   const mins = Math.round(e.secs/60);
@@ -5622,85 +6059,22 @@ function drawAudio(){
       (mins>=60 ? Math.floor(mins/60)+"h "+(mins%60)+"m" : mins+" min")+"</b> of audio."+
       (first ? "<br>Starts with: "+first+"…" : "")
     : "Select at least one verb and one tense above.";
-  updateRunCmd();
 }
-/* If opened as a plain local file (double-click, not a dev server), the file://
-   URL genuinely contains the real filesystem path — decode it once and reuse. */
-function htmlDir(){
-  if(location.protocol !== "file:") return null;
-  try{
-    const path = decodeURIComponent(location.pathname);
-    return path.slice(0, path.lastIndexOf("/")) || "/";
-  }catch(e){ return null; }
-}
-/* Tracks whether the last export landed exactly next to render-audio.sh (the
-   File System Access picker, Chrome/Edge only) or in the browser's ordinary
-   downloads folder (the universal fallback) — the copy-paste command differs. */
-let lastSave = null;   // null | "picker" | "download"
-function updateRunCmd(){
-  const filename = audioFilename();
-  const voice = ($("sayVoice").value || "Paola (Enhanced)").trim();
-  const enVoice = ($("enVoice").value || "Samantha").trim();
-  const dir = htmlDir();
-  let cmd, hint;
-  if(lastSave === "picker"){
-    cmd = './render-audio.sh "'+filename+'" "'+voice+'" "'+enVoice+'"';
-    hint = "Saved straight into this folder — or just double-click Crea_audio.command, it'll find this one too.";
-  } else if(dir){
-    cmd = 'cd "'+dir+'" && ./render-audio.sh ~/Downloads/"'+filename+'" "'+voice+'" "'+enVoice+'"';
-    hint = "Assumes the file downloaded to your browser's default Downloads folder — or skip this and double-click Crea_audio.command instead.";
-  } else {
-    cmd = './render-audio.sh ~/Downloads/"'+filename+'" "'+voice+'" "'+enVoice+'"';
-    hint = "Run this from whichever folder you put render-audio.sh in (couldn't detect it automatically here).";
-  }
-  $("runCmd").textContent = cmd;
-  $("runHint").textContent = hint;
-}
-$("sayVoice").oninput = updateRunCmd;
-$("enVoice").oninput = updateRunCmd;
-$("copyCmd").onclick = async ()=>{
-  try{
-    await navigator.clipboard.writeText($("runCmd").textContent);
-    const btn = $("copyCmd"); const was = btn.textContent;
-    btn.textContent = "✓ Copied"; setTimeout(()=>{ btn.textContent = was; }, 1500);
-  }catch(e){ $("runHint").textContent = "Couldn't copy automatically — select the line above and copy it by hand."; }
-};
 function audioFilename(){
   const e = audioEstimate();
   return "audio-script-"+e.verbs+"verbs-"+((S.audioGap||2000)/1000)+"s"+
-         (S.verbOrder==="freq" ? "-freq" : "")+".txt";
+         (S.audioOrder==="freq" ? "-freq" : "")+".txt";
 }
-$("audioDl").onclick = async ()=>{
+$("audioDl").onclick = ()=>{
   const txt = buildAudioScript();
   if(!txt){ $("audioStat").innerHTML = "Nothing selected — pick some verbs and tenses first."; return; }
-  const filename = audioFilename();
-  // Chrome/Edge: let the user point the save dialog at the same folder as render-audio.sh,
-  // so the exported file lands exactly next to it — no manual moving, no ~/Downloads guess.
-  if(window.showSaveFilePicker){
-    try{
-      const handle = await window.showSaveFilePicker({
-        suggestedName: filename,
-        types: [{description:"Text file", accept:{"text/plain":[".txt"]}}]
-      });
-      const w = await handle.createWritable();
-      await w.write(txt); await w.close();
-      lastSave = "picker"; updateRunCmd();
-      $("audioStat").innerHTML = "Saved. Double-click Crea_audio.command, or copy the command below.";
-      return;
-    }catch(e){
-      if(e.name === "AbortError") return;         // user cancelled the picker — don't also force a download
-      // any other failure (e.g. Safari lying about support): fall through to the classic download
-    }
-  }
   try{
     const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = filename;
+    a.download = audioFilename();
     document.body.appendChild(a); a.click();
     setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-    lastSave = "download"; updateRunCmd();
-    $("audioStat").innerHTML = "Downloaded. Double-click Crea_audio.command, or copy the command below.";
   }catch(err){                                  // some file:// contexts block blob downloads
     $("audioShow").onclick();
     $("audioStat").innerHTML = "Download blocked here — copy the text below instead.";
@@ -5761,13 +6135,31 @@ $("voiceSel").onchange = e =>{
 };
 $("autoSpk").onclick = ()=>{ S.speak = !S.speak; save(); drawChips(); };
 $("testSpk").onclick = ()=>{ speak("Stasera andiamo a mangiare fuori: vorrei assaggiare il vino della casa."); drawVoices(); };
+/* two-tap confirm: first tap arms the button, a second tap within 4 s runs it */
+function armConfirm(btn, prompt, action){
+  if(btn.dataset.armed){
+    clearTimeout(btn._t); delete btn.dataset.armed;
+    btn.textContent = btn.dataset.label; btn.classList.remove("armed");
+    action(); return;
+  }
+  btn.dataset.label = btn.dataset.label || btn.textContent;
+  btn.dataset.armed = "1"; btn.textContent = "Tap again to confirm"; btn.classList.add("armed");
+  toast(prompt, 4000);
+  btn._t = setTimeout(()=>{ delete btn.dataset.armed; btn.textContent = btn.dataset.label; btn.classList.remove("armed"); }, 4000);
+}
 $("resetBtn").onclick = ()=>{
-  if(confirm("Erase all progress? This also brings back every known (retired) card.")){ S.stats={}; S.known={}; S.seen=0; S.right=0; save(); drawChips(); buildDeck(); }
+  armConfirm($("resetBtn"), "Erase all progress? This also brings back every known (retired) card.", ()=>{
+    S.stats={}; S.known={}; S.seen=0; S.right=0; save(); drawChips(); buildDeck();
+    toast("Progress erased — every card is back in the deck.");
+  });
 };
 $("resetKnownBtn").onclick = ()=>{
   const n = Object.keys(S.known).length;
-  if(!n){ alert("No known cards yet — answer some with “Got it” first."); return; }
-  if(confirm("Bring back all "+n+" known card(s)? Your accuracy stats are kept.")){ S.known={}; save(); drawChips(); buildDeck(); }
+  if(!n){ toast("No known cards yet — answer some with “Got it” first."); return; }
+  armConfirm($("resetKnownBtn"), "Bring back all "+n+" known card(s)? Your accuracy stats are kept.", ()=>{
+    S.known={}; save(); drawChips(); buildDeck();
+    toast(n+" known card(s) are back in the deck.");
+  });
 };
 
 /* ============ USER-ADDED VERBS: settings-sheet UI (runs after $ is defined) ============ */
@@ -5822,6 +6214,95 @@ if ($("niAdd")){
   $("niAux").onclick = () => { niAuxMode = niAuxMode === "auto" ? "avere" : niAuxMode === "avere" ? "essere" : "auto"; niSetAux(); };
   $("niInf").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("niEn").focus(); } });
   $("niEn").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); addUserVerb(); } });
+}
+
+/* ---------------- ESSERE / AVERE — curated sentence deck ----------------
+   Hand-picked passato prossimo sentences testing which auxiliary each
+   verb takes. Front of card = infinitive only; back = the real sentence.
+--------------------------------------------------------------------- */
+const EA_SENTENCES = [
+  // essere
+  {inf:"apparire",   aux:"essere", it:"Sono apparso all'improvviso alla festa.", en:"I appeared suddenly at the party."},
+  {inf:"avvenire",   aux:"essere", it:"L'incidente è avvenuto di notte.",        en:"The accident happened at night."},
+  {inf:"comparire",  aux:"essere", it:"Il sole è comparso all'orizzonte.",       en:"The sun appeared on the horizon."},
+  {inf:"crescere",   aux:"essere", it:"Sono cresciuto in una piccola città.",    en:"I grew up in a small town."},
+  {inf:"essere",     aux:"essere", it:"Sono stato in Italia l'anno scorso.",     en:"I was in Italy last year."},
+  {inf:"giungere",   aux:"essere", it:"Siamo giunti a destinazione alle otto.",  en:"We arrived at our destination at eight."},
+  {inf:"intervenire",aux:"essere", it:"Il professore è intervenuto nella discussione.", en:"The professor intervened in the discussion."},
+  {inf:"morire",     aux:"essere", it:"Il mio cane è morto l'anno scorso.",      en:"My dog died last year."},
+  {inf:"nascere",    aux:"essere", it:"Mio fratello è nato a maggio.",           en:"My brother was born in May."},
+  {inf:"piacere",    aux:"essere", it:"Mi è piaciuto il film.",                  en:"I liked the movie."},
+  {inf:"rimanere",   aux:"essere", it:"Sono rimasto a casa tutto il giorno.",    en:"I stayed home all day."},
+  {inf:"rinascere",  aux:"essere", it:"La speranza è rinata dopo la notizia.",   en:"Hope was reborn after the news."},
+  {inf:"scendere",   aux:"essere", it:"Sono sceso dalle scale di corsa.",        en:"I ran down the stairs."},
+  {inf:"scomparire", aux:"essere", it:"Il gatto è scomparso ieri sera.",         en:"The cat disappeared last night."},
+  {inf:"sopravvivere",aux:"essere",it:"È sopravvissuto all'incidente.",          en:"He survived the accident."},
+  {inf:"sorgere",    aux:"essere", it:"Il sole è sorto alle sei.",               en:"The sun rose at six."},
+  {inf:"succedere",  aux:"essere", it:"È successo un incidente ieri.",           en:"An accident happened yesterday."},
+  {inf:"venire",     aux:"essere", it:"Sono venuto qui in treno.",               en:"I came here by train."},
+  // avere
+  {inf:"aprire",    aux:"avere", it:"Ho aperto la finestra.",                   en:"I opened the window."},
+  {inf:"avere",     aux:"avere", it:"Ho avuto una bella sorpresa.",             en:"I had a nice surprise."},
+  {inf:"bere",      aux:"avere", it:"Ho bevuto un caffè forte.",                en:"I drank a strong coffee."},
+  {inf:"camminare", aux:"avere", it:"Ho camminato per due ore.",                en:"I walked for two hours."},
+  {inf:"chiedere",  aux:"avere", it:"Ho chiesto aiuto al professore.",          en:"I asked the professor for help."},
+  {inf:"chiudere",  aux:"avere", it:"Ho chiuso la porta a chiave.",             en:"I locked the door."},
+  {inf:"correre",   aux:"avere", it:"Ho corso al parco stamattina.",            en:"I ran in the park this morning."},
+  {inf:"dire",      aux:"avere", it:"Ho detto la verità a tutti.",              en:"I told everyone the truth."},
+  {inf:"discutere", aux:"avere", it:"Abbiamo discusso del progetto.",           en:"We discussed the project."},
+  {inf:"fare",      aux:"avere", it:"Ho fatto una torta per la festa.",         en:"I made a cake for the party."},
+  {inf:"leggere",   aux:"avere", it:"Ho letto un romanzo francese.",            en:"I read a French novel."},
+  {inf:"mettere",   aux:"avere", it:"Ho messo il libro sul tavolo.",            en:"I put the book on the table."},
+  {inf:"nuotare",   aux:"avere", it:"Ho nuotato in piscina ieri.",              en:"I swam in the pool yesterday."},
+  {inf:"perdere",   aux:"avere", it:"Ho perso le chiavi ieri.",                 en:"I lost my keys yesterday."},
+  {inf:"prendere",  aux:"avere", it:"Ho preso l'autobus stamattina.",           en:"I took the bus this morning."},
+  {inf:"produrre",  aux:"avere", it:"La fabbrica ha prodotto molte auto.",      en:"The factory produced many cars."},
+  {inf:"risolvere", aux:"avere", it:"Ho risolto il problema di matematica.",    en:"I solved the math problem."},
+  {inf:"rispondere",aux:"avere", it:"Ho risposto subito alla mail.",            en:"I answered the email right away."},
+  {inf:"rompere",   aux:"avere", it:"Ho rotto un bicchiere.",                   en:"I broke a glass."},
+  {inf:"scegliere", aux:"avere", it:"Ho scelto il vestito blu.",                en:"I chose the blue dress."},
+  {inf:"scrivere",  aux:"avere", it:"Ho scritto una lettera a mia nonna.",      en:"I wrote a letter to my grandmother."},
+  {inf:"spegnere",  aux:"avere", it:"Ho spento la luce prima di uscire.",       en:"I turned off the light before leaving."},
+  {inf:"togliere",  aux:"avere", it:"Ho tolto la giacca perché faceva caldo.",  en:"I took off my jacket because it was hot."},
+  {inf:"tradurre",  aux:"avere", it:"Ho tradotto il testo in inglese.",         en:"I translated the text into English."},
+  {inf:"vedere",    aux:"avere", it:"Ho visto un film interessante.",           en:"I saw an interesting movie."},
+  {inf:"viaggiare", aux:"avere", it:"Ho viaggiato in Europa l'estate scorsa.",  en:"I traveled to Europe last summer."},
+  {inf:"vincere",   aux:"avere", it:"Ho vinto una partita a carte.",            en:"I won a card game."}
+];
+
+let eaOrder = EA_SENTENCES.map((_, i) => i);
+let eaIdx = 0;
+
+function eaShuffleOrder(){
+  for (let i = eaOrder.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [eaOrder[i], eaOrder[j]] = [eaOrder[j], eaOrder[i]];
+  }
+  eaIdx = 0;
+}
+
+function eaRender(){
+  const c = EA_SENTENCES[eaOrder[eaIdx]];
+  $("eaCard").classList.remove("flipped");
+  $("eaFront").innerHTML = '<div class="big">' + c.inf + '</div>';
+  $("eaSentIt").textContent = c.it;
+  $("eaSentEn").textContent = c.en;
+  $("eaCounter").textContent = (eaIdx + 1) + " / " + EA_SENTENCES.length;
+  $("eaHint").textContent = "tap to reveal";
+}
+
+function eaFlip(){ $("eaCard").classList.toggle("flipped"); }
+function eaNext(){ eaIdx = (eaIdx + 1) % EA_SENTENCES.length; eaRender(); }
+function eaPrev(){ eaIdx = (eaIdx - 1 + EA_SENTENCES.length) % EA_SENTENCES.length; eaRender(); }
+
+if ($("eaBtn")){
+  $("eaBtn").onclick = () => { eaShuffleOrder(); eaRender(); $("eaSheet").classList.add("open"); };
+  $("eaClose").onclick = () => $("eaSheet").classList.remove("open");
+  $("eaCard").onclick = eaFlip;
+  $("eaReveal").onclick = eaFlip;
+  $("eaNext").onclick = eaNext;
+  $("eaPrev").onclick = eaPrev;
+  $("eaShuffle").onclick = () => { eaShuffleOrder(); eaRender(); };
 }
 
 buildDeck();

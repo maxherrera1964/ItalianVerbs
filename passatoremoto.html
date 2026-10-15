@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1216">
+<title>Passato Remoto — Italian Quiz</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0f1216; --panel:#181d24; --panel2:#212832; --line:#2c343f;
+    --txt:#eef2f6; --dim:#93a1b1; --accent:#4ade80; --accent2:#38bdf8;
+    --red:#f87171; --amber:#fbbf24; --violet:#c4b5fd;
+  }
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Segoe UI,Roboto,sans-serif;
+    display:flex; flex-direction:column; overscroll-behavior:none;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    -webkit-user-select:none; user-select:none;
+  }
+  header{display:flex;align-items:center;gap:7px;padding:12px 14px 8px}
+  header h1{font-size:15px;margin:0;font-weight:650;letter-spacing:.3px;flex:1}
+  header h1 span{color:var(--accent)}
+  .btn{
+    background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:10px; padding:8px 11px; font-size:13px; font-weight:600; cursor:pointer;
+    white-space:nowrap; font-family:inherit;
+  }
+  .btn:active{transform:scale(.96)}
+  .btn.on{background:var(--accent);color:#06210f;border-color:var(--accent)}
+
+  .bar{height:4px;background:var(--panel2);margin:4px 16px 0;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+  .meta{display:flex;justify-content:space-between;padding:8px 16px;font-size:12px;color:var(--dim);gap:10px}
+  .meta span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  main{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 16px;overflow-y:auto}
+  .card{
+    width:100%; max-width:520px; min-height:40vh; margin:auto;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));
+    border:1px solid var(--line); border-radius:22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:32px 20px 26px; position:relative;
+  }
+  .card.tappable{cursor:pointer}
+  .tag{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--dim);
+    white-space:nowrap; max-width:92%; overflow:hidden; text-overflow:ellipsis;
+  }
+  .prompt{font-size:15px;color:var(--accent2);margin-bottom:6px;font-weight:600}
+  .big{font-size:clamp(24px,7vw,38px);font-weight:700;line-height:1.25;margin:6px 0}
+  .big.sm{font-size:clamp(18px,5vw,26px)}
+  .gloss{font-size:16px;color:var(--violet);margin-top:4px;font-weight:600}
+  .sub{font-size:15px;color:var(--dim);margin-top:10px;line-height:1.5}
+  .hint{position:absolute;bottom:14px;font-size:11px;color:#5d6b7a;letter-spacing:.5px}
+  .answer{display:none;width:100%;display:none}
+  .card.flipped .answer{display:block}
+  .card.flipped .hint{display:none}
+  .pron{font-size:13px;color:var(--dim);margin-top:14px;line-height:1.5;max-width:420px;margin-left:auto;margin-right:auto}
+  .pron b{color:var(--txt)}
+  .spkrow{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .spk{
+    background:var(--panel2);color:var(--accent2);border:1px solid var(--line);
+    border-radius:99px;padding:9px 16px;font-size:14px;font-weight:650;cursor:pointer;font-family:inherit;
+  }
+  .spk.alt{color:var(--dim);font-weight:500}
+  .spk:active{transform:scale(.95)}
+
+  /* six-person conjugation block on the answer side */
+  .conj{margin:14px auto 0;max-width:380px;border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left}
+  .conj h4{margin:0;padding:9px 13px;background:var(--panel2);font-size:12px;font-weight:700;
+    letter-spacing:.4px;color:var(--txt)}
+  .conj h4 em{font-style:normal;color:var(--violet);font-weight:600;margin-left:8px;font-size:12px}
+  .conj .cr{display:flex;align-items:baseline;gap:10px;padding:7px 13px;border-top:1px solid var(--line);font-size:15px}
+  .conj .cr span{width:64px;flex:none;color:var(--dim);font-size:12px}
+  .conj .cr b{font-weight:650}
+  .conj .cr.irr b{color:var(--amber)}
+  .conj .cr.hit{background:#12301f}
+  .conj .cr.hit b{color:var(--accent)}
+  .conj .cr i{font-style:normal;color:#6c7a89;font-size:12px;margin-left:auto}
+  .conj .cfoot{padding:9px 13px;border-top:1px solid var(--line);background:#12181e;font-size:12px;color:var(--dim);line-height:1.5}
+
+  footer{padding:10px 16px calc(14px + env(safe-area-inset-bottom))}
+  .rate{display:flex;gap:10px}
+  .rate button{flex:1;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .again{background:#3a2226;color:var(--red)}
+  .good{background:#12301f;color:var(--accent)}
+  .rate button:active{transform:scale(.97)}
+  .single{width:100%;padding:15px 0;border-radius:14px;border:none;font-size:15px;font-weight:700;
+    background:var(--panel2);color:var(--txt);cursor:pointer;font-family:inherit}
+
+  .opts{display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto}
+  .opt{
+    width:100%;text-align:left;padding:13px 14px;border-radius:12px;
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.35;
+    display:flex;gap:10px;align-items:baseline;
+  }
+  .opt i{font-style:normal;color:var(--dim);font-size:12px;font-weight:700;min-width:12px}
+  .opt:active{transform:scale(.99)}
+  .opt.right{background:#12301f;border-color:var(--accent);color:var(--accent)}
+  .opt.right i{color:var(--accent)}
+  .opt.wrong{background:#3a2226;border-color:var(--red);color:var(--red)}
+  .opt.wrong i{color:var(--red)}
+  .opt.mute{opacity:.45}
+  .opt[disabled]{cursor:default}
+
+  .typerow{display:flex;gap:8px}
+  .tin{
+    flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:12px;padding:14px;font-size:17px;font-family:inherit;font-weight:600;
+    -webkit-user-select:text;user-select:text;
+  }
+  .tin::placeholder{color:#5d6b7a;font-weight:400}
+  .tin.ok{border-color:var(--accent);color:var(--accent)}
+  .tin.no{border-color:var(--red);color:var(--red)}
+  .accrow{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .acc{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;
+    padding:8px 12px;font-size:16px;cursor:pointer;font-family:inherit}
+  .acc:active{transform:scale(.95)}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    padding:4px 9px;border-radius:99px;margin:0 4px 8px;background:#33260f;color:var(--amber)}
+
+  /* sheets */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:10;align-items:flex-end}
+  .sheet.open{display:flex}
+  .sheetbox{
+    background:var(--panel);width:100%;max-height:88vh;overflow-y:auto;
+    border-radius:20px 20px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line);
+  }
+  .sheetbox h2{font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--dim);margin:18px 0 10px}
+  .sheetbox h2:first-child{margin-top:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+    padding:8px 12px;border-radius:99px;font-size:13px;cursor:pointer;font-family:inherit;
+  }
+  .chip.sel{background:var(--accent);color:#06210f;border-color:var(--accent);font-weight:650}
+  .chip .n{opacity:.7;font-size:11px;margin-left:5px}
+  .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .row .btn{flex:1;text-align:center}
+  .addhint{font-size:12px;color:var(--dim);margin-top:9px;line-height:1.5}
+  .addhint b{color:var(--txt)}
+  .stat{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+  .close{width:100%;margin-top:22px;padding:14px;border-radius:14px;border:none;
+    background:var(--accent);color:#06210f;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+  .danger{background:transparent;color:var(--red);border:1px solid #4a2a2e}
+  .picker{flex:1;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:11px;font-size:15px;font-weight:650;text-align:center;cursor:pointer;font-family:inherit}
+
+  /* reference view */
+  .sheet.full{align-items:stretch}
+  .sheet.full .sheetbox{border-radius:0;max-height:100vh;height:100%;padding-top:calc(14px + env(safe-area-inset-top))}
+  .studyhead{display:flex;align-items:center;gap:8px;position:sticky;top:0;
+    background:var(--panel);padding-bottom:10px;margin-bottom:4px;z-index:2}
+  .studyhead b{flex:1;font-size:16px}
+  .search{width:100%;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:12px;padding:12px;font-size:15px;font-family:inherit;margin-bottom:4px;
+    -webkit-user-select:text;user-select:text}
+  .search::placeholder{color:#5d6b7a}
+  .tbl{margin:14px 0 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .tbl h3{margin:0;padding:10px 14px;background:var(--panel2);font-size:12px;
+    text-transform:uppercase;letter-spacing:1.1px;color:var(--accent2)}
+  .tbl .r{display:flex;align-items:baseline;gap:10px;padding:10px 14px;border-top:1px solid var(--line);cursor:pointer}
+  .tbl .r:active{background:#1c2430}
+  .tbl .r .p{width:78px;flex:none;color:var(--dim);font-size:13px}
+  .tbl .r .f{flex:1;font-size:16px;font-weight:600}
+  .tbl .r .e{color:var(--dim);font-size:12px;text-align:right;max-width:45%}
+  .note{font-size:12px;color:var(--amber);padding:11px 14px;border-top:1px solid var(--line);background:#1d1a12;line-height:1.55}
+  .plain{font-size:13px;color:var(--dim);padding:11px 14px;border-top:1px solid var(--line);line-height:1.55}
+  .plain b{color:var(--txt)}
+  .vb{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+  .vb .vh{display:flex;align-items:baseline;gap:8px;padding:10px 14px;background:var(--panel2);cursor:pointer}
+  .vb .vh b{font-size:16px}
+  .vb .vh em{font-style:normal;color:var(--violet);font-size:13px;font-weight:600}
+  .vb .vh span{margin-left:auto;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px}
+  .vb .vg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0}
+  .vb .vg div{padding:7px 14px;border-top:1px solid var(--line);font-size:15px}
+  .vb .vg div small{color:var(--dim);font-size:12px;display:inline-block;width:60px}
+  .vb .vg div.irr{color:var(--amber);font-weight:650}
+  .studypad{padding-bottom:24px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Passato <span>remoto</span></h1>
+  <button class="btn" id="studyBtn">Study</button>
+  <button class="btn" id="modeBtn">Choice</button>
+  <button class="btn" id="setBtn">Deck</button>
+</header>
+<div class="bar"><i id="barFill"></i></div>
+<div class="meta"><span id="counter">—</span><span id="score">—</span></div>
+
+<main>
+  <div class="card" id="card">
+    <div class="tag" id="tag"></div>
+    <div id="front"></div>
+    <div class="answer" id="back"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</main>
+
+<footer><div id="controls"></div></footer>
+
+<div class="sheet full" id="studySheet">
+  <div class="sheetbox">
+    <div class="studyhead">
+      <b id="studyTitle">Reference</b>
+      <button class="btn on" id="tabRules">Rules</button>
+      <button class="btn" id="tabVerbs">Verbs</button>
+      <button class="btn" id="studyClose">Done</button>
+    </div>
+    <input class="search" id="vSearch" placeholder="filter verbs — Italian or English…" autocapitalize="off" autocorrect="off" spellcheck="false" style="display:none">
+    <div class="studypad" id="studyBody"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheetbox">
+    <h2>Test mode</h2>
+    <div class="chips" id="modeChips"></div>
+    <div class="addhint" id="modeHint"></div>
+
+    <h2>What to drill</h2>
+    <div class="chips" id="catChips"></div>
+    <div class="row">
+      <button class="btn" id="allC">All</button>
+      <button class="btn" id="noneC">Clear</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="rulesC">Rules + regular</button>
+      <button class="btn" id="irrC">Irregulars only</button>
+      <button class="btn" id="meanC">Meanings only</button>
+    </div>
+    <div class="addhint">Every card shows the verb's English meaning, and every answer opens the full six-person
+      conjugation with the irregular persons marked in amber.</div>
+
+    <h2>Order</h2>
+    <div class="chips" id="ordChips"></div>
+
+    <h2>Audio — Italian voice</h2>
+    <select id="voiceSel" class="picker" style="width:100%"></select>
+    <div class="row">
+      <button class="btn" id="autoSpk">Speak answer on reveal</button>
+      <button class="btn" id="testSpk">▶ Test</button>
+    </div>
+    <div class="stat" id="voiceStat"></div>
+
+    <h2>Progress</h2>
+    <div class="stat" id="progStat"></div>
+    <div class="row">
+      <button class="btn" id="resetKnownBtn">Reset known cards</button>
+      <button class="btn danger" id="resetBtn">Reset progress</button>
+    </div>
+    <button class="close" id="closeBtn">Start studying</button>
+  </div>
+</div>
+
+<script>
+/* =======================================================================
+   PASSATO REMOTO — data and conjugator
+
+   Regular endings
+     -are   -ai, -asti, -ò,  -ammo, -aste, -arono
+     -ere   -ei, -esti, -é,  -emmo, -este, -erono     (also -etti / -ette / -ettero)
+     -ire   -ii, -isti, -ì,  -immo, -iste, -irono
+
+   Irregular verbs follow the 1-3-3 pattern: only io, lui/lei and loro change
+   stem. tu, noi and voi keep the verb's ordinary stem — the same one the
+   imperfetto uses, which is why fare gives facesti and bere gives bevesti.
+   From the io form: drop the -i, add -e for lui/lei and -ero for loro.
+   ======================================================================= */
+const PERSONS = ["io","tu","lui / lei","noi","voi","loro"];
+const END = {
+  are:["ai","asti","ò","ammo","aste","arono"],
+  ere:["ei","esti","é","emmo","este","erono"],
+  ire:["ii","isti","ì","immo","iste","irono"]
+};
+const ETTI = {0:"etti", 2:"ette", 5:"ettero"};
+
+/* [infinitive, meaning, io form, stem override, note]  — irregular */
+const IRR = [
+  ["avere","to have","ebbi"],
+  ["fare","to do, to make","feci","fac:ere","The tu / noi / voi forms come from the old stem fac-, exactly as in the imperfetto (facevo)."],
+  ["dire","to say, to tell","dissi","dic:ere","Regular half from dic-, as in dicevo."],
+  ["bere","to drink","bevvi","bev","Regular half from bev-, as in bevevo."],
+  ["vedere","to see","vidi"],
+  ["venire","to come","venni"],
+  ["volere","to want","volli"],
+  ["sapere","to know a fact, to find out","seppi","", "In the passato remoto sapere shifts meaning: seppi la verità = I found out the truth."],
+  ["tenere","to hold, to keep","tenni"],
+  ["prendere","to take","presi","", "The model for the whole -ndere family: presi / prese / presero, participle preso."],
+  ["mettere","to put","misi"],
+  ["scrivere","to write","scrissi"],
+  ["leggere","to read","lessi"],
+  ["chiedere","to ask","chiesi"],
+  ["rispondere","to answer","risposi","", "Note the participle breaks the family pattern: risposto, not ✗ risposo."],
+  ["rimanere","to remain, to be left","rimasi"],
+  ["vivere","to live","vissi"],
+  ["nascere","to be born","nacqui"],
+  ["conoscere","to know a person, to meet","conobbi","", "Like sapere, it shifts: lo conobbi a Roma = I met him in Rome."],
+  ["scegliere","to choose","scelsi","scegli"],
+  ["vincere","to win","vinsi"],
+  ["chiudere","to close","chiusi"],
+  ["decidere","to decide","decisi"],
+  ["rompere","to break","ruppi"],
+  ["cadere","to fall","caddi"],
+  ["piacere","to be pleasing, to be liked","piacqui"],
+  ["tacere","to be silent, to keep quiet","tacqui"],
+  ["crescere","to grow","crebbi"],
+  ["piangere","to cry","piansi"],
+  ["spegnere","to switch off","spensi"],
+  ["correre","to run","corsi"],
+  ["perdere","to lose","persi","", "Perdei and perdetti are also standard, though persi is far more common."],
+  ["muovere","to move something","mossi","muov","Older texts use the shorter stem: movesti, movemmo, moveste."],
+  ["nascondere","to hide","nascosi","", "Participle nascosto — another break in the -ndere family."],
+  ["ridere","to laugh","risi"],
+  ["sorridere","to smile","sorrisi"],
+  ["uccidere","to kill","uccisi"],
+  ["dividere","to divide, to share out","divisi"],
+  ["difendere","to defend","difesi"],
+  ["offendere","to offend","offesi"],
+  ["scendere","to go down, to get off","scesi"],
+  ["spendere","to spend money","spesi"],
+  ["accendere","to switch on, to light","accesi"],
+  ["rendere","to give back, to hand back","resi"],
+  ["comprendere","to understand fully, to include","compresi","", "A compound of prendere, so it inherits presi → compresi."],
+  ["sorprendere","to surprise","sorpresi"],
+  ["apprendere","to learn","appresi"],
+  ["riprendere","to resume, to take back","ripresi"],
+  ["promettere","to promise","promisi"],
+  ["permettere","to allow","permisi"],
+  ["ammettere","to admit","ammisi"],
+  ["smettere","to quit, to stop doing","smisi"],
+  ["giungere","to arrive, to reach a place","giunsi"],
+  ["raggiungere","to catch up with, to reach a goal","raggiunsi"],
+  ["aggiungere","to add","aggiunsi"],
+  ["spingere","to push","spinsi"],
+  ["stringere","to squeeze, to tighten","strinsi"],
+  ["dipingere","to paint","dipinsi"],
+  ["fingere","to pretend","finsi"],
+  ["distruggere","to destroy","distrussi"],
+  ["proteggere","to protect","protessi"],
+  ["dirigere","to direct, to manage","diressi"],
+  ["esprimere","to express","espressi"],
+  ["assumere","to hire, to take on","assunsi"],
+  ["concludere","to conclude","conclusi"],
+  ["eleggere","to elect","elessi"],
+  ["descrivere","to describe","descrissi"],
+  ["dipendere","to depend","dipesi"],
+  ["mordere","to bite","morsi"],
+  ["ottenere","to obtain","ottenni"],
+  ["mantenere","to maintain","mantenni"],
+  ["togliere","to remove, to take off","tolsi","togli"],
+  ["cogliere","to pick, to gather","colsi","cogli"],
+  ["condurre","to lead, to drive","condussi","conduc","The -urre verbs work off the old Latin stem conduc-, so the regular half is conducesti, conducemmo, conduceste."],
+  ["tradurre","to translate","tradussi","traduc"],
+  ["porre","to place, to set down","posi","pon","Old stem pon-: ponesti, ponemmo, poneste."],
+  ["trarre","to pull, to draw out","trassi","tra"]
+];
+
+/* verbs irregular in all six persons */
+const FULL = [
+  ["essere","to be",["fui","fosti","fu","fummo","foste","furono"],
+   "Irregular in all six persons — nothing here is built from the infinitive. Memorize the set whole."],
+  ["dare","to give",["diedi","desti","diede","demmo","deste","diedero"],
+   "Irregular throughout. The io, lui/lei and loro forms also exist as detti, dette, dettero — both sets are standard."],
+  ["stare","to be, to stay",["stetti","stesti","stette","stemmo","steste","stettero"],
+   "Irregular throughout, and worth learning next to dare, which it rhymes with."]
+];
+
+/* [infinitive, meaning, note] — regular */
+const REG = [
+  ["parlare","to speak, to talk"],
+  ["andare","to go","Completely regular in the passato remoto, unlike almost every other tense: andai, andasti, andò."],
+  ["amare","to love"],
+  ["guardare","to watch, to look at"],
+  ["mangiare","to eat","The i of -giare survives here because the endings start with a or o: mangiai, mangiasti."],
+  ["cominciare","to begin","Same as mangiare — the i stays: cominciai, cominciò."],
+  ["cercare","to look for","No h is needed, unlike the future: cercai, cercasti, cercò. The endings never start with e or i."],
+  ["pagare","to pay","No h here either: pagai, pagò."],
+  ["comprare","to buy"],
+  ["arrivare","to arrive"],
+  ["tornare","to go back, to come back"],
+  ["lavorare","to work"],
+  ["trovare","to find"],
+  ["pensare","to think"],
+  ["portare","to bring, to carry"],
+  ["chiamare","to call"],
+  ["aspettare","to wait for"],
+  ["entrare","to go in, to enter"],
+  ["credere","to believe"],
+  ["vendere","to sell"],
+  ["temere","to fear"],
+  ["ricevere","to receive"],
+  ["sedere","to sit"],
+  ["potere","to be able to, can","A stem already ending in -t- takes only the plain set: potei, poté, poterono — never ✗ potetti."],
+  ["dovere","to have to, must"],
+  ["dormire","to sleep"],
+  ["partire","to leave, to depart"],
+  ["sentire","to hear, to feel"],
+  ["capire","to understand","No -isc- here — that infix belongs only to the present: capii, capisti, capì."],
+  ["finire","to finish","No -isc- in this tense: finii, finisti, finì."],
+  ["preferire","to prefer"],
+  ["seguire","to follow"],
+  ["uscire","to go out","Regular in the passato remoto: uscii, uscisti, uscì."],
+  ["aprire","to open","The literary forms apersi, aperse, apersero also exist, but aprii is the ordinary one."],
+  ["offrire","to offer","Offersi, offerse, offersero also exist alongside the regular offrii."]
+];
+
+const group = inf => inf.endsWith("are") ? "are" : (inf.endsWith("ire") ? "ire" : "ere");
+const baseStem = inf => inf.slice(0,-3);
+
+/* one verb record: forms[6], alt[6], irr[6]
+   stemOv may be written "fac:ere" when the regular half needs a different
+   ending set than the infinitive suggests — fare and dire both do. */
+function build(inf, en, io, stemOv, note, forms, reg){
+  let gOv = null;
+  if(stemOv && stemOv.indexOf(":")>0){ const parts = stemOv.split(":"); stemOv = parts[0]; gOv = parts[1]; }
+  const g = gOv || group(inf), stem = stemOv || baseStem(inf);
+  const f = [], alt = [null,null,null,null,null,null], irr = [false,false,false,false,false,false];
+  if(forms){
+    for(let i=0;i<6;i++){ f[i]=forms[i]; irr[i]=true; }
+    if(inf==="dare"){ alt[0]="detti"; alt[2]="dette"; alt[5]="dettero"; }
+  }else{
+    for(let i=0;i<6;i++) f[i] = stem + END[g][i];
+    if(io){                                   // 1-3-3: io, lui/lei, loro take the irregular stem
+      f[0]=io; f[2]=io.slice(0,-1)+"e"; f[5]=io.slice(0,-1)+"ero";
+      irr[0]=irr[2]=irr[5]=true;
+    }else if(g==="ere" && inf!=="potere"){    // the -etti alternative, regular -ere verbs only
+      alt[0]=stem+ETTI[0]; alt[2]=stem+ETTI[2]; alt[5]=stem+ETTI[5];
+    }
+  }
+  return {inf, en, g, stem, forms:f, alt, irr, note:note||"", reg:!!reg,
+          say:f.join(", ")};
+}
+
+const VERBS = []
+  .concat(FULL.map(([inf,en,forms,note])=> build(inf,en,null,null,note,forms,false)))
+  .concat(IRR.map(([inf,en,io,stemOv,note])=> build(inf,en,io,stemOv||null,note,null,false)))
+  .concat(REG.map(([inf,en,note])=> build(inf,en,null,null,note,null,true)));
+VERBS.sort((a,b)=>a.inf.localeCompare(b.inf,"it"));
+const verb = inf => VERBS.find(v=>v.inf===inf);
+
+/* the 30 verbs worth drilling from every angle */
+const CORE = ["essere","avere","fare","dare","stare","dire","bere","vedere","venire","volere","sapere",
+  "tenere","prendere","mettere","scrivere","leggere","chiedere","rispondere","rimanere","vivere","nascere",
+  "conoscere","scegliere","vincere","chiudere","decidere","rompere","cadere","piacere","correre"];
+
+/* meanings that overlap in English — never offer two of them as options */
+const SYN = [
+  ["sapere","conoscere"],
+  ["stare","rimanere"],
+  ["giungere","raggiungere","arrivare"],
+  ["comprendere","capire"],
+  ["concludere","finire"],
+  ["tenere","mantenere"],
+  ["condurre","dirigere"],
+  ["porre","mettere"],
+  ["difendere","proteggere"],
+  ["rendere","dare"]
+];
+
+/* ---------------- CARDS ---------------- */
+const CATS = [
+  {id:"regole",         label:"Rules",            it:"Come si forma"},
+  {id:"regolari",       label:"Regular forms",    it:"Verbi regolari"},
+  {id:"irregolari",     label:"Irregular io",     it:"Verbi irregolari — la forma io"},
+  {id:"derivazione",    label:"Deriving persons", it:"Dalla forma io alle altre"},
+  {id:"riconoscimento", label:"Recognition",      it:"Dalla forma al verbo"},
+  {id:"significato",    label:"Meanings",         it:"Significati"},
+  {id:"famiglie",       label:"Families",         it:"Famiglie di verbi"}
+];
+const CARDS = [];
+const add = c => { CARDS.push(c); return c; };
+
+/* --- rules --- */
+add({cat:"regole", fam:"rule", q:"-are", qs:"passato remoto — which endings?",
+  a:"-ai, -asti, -ò, -ammo, -aste, -arono",
+  opts:["-ai, -asti, -ò, -ammo, -aste, -arono","-ei, -esti, -é, -emmo, -este, -erono",
+        "-ii, -isti, -ì, -immo, -iste, -irono","-ò, -ai, -à, -emo, -ete, -anno"],
+  note:"parlare → parlai, parlasti, parlò, parlammo, parlaste, parlarono."});
+add({cat:"regole", fam:"rule", q:"-ere", qs:"passato remoto — which endings?",
+  a:"-ei, -esti, -é, -emmo, -este, -erono",
+  opts:["-ei, -esti, -é, -emmo, -este, -erono","-ai, -asti, -ò, -ammo, -aste, -arono",
+        "-ii, -isti, -ì, -immo, -iste, -irono","-ei, -esti, -ebbe, -emmo, -este, -ebbero"],
+  note:"credere → credei, credesti, credé, credemmo, credeste, crederono. The -ere endings are also the ones an irregular verb uses for its regular half."});
+add({cat:"regole", fam:"rule", q:"-ire", qs:"passato remoto — which endings?",
+  a:"-ii, -isti, -ì, -immo, -iste, -irono",
+  opts:["-ii, -isti, -ì, -immo, -iste, -irono","-ai, -asti, -ò, -ammo, -aste, -arono",
+        "-ei, -esti, -é, -emmo, -este, -erono","-ivo, -ivi, -iva, -ivamo, -ivate, -ivano"],
+  note:"dormire → dormii, dormisti, dormì, dormimmo, dormiste, dormirono. The io form has a double i."});
+add({cat:"regole", fam:"rule", q:"credetti, credette, credettero", qs:"what is this second -ere set?",
+  a:"an equally standard alternative in io, lui/lei and loro",
+  opts:["an equally standard alternative in io, lui/lei and loro","a regional form to avoid","the imperfect subjunctive","the only correct set"],
+  note:"Regular -ere verbs allow both: credei / credetti, credé / credette, crederono / credettero. Credetti is the more common of the two. The exception is a stem already ending in -t-, which takes only the plain set: potere → potei, poté, poterono, never ✗ potetti."});
+add({cat:"regole", fam:"rule", q:"presi, prendesti, prese, prendemmo, prendeste, presero", qs:"which persons go irregular?",
+  a:"three only — io, lui/lei and loro",
+  opts:["three only — io, lui/lei and loro","all six","only io","only the plural"],
+  note:"This is the 1-3-3 pattern, and nearly every irregular verb lives inside it. The other three persons keep the verb's ordinary stem."});
+add({cat:"regole", fam:"rule", q:"tu, noi, voi", qs:"where does their stem come from?",
+  a:"the verb's ordinary stem — the same one the imperfetto uses",
+  opts:["the verb's ordinary stem — the same one the imperfetto uses","the irregular io stem","the future stem","the past participle"],
+  note:"That is why fare gives facesti (cf. facevo), dire gives dicesti (dicevo) and bere gives bevesti (bevevo) — not anything built on the infinitive."});
+add({cat:"regole", fam:"rule", q:"presi", qs:"how do you get lui/lei and loro from it?",
+  a:"drop the -i, add -e for lui/lei and -ero for loro",
+  opts:["drop the -i, add -e for lui/lei and -ero for loro","add -o and -ono","add -ette and -ettero","they cannot be derived"],
+  note:"presi → prese → presero. It works for every irregular: ebbi → ebbe → ebbero, nacqui → nacque → nacquero, ruppi → ruppe → ruppero. Learn the io form and the other two are free."});
+add({cat:"regole", fam:"rule", q:"essere, dare, stare", qs:"what is unusual about these three?",
+  a:"irregular in all six persons",
+  opts:["irregular in all six persons","completely regular","irregular only in io","they have no passato remoto"],
+  note:"fui, fosti, fu, fummo, foste, furono · diedi, desti, diede, demmo, deste, diedero · stetti, stesti, stette, stemmo, steste, stettero. Everything else follows the 1-3-3 pattern."});
+add({cat:"regole", fam:"rule", q:"andare", qs:"how irregular is it here?",
+  a:"completely regular — andai, andasti, andò",
+  opts:["completely regular — andai, andasti, andò","irregular in three persons","irregular in all six","it has no passato remoto"],
+  note:"A relief, given how irregular andare is everywhere else. Its relatives dare and stare are the opposite case."});
+add({cat:"regole", fam:"rule", q:"parlò, dormì, credé", qs:"why the written accents?",
+  a:"the lui/lei form of a regular verb is always stressed on the ending",
+  opts:["the lui/lei form of a regular verb is always stressed on the ending","they are optional","they mark the plural","only -are verbs take one"],
+  note:"parlò, dormì, credé. Dropping the accent changes the word: parlo is the present, parlò is the passato remoto. Irregular verbs need no accent because their stress falls on the stem: prese, ruppe, venne."});
+add({cat:"regole", fam:"rule", q:"passato remoto", qs:"what is it for?",
+  a:"a finished action cut off from the present",
+  opts:["a finished action cut off from the present","an ongoing or habitual past action","a past action still relevant now","a polite request"],
+  note:"Same meaning as the passato prossimo, different register: novels, history and storytelling — plus ordinary speech in central and southern Italy, where a northern speaker would say ho preso."});
+add({cat:"regole", fam:"rule", q:"Ieri ___ al cinema.", qs:"passato remoto or passato prossimo?",
+  a:"passato prossimo — sono andato",
+  opts:["passato prossimo — sono andato","passato remoto — andai","either one","neither"],
+  note:"Yesterday is not cut off from the present. The passato remoto wants distance: Dante nacque nel 1265, not ✗ Dante è nato ieri."});
+add({cat:"regole", fam:"rule", q:"cercare, pagare", qs:"do they need an h, as in the future?",
+  a:"no — cercai, pagai",
+  opts:["no — cercai, pagai","yes — cerchai, paghai","only in the loro form","only in the io form"],
+  note:"The h exists to keep a hard c or g before e or i. Passato remoto endings start with a, o or e-after-consonant in a way that never threatens the sound: cercai, cercasti, cercò. Compare the future cercherò, which does need it."});
+
+/* --- generated verb cards --- */
+const gloss = v => v.inf+" — "+v.en;
+
+VERBS.forEach(v=>{
+  /* meaning of every verb, without exception */
+  add({cat:"significato", fam:"mean", v:v, q:v.inf, qs:"what does this verb mean?", a:v.en, noType:true});
+
+  if(v.irr[1]){
+    /* essere, dare, stare — irregular in all six, so every person is worth a card
+       and the 1-3-3 derivation does not apply to them */
+    v.forms.forEach((f,i)=> add({cat:"irregolari", fam:"irrio", v:v, q:v.inf, sub:v.en,
+      qs:"passato remoto · "+PERSONS[i], a:f}));
+  }else if(!v.reg){
+    add({cat:"irregolari", fam:"irrio", v:v, q:v.inf, sub:v.en, qs:"passato remoto · io", a:v.forms[0]});
+  }else{
+    /* the two persons that carry the accent, plus io for -ere */
+    [2,5].forEach(i=> add({cat:"regolari", fam:"regform", v:v, q:v.inf, sub:v.en,
+      qs:"passato remoto · "+PERSONS[i], a:v.forms[i]}));
+    if(v.g!=="are") add({cat:"regolari", fam:"regform", v:v, q:v.inf, sub:v.en,
+      qs:"passato remoto · io", a:v.forms[0]});
+  }
+
+  if(CORE.includes(v.inf)){
+    if(!v.reg && !v.irr[1]){
+      add({cat:"derivazione", fam:"der3", v:v, q:v.forms[0]+" → lui / lei", sub:gloss(v),
+        qs:"complete the 1-3-3 pattern", a:v.forms[2]});
+      add({cat:"derivazione", fam:"der3", v:v, q:v.forms[0]+" → loro", sub:gloss(v),
+        qs:"complete the 1-3-3 pattern", a:v.forms[5]});
+      add({cat:"derivazione", fam:"derreg", v:v, q:v.inf, sub:v.en,
+        qs:"passato remoto · tu — the regular half", a:v.forms[1]});
+      add({cat:"derivazione", fam:"derreg", v:v, q:v.inf, sub:v.en,
+        qs:"passato remoto · noi — the regular half", a:v.forms[3]});
+    }
+    const shown = v.reg ? v.forms[5] : (CORE.indexOf(v.inf)%2 ? v.forms[5] : v.forms[2]);
+    add({cat:"riconoscimento", fam:"recog", v:v, q:shown, qs:"which verb is this, and what does it mean?",
+      a:v.inf, showGloss:true});
+  }
+});
+
+/* --- families --- */
+[["prendere","presi","preso","comprendere, sorprendere, apprendere, riprendere"],
+ ["mettere","misi","messo","promettere, permettere, ammettere, smettere"],
+ ["scrivere","scrissi","scritto","descrivere, iscrivere, prescrivere"],
+ ["giungere","giunsi","giunto","raggiungere, aggiungere, congiungere"],
+ ["tenere","tenni","tenuto","ottenere, mantenere, contenere, sostenere"]
+].forEach(([base,io,part,fam])=> add({cat:"famiglie", fam:"famq", v:verb(base),
+  q:fam.split(",")[0].trim(), qs:"which verb is it built on?", a:base,
+  opts:["prendere","mettere","scrivere","giungere","tenere"],
+  note:"Every compound of "+base+" inherits both irregular shapes: the passato remoto "+io+" and the participle "+part+". The family: "+fam+"."}));
+
+add({cat:"famiglie", fam:"rule", q:"-ndere verbs", qs:"what shape do most of them take?",
+  a:"-si in the passato remoto, -so in the participle",
+  opts:["-si in the passato remoto, -so in the participle","-ssi and -sso","-nsi and -nto","-etti and -uto"],
+  note:"prendere → presi / preso · scendere → scesi / sceso · rendere → resi / reso · spendere → spesi / speso · accendere → accesi / acceso · offendere → offesi / offeso · difendere → difesi / difeso. It is a family resemblance, not a rule: rispondere → risposto and nascondere → nascosto break it, and vendere is entirely regular (vendei, venduto)."});
+add({cat:"famiglie", fam:"rule", q:"-ngere verbs", qs:"what shape do they take?",
+  a:"-nsi in the passato remoto, -nto in the participle",
+  opts:["-nsi in the passato remoto, -nto in the participle","-si and -so","-ssi and -sso","-cqui and -uto"],
+  note:"piangere → piansi / pianto · spingere → spinsi / spinto · stringere → strinsi / stretto · dipingere → dipinsi / dipinto · fingere → finsi / finto · giungere → giunsi / giunto."});
+add({cat:"famiglie", fam:"rule", q:"piacere, tacere, nascere", qs:"what do their io forms share?",
+  a:"a -cqui ending — piacqui, tacqui, nacqui",
+  opts:["a -cqui ending — piacqui, tacqui, nacqui","a -bbi ending","a doubled v","nothing — they are regular"],
+  note:"And so lui/lei is piacque, tacque, nacque, loro is piacquero, tacquero, nacquero. Compare the -bbi group: ebbi, crebbi, conobbi."});
+add({cat:"famiglie", fam:"rule", q:"-urre verbs like condurre and tradurre", qs:"where does the regular half come from?",
+  a:"the old stem conduc- / traduc-",
+  opts:["the old stem conduc- / traduc-","the infinitive minus -urre","the participle","the future stem"],
+  note:"condussi, conducesti, condusse, conducemmo, conduceste, condussero. The same old stem drives the imperfetto conducevo. Porre works the same way with pon-, and trarre with tra-."});
+
+/* synonym guard for the meaning cards */
+CARDS.forEach(c=>{
+  const key = c.v ? c.v.inf : null;
+  const g = key ? SYN.findIndex(grp=>grp.includes(key)) : -1;
+  c.syn = g<0 ? "solo:"+(key||CARDS.length+Math.random()) : "g"+g;
+});
+SYN.forEach(grp=>grp.forEach(n=>{ if(!verb(n)) console.warn("SYN name is not a verb:",n); }));
+
+/* =======================================================================
+   ENGINE
+   ======================================================================= */
+const MODES = [
+  {id:"choice", label:"Choice", hint:"The prompt on the card, four answers underneath — tap one or press 1–4 (1–5 on the family cards). Graded for you."},
+  {id:"type",   label:"Type",   hint:"Type the form yourself, accents and all — the buttons under the box insert à è é ì ò ù. Meaning cards and rule cards stay multiple choice."},
+  {id:"recall", label:"Recall", hint:"Say the answer out loud, reveal it, then rate yourself Again or Got it."}
+];
+const catLabel = id => (CATS.find(c=>c.id===id)||{}).label || id;
+
+const KEY = "passatoremoto_v1";
+let S = {
+  ver:1, mode:"choice", cats:CATS.map(c=>c.id), order:"section",
+  speak:false, voiceName:"", stats:{}, known:{}, seen:0, right:0
+};
+try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
+
+let deck=[], pos=0, flipped=false, answered=false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const cid = c => c.cat+"|"+c.q+"|"+c.qs;
+const shuffle = a => { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+function pool(){ return CARDS.filter(c=>S.cats.includes(c.cat)); }
+function buildDeck(){
+  let list = pool().filter(c=>!S.known[cid(c)]);
+  if(S.order==="random") shuffle(list);
+  else{
+    const ord = CATS.map(c=>c.id);
+    list.sort((a,b)=> ord.indexOf(a.cat)-ord.indexOf(b.cat) || CARDS.indexOf(a)-CARDS.indexOf(b));
+  }
+  deck=list; pos=0; render();
+}
+
+function optionsFor(c){
+  if(c.opts && c.opts.length){
+    const list = c.opts.slice();
+    if(!list.includes(c.a)) list.push(c.a);
+    return {correct:c.a, list:list.length>2 ? shuffle(list) : list};
+  }
+  const ok = x => x!==c && x.fam===c.fam && x.a!==c.a && x.syn!==c.syn;
+  const near = shuffle(CARDS.filter(x=>ok(x) && x.v && c.v && x.v.g===c.v.g));   // same conjugation class first
+  const rest = shuffle(CARDS.filter(x=>ok(x)));
+  const picks=[];
+  const push = x => { if(picks.length<3 && !picks.some(p=>p.a===x.a)) picks.push(x); };
+  near.forEach(push); rest.forEach(push);
+  if(picks.length<3){                       // last resort: any card of another family
+    shuffle(CARDS.filter(x=>x!==c && !x.opts && x.a!==c.a && x.syn!==c.syn)).forEach(push);
+  }
+  return {correct:c.a, list:shuffle(picks.map(x=>x.a).concat(c.a))};
+}
+
+const typable = c => !c.opts && !c.noType;
+const norm  = s => String(s||"").toLowerCase().trim().replace(/[.!?]+$/,"").replace(/\s+/g," ").replace(/[’']/g,"'");
+const strip = s => norm(s).replace(/[àá]/g,"a").replace(/[èé]/g,"e").replace(/[ìí]/g,"i").replace(/[òó]/g,"o").replace(/[ùú]/g,"u");
+function answersFor(c){
+  const list = [c.a];
+  if(c.v && c.v.alt){                                   // credetti for credei, detti for diedi …
+    c.v.forms.forEach((f,i)=>{ if(f===c.a && c.v.alt[i]) list.push(c.v.alt[i]); });
+  }
+  return list;
+}
+
+/* ---------------- RENDER ---------------- */
+function conjTable(v, hitForm){
+  const rows = v.forms.map((f,i)=>
+    '<div class="cr'+(v.irr[i]?" irr":"")+(f===hitForm?" hit":"")+'">'+
+      '<span>'+PERSONS[i]+'</span><b>'+esc(f)+'</b>'+
+      (v.alt[i] ? '<i>or '+esc(v.alt[i])+'</i>' : '')+
+    '</div>').join("");
+  const foot = v.note ? '<div class="cfoot">'+esc(v.note)+'</div>' : "";
+  const kind = v.reg ? "regular" : (v.irr[1] ? "irregular throughout" : "irregular in io, lui/lei, loro");
+  return '<div class="conj"><h4>'+esc(v.inf)+' <em>'+esc(v.en)+'</em></h4>'+rows+
+         '<div class="cfoot">'+kind+' · '+esc(v.g==="are"?"-are":(v.g==="ire"?"-ire":"-ere"))+' verb</div>'+foot+'</div>';
+}
+function backHTML(c){
+  const head = '<div class="big'+(c.a.length>24?" sm":"")+'" style="color:var(--accent)">'+esc(c.a)+'</div>'+
+               (c.showGloss && c.v ? '<div class="gloss">'+esc(c.v.en)+'</div>' : '')+
+               (c.fam==="mean" && c.v ? '<div class="sub">'+esc(c.v.inf)+'</div>' : '');
+  const table = c.v ? conjTable(c.v, c.a) : "";
+  const note  = (!c.v && c.note) ? '<div class="pron">'+esc(c.note)+'</div>'
+                                 : (c.note && c.v ? '<div class="pron">'+esc(c.note)+'</div>' : "");
+  const spk = '<div class="spkrow"><button class="spk" id="spkBtn">🔊 '+(c.v?"tutta la coniugazione":"ascolta")+'</button>'+
+              (c.v?'<button class="spk alt" id="spkOne">🔊 solo questa forma</button>':'')+'</div>';
+  return head + table + spk + note;
+}
+
+function render(){
+  const card=$("card");
+  card.classList.remove("flipped"); flipped=false; answered=false;
+  card.classList.toggle("tappable", S.mode==="recall");
+  $("hint").textContent = S.mode==="recall" ? "tap to reveal" : "";
+
+  if(!deck.length){
+    $("tag").textContent="";
+    $("front").innerHTML='<div class="big">All done! ✓</div><div class="sub">Every selected card is retired as known, or nothing is selected. Open “Deck” to reset known cards or pick more sections.</div>';
+    $("back").innerHTML=""; $("controls").innerHTML="";
+    $("counter").textContent="—"; $("score").textContent="—"; $("barFill").style.width="0";
+    return;
+  }
+  if(pos>=deck.length){ buildDeck(); return; }
+
+  const c = deck[pos];
+  $("tag").textContent = catLabel(c.cat).toUpperCase();
+  $("front").innerHTML = '<div class="prompt">'+esc(c.qs)+'</div>'+
+                         '<div class="big'+(c.q.length>26?" sm":"")+'">'+esc(c.q)+'</div>'+
+                         (c.sub ? '<div class="gloss">'+esc(c.sub)+'</div>' : '');
+  $("back").innerHTML = backHTML(c);
+
+  if(S.mode==="recall"){
+    $("controls").innerHTML = '<button class="single" id="revealBtn">Reveal</button>';
+    $("revealBtn").onclick = flip;
+  }else if(S.mode==="type" && typable(c)){
+    $("controls").innerHTML =
+      '<div class="typerow"><input class="tin" id="typeIn" placeholder="type the form…" '+
+      'autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">'+
+      '<button class="btn" id="checkBtn" style="padding:0 18px">Check</button></div>'+
+      '<div class="accrow">'+["à","è","é","ì","ò","ù"].map(a=>'<button class="acc" data-a="'+a+'">'+a+'</button>').join("")+'</div>';
+    const inp=$("typeIn");
+    $("checkBtn").onclick = ()=>checkTyped(inp,c);
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); checkTyped(inp,c); } });
+    $("controls").querySelectorAll(".acc").forEach(b=> b.onclick = ()=>{
+      const s=inp.selectionStart||inp.value.length;
+      inp.value = inp.value.slice(0,s)+b.dataset.a+inp.value.slice(inp.selectionEnd||s);
+      inp.focus(); inp.setSelectionRange(s+1,s+1);
+    });
+    setTimeout(()=>inp.focus(),0);
+  }else{
+    const o=optionsFor(c);
+    $("controls").innerHTML = '<div class="opts">'+o.list.map((t,i)=>
+      '<button class="opt" data-v="'+esc(t)+'"><i>'+(i+1)+'</i><span>'+esc(t)+'</span></button>').join("")+'</div>';
+    $("controls").querySelectorAll(".opt").forEach(b=> b.onclick = ()=>choose(b,o.correct));
+  }
+
+  const st = S.stats[cid(c)];
+  $("counter").textContent = (pos+1)+" / "+deck.length + (st ? "  ·  ✓"+st.r+" ✗"+st.w : "");
+  const pct = S.seen ? Math.round(S.right/S.seen*100) : 0;
+  $("score").textContent = S.seen ? pct+"% correct ("+S.seen+" answered)" : "no answers yet";
+  $("barFill").style.width = (pos/deck.length*100)+"%";
+}
+
+function wireSpeak(){
+  const c=deck[pos]; if(!c) return;
+  const all = c.v ? c.v.say : c.a;
+  const b=$("spkBtn"), o=$("spkOne");
+  if(b) b.onclick = e=>{ e.stopPropagation(); speak(all); };
+  if(o) o.onclick = e=>{ e.stopPropagation(); speak(c.fam==="mean" ? c.v.inf : c.a); };
+  if(S.speak) speak(all, true);
+}
+function reveal(){
+  flipped=true; $("card").classList.add("flipped"); wireSpeak();
+  /* the conjugation table can push the card past the viewport — bring its
+     bottom into view so the six forms are never half-hidden */
+  const m=document.querySelector("main");
+  setTimeout(()=>{ if(m.scrollHeight>m.clientHeight) m.scrollTop = m.scrollHeight; },0);
+}
+
+function flip(){
+  if(!deck.length || flipped) return;
+  reveal();
+  $("controls").innerHTML = '<div class="rate"><button class="again" id="againBtn">Again</button>'+
+                            '<button class="good" id="goodBtn">Got it</button></div>';
+  $("againBtn").onclick = ()=>rate(false);
+  $("goodBtn").onclick  = ()=>rate(true);
+}
+function nextButton(label, ok){
+  const n=document.createElement("button");
+  n.className="single"; n.style.marginTop="10px"; n.textContent=label;
+  n.onclick = ()=>rate(ok);
+  $("controls").appendChild(n); n.focus();
+}
+function choose(btn, correct){
+  if(answered) return; answered=true;
+  const ok = btn.dataset.v===correct;
+  $("controls").querySelectorAll(".opt").forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.v===correct) b.classList.add("right");
+    else if(b===btn) b.classList.add("wrong");
+    else b.classList.add("mute");
+  });
+  reveal();
+  nextButton(ok ? "Correct ✓ — next" : "Next", ok);
+}
+function checkTyped(inp, c){
+  if(answered) return;
+  const got = norm(inp.value); if(!got) return;
+  const answers = answersFor(c);
+  const exact = answers.some(a=>norm(a)===got);
+  const loose = answers.some(a=>strip(a)===strip(got));
+  answered = true; inp.disabled = true;
+  inp.classList.add(exact ? "ok" : "no");
+  reveal();
+  if(!exact && loose){
+    const b=document.createElement("div");
+    b.className="badge"; b.textContent="right letters, wrong accent";
+    $("back").prepend(b);
+  }
+  nextButton(exact ? "Correct ✓ — next" : (loose ? "Accents count — next" : "Next"), exact);
+}
+function rate(ok){
+  const c=deck[pos], id=cid(c);
+  const st=S.stats[id]||{r:0,w:0};
+  ok ? st.r++ : st.w++;
+  S.stats[id]=st;
+  if(ok) S.known[id]=true;
+  S.seen++; if(ok) S.right++;
+  if(!ok){ const at=Math.min(pos+6, deck.length); deck.splice(at,0,c); }
+  save(); pos++; render();
+}
+$("card").onclick = ()=>{ if(S.mode==="recall" && !flipped) flip(); };
+
+document.addEventListener("keydown", e=>{
+  if($("sheet").classList.contains("open") || $("studySheet").classList.contains("open")) return;
+  const typing = document.activeElement && (document.activeElement.id==="typeIn" || document.activeElement.id==="vSearch");
+  if((e.key===" "||e.key==="Enter") && !typing){
+    e.preventDefault();
+    if(S.mode==="recall" && !flipped) return flip();
+    const n=$("controls").querySelector(".single"); if(n) n.click();
+    return;
+  }
+  if(!typing && /^[1-5]$/.test(e.key)){
+    const b=$("controls").querySelectorAll(".opt")[+e.key-1]; if(b && !b.disabled) b.click();
+  }
+  if(!typing && flipped && S.mode==="recall"){
+    if(e.key==="a"||e.key==="A") rate(false);
+    if(e.key==="g"||e.key==="G") rate(true);
+  }
+});
+
+/* ---------------- AUDIO ---------------- */
+let itVoices=[], itVoice=null;
+function rankVoice(v){
+  const n=(v.name||"").toLowerCase(); let s=0;
+  if(/premium|enhanced|siri|neural/.test(n)) s+=40;
+  if(/alice|federica|luca|emma|paola|eloisa|carlo/.test(n)) s+=20;
+  if(v.localService) s+=10;
+  if(/^it[-_]IT$/i.test(v.lang)) s+=10;
+  return s;
+}
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return;
+  itVoices = speechSynthesis.getVoices().filter(v=>/^it\b|^it[-_]/i.test(v.lang)).sort((a,b)=>rankVoice(b)-rankVoice(a));
+  itVoice = itVoices.find(v=>v.name===S.voiceName) || itVoices[0] || null;
+}
+let voiceTries=0;
+function refreshVoices(){
+  try{ const had=itVoices.length; pickVoice(); if(itVoices.length!==had && $("voiceSel")) drawVoices(); }catch(e){}
+  return itVoices.length;
+}
+function pollVoices(){ if(refreshVoices() || ++voiceTries>40) return; setTimeout(pollVoices,250); }
+if("speechSynthesis" in window){
+  speechSynthesis.onvoiceschanged = ()=>{ voiceTries=0; refreshVoices(); };
+  setTimeout(pollVoices,0);
+  ["touchend","click","keydown"].forEach(ev=>
+    document.addEventListener(ev, ()=>{ voiceTries=0; pollVoices(); }, {passive:true, once:true}));
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refreshVoices(); });
+}
+function speak(text, quiet){
+  if(!("speechSynthesis" in window)) return;
+  if(!itVoice) pickVoice();
+  if(!itVoice){
+    if(quiet) return;
+    alert("No Italian voice has been detected yet.\n\n"+
+          "The voice list sometimes loads a moment late — tap this again in a few seconds.\n\n"+
+          "If it stays silent, add an Italian voice:\n"+
+          "iPhone / iPad: Settings › Accessibility › Spoken Content › Voices › Italian\n"+
+          "Mac: System Settings › Accessibility › Spoken Content › System Voice › Manage Voices…\n\n"+
+          "An English voice reading Italian sounds wrong, so audio stays off until one is available.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(String(text).replace(/___/g,"…").replace(/\s*—.*$/,""));
+  u.voice=itVoice; u.lang=itVoice.lang||"it-IT"; u.rate=0.92; u.pitch=1;
+  speechSynthesis.speak(u);
+}
+function drawVoices(){
+  const sel=$("voiceSel"); if(!sel) return;
+  sel.innerHTML = itVoices.length
+    ? itVoices.map(v=>'<option value="'+esc(v.name)+'"'+(itVoice&&v.name===itVoice.name?" selected":"")+'>'+esc(v.name)+' — '+esc(v.lang)+'</option>').join("")
+    : '<option>No Italian voice found on this device</option>';
+  $("voiceStat").textContent = itVoices.length
+    ? itVoices.length+" Italian voice"+(itVoices.length>1?"s":"")+" available. Enhanced or Premium voices sound markedly better."
+    : "Audio stays off until an Italian voice is installed — an English voice reading Italian sounds wrong.";
+}
+$("voiceSel").onchange = e=>{ S.voiceName=e.target.value; pickVoice(); save(); };
+$("autoSpk").onclick = ()=>{ S.speak=!S.speak; save(); drawChips(); };
+$("testSpk").onclick = ()=>{ speak("Dante nacque nel 1265 e scrisse la Divina Commedia."); drawVoices(); };
+
+/* ---------------- SETTINGS ---------------- */
+const count = cat => CARDS.filter(c=>c.cat===cat).length;
+function drawChips(){
+  $("modeChips").innerHTML = MODES.map(m=>
+    '<button class="chip'+(S.mode===m.id?" sel":"")+'" data-m="'+m.id+'">'+m.label+'</button>').join("");
+  $("modeChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    S.mode=b.dataset.m; save(); drawChips(); syncModeBtn(); render();
+  });
+  $("modeHint").textContent = (MODES.find(m=>m.id===S.mode)||{}).hint || "";
+
+  $("catChips").innerHTML = CATS.map(c=>
+    '<button class="chip'+(S.cats.includes(c.id)?" sel":"")+'" data-c="'+c.id+'">'+c.label+
+    '<span class="n">'+count(c.id)+'</span></button>').join("");
+  $("catChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{
+    const id=b.dataset.c;
+    S.cats = S.cats.includes(id) ? S.cats.filter(x=>x!==id) : S.cats.concat(id);
+    save(); drawChips(); buildDeck();
+  });
+
+  $("ordChips").innerHTML = [["section","By section"],["random","Shuffled"]].map(([id,l])=>
+    '<button class="chip'+(S.order===id?" sel":"")+'" data-o="'+id+'">'+l+'</button>').join("");
+  $("ordChips").querySelectorAll(".chip").forEach(b=> b.onclick = ()=>{ S.order=b.dataset.o; save(); drawChips(); buildDeck(); });
+
+  $("autoSpk").classList.toggle("on", !!S.speak);
+  const inPool=pool().length, known=pool().filter(c=>S.known[cid(c)]).length;
+  $("progStat").textContent = known+" of "+inPool+" selected cards retired as known · "+
+    S.seen+" answers, "+(S.seen?Math.round(S.right/S.seen*100):0)+"% correct.";
+  drawVoices();
+}
+function syncModeBtn(){ $("modeBtn").textContent = (MODES.find(m=>m.id===S.mode)||MODES[0]).label; }
+
+$("setBtn").onclick   = ()=>{ drawChips(); $("sheet").classList.add("open"); };
+$("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); };
+$("sheet").onclick    = e=>{ if(e.target===$("sheet")){ $("sheet").classList.remove("open"); buildDeck(); } };
+$("allC").onclick   = ()=>{ S.cats=CATS.map(c=>c.id); save(); drawChips(); buildDeck(); };
+$("noneC").onclick  = ()=>{ S.cats=[]; save(); drawChips(); buildDeck(); };
+$("rulesC").onclick = ()=>{ S.cats=["regole","regolari"]; save(); drawChips(); buildDeck(); };
+$("irrC").onclick   = ()=>{ S.cats=["irregolari","derivazione","riconoscimento","famiglie"]; save(); drawChips(); buildDeck(); };
+$("meanC").onclick  = ()=>{ S.cats=["significato"]; save(); drawChips(); buildDeck(); };
+$("resetKnownBtn").onclick = ()=>{ S.known={}; save(); drawChips(); buildDeck(); };
+$("resetBtn").onclick = ()=>{
+  if(!confirm("Reset all progress — known cards, per-card stats, and the score?")) return;
+  S.known={}; S.stats={}; S.seen=0; S.right=0; save(); drawChips(); buildDeck();
+};
+$("modeBtn").onclick = ()=>{
+  const i=MODES.findIndex(m=>m.id===S.mode);
+  S.mode=MODES[(i+1)%MODES.length].id; save(); syncModeBtn(); render();
+};
+
+/* ---------------- REFERENCE ---------------- */
+let studyTab = "rules";
+function endingRow(g,label){
+  return '<div class="r"><div class="p">'+label+'</div><div class="f">'+END[g].map(e=>"-"+e).join(", ")+'</div></div>';
+}
+function drawRules(){
+  const ex = inf => { const v=verb(inf); return '<div class="r" data-say="'+esc(v.say)+'"><div class="p">'+esc(v.inf)+
+    '</div><div class="f">'+v.forms.join(", ")+'</div><div class="e">'+esc(v.en)+'</div></div>'; };
+  $("studyTitle").textContent = "How it is built";
+  $("vSearch").style.display = "none";
+  $("studyBody").innerHTML =
+    '<div class="tbl"><h3>1 · The regular endings</h3>'+
+      endingRow("are","-are")+endingRow("ere","-ere")+endingRow("ire","-ire")+
+      ex("parlare")+ex("credere")+ex("dormire")+
+      '<div class="plain">The <b>lui/lei</b> form of a regular verb carries a written accent — <b>parlò, credé, dormì</b> — '+
+        'because the stress falls on the ending. Leave it off and parlò becomes parlo, the present tense.</div>'+
+      '<div class="note">Regular -ere verbs have a second, equally standard set in io, lui/lei and loro: '+
+        'credetti, credette, credettero. Credetti is the commoner of the two. A stem already ending in -t- takes only '+
+        'the plain set: potere → potei, poté, poterono, never ✗ potetti.</div>'+
+    '</div>'+
+
+    '<div class="tbl"><h3>2 · The 1-3-3 pattern — where every irregular lives</h3>'+
+      '<div class="plain">An irregular verb changes stem in <b>three persons only</b>: io, lui/lei and loro. '+
+        'The other three keep the verb\'s ordinary stem — the same one the imperfetto uses. Learn the io form and '+
+        'the rest is arithmetic.</div>'+
+      ex("prendere")+
+      '<div class="plain"><b>From the io form:</b> drop the -i, add <b>-e</b> for lui/lei and <b>-ero</b> for loro. '+
+        'presi → prese → presero · ebbi → ebbe → ebbero · nacqui → nacque → nacquero · ruppi → ruppe → ruppero.</div>'+
+      '<div class="plain"><b>The regular half</b> is the imperfetto stem plus -esti, -emmo, -este (or -isti, -immo, -iste '+
+        'for an -ire verb). That is why: </div>'+
+      ex("fare")+ex("dire")+ex("bere")+ex("venire")+
+      '<div class="note">Irregular forms need no written accent, because their stress sits on the stem: '+
+        'prese, ruppe, venne, nacque — never ✗ prendè.</div>'+
+    '</div>'+
+
+    '<div class="tbl"><h3>3 · The three that break the pattern</h3>'+
+      ex("essere")+ex("dare")+ex("stare")+
+      '<div class="plain">These three are irregular in <b>all six</b> persons — memorize each set whole. '+
+        'Dare also has detti, dette, dettero alongside diedi, diede, diedero.</div>'+
+      '<div class="note">By contrast <b>andare</b>, wildly irregular everywhere else, is completely regular here: '+
+        'andai, andasti, andò, andammo, andaste, andarono.</div>'+
+    '</div>'+
+
+    '<div class="tbl"><h3>4 · Families — learn one, get a dozen</h3>'+
+      '<div class="plain"><b>-ndere → -si / -so</b>: prendere → presi / preso · scendere → scesi / sceso · '+
+        'rendere → resi / reso · spendere → spesi / speso · accendere → accesi / acceso · offendere → offesi / offeso · '+
+        'difendere → difesi / difeso.</div>'+
+      '<div class="plain"><b>-ngere → -nsi / -nto</b>: piangere → piansi / pianto · spingere → spinsi / spinto · '+
+        'dipingere → dipinsi / dipinto · fingere → finsi / finto · giungere → giunsi / giunto.</div>'+
+      '<div class="plain"><b>-cqui group</b>: nascere → nacqui · piacere → piacqui · tacere → tacqui. '+
+        'And the <b>-bbi group</b>: avere → ebbi · crescere → crebbi · conoscere → conobbi · cadere → caddi.</div>'+
+      '<div class="plain"><b>-urre / -orre / -arre</b> work off their old Latin stems: condurre → condussi, conducesti · '+
+        'tradurre → tradussi, traducesti · porre → posi, ponesti · trarre → trassi, traesti.</div>'+
+      '<div class="plain"><b>Compounds inherit everything</b>: prendere → comprendere, sorprendere, apprendere, riprendere · '+
+        'mettere → promettere, permettere, ammettere, smettere · tenere → ottenere, mantenere, contenere.</div>'+
+      '<div class="note">A family resemblance, not a law: rispondere → risposto and nascondere → nascosto break the '+
+        '-so shape, and vendere is entirely regular (vendei, venduto).</div>'+
+    '</div>'+
+
+    '<div class="tbl"><h3>5 · When to use it</h3>'+
+      '<div class="plain">Same meaning as the passato prossimo, different register. The passato remoto is the tense of '+
+        '<b>narrative</b> — novels, history, fairy tales — and of ordinary speech in central and southern Italy, where a '+
+        'northern speaker would say <b>ho preso</b>. Even if you never produce it, you need to read it.</div>'+
+      '<div class="plain"><b>Dante nacque nel 1265.</b> · <b>Colombo giunse in America nel 1492.</b> · '+
+        '<b>Mio nonno visse a Napoli per trent\'anni.</b></div>'+
+      '<div class="note">Sapere and conoscere shift meaning in this tense: <b>seppi</b> = I found out, '+
+        '<b>conobbi</b> = I met. The passato remoto marks the moment the knowing began.</div>'+
+    '</div>';
+  $("studyBody").querySelectorAll(".r").forEach(el=>{ if(el.dataset.say) el.onclick=()=>speak(el.dataset.say); });
+}
+function drawVerbs(){
+  $("studyTitle").textContent = "Every verb, conjugated";
+  $("vSearch").style.display = "";
+  const q = norm($("vSearch").value);
+  const match = v => !q || v.inf.includes(q) || strip(v.inf).includes(strip(q)) || v.en.toLowerCase().includes(q);
+  const block = v =>
+    '<div class="vb"><div class="vh" data-say="'+esc(v.say)+'"><b>'+esc(v.inf)+'</b><em>'+esc(v.en)+'</em>'+
+      '<span>'+(v.reg?"regular":"irregular")+'</span></div><div class="vg">'+
+      v.forms.map((f,i)=>'<div'+(v.irr[i]?' class="irr"':'')+'><small>'+PERSONS[i]+'</small>'+esc(f)+
+        (v.alt[i]?' <span style="color:#6c7a89;font-size:12px">/ '+esc(v.alt[i])+'</span>':'')+'</div>').join("")+
+      '</div>'+(v.note?'<div class="plain">'+esc(v.note)+'</div>':'')+'</div>';
+  const irr = VERBS.filter(v=>!v.reg && match(v)), reg = VERBS.filter(v=>v.reg && match(v));
+  $("studyBody").innerHTML =
+    '<div class="addhint">Amber marks a form that does not follow the regular endings. Tap a verb\'s header to hear '+
+      'all six forms read out.</div>'+
+    (irr.length ? '<div class="tbl"><h3>Irregular — '+irr.length+' verb'+(irr.length>1?"s":"")+'</h3></div>'+irr.map(block).join("") : "")+
+    (reg.length ? '<div class="tbl" style="margin-top:20px"><h3>Regular — '+reg.length+' verb'+(reg.length>1?"s":"")+'</h3></div>'+reg.map(block).join("") : "")+
+    (!irr.length && !reg.length ? '<div class="addhint">Nothing matches “'+esc($("vSearch").value)+'”.</div>' : "");
+  $("studyBody").querySelectorAll(".vh").forEach(el=> el.onclick=()=>speak(el.dataset.say));
+}
+function setTab(t){
+  studyTab = t;
+  $("tabRules").classList.toggle("on", t==="rules");
+  $("tabVerbs").classList.toggle("on", t==="verbs");
+  t==="rules" ? drawRules() : drawVerbs();
+}
+$("tabRules").onclick = ()=>setTab("rules");
+$("tabVerbs").onclick = ()=>setTab("verbs");
+$("vSearch").addEventListener("input", ()=>{ if(studyTab==="verbs") drawVerbs(); });
+$("studyBtn").onclick   = ()=>{ setTab(studyTab); $("studySheet").classList.add("open"); };
+$("studyClose").onclick = ()=> $("studySheet").classList.remove("open");
+
+/* ---------------- BOOT ---------------- */
+syncModeBtn();
+buildDeck();
+</script>
+</body>
+</html>
