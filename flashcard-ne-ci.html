@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flashcard: ne o ci</title>
+<style>
+  :root {
+    --bg: #f6f3ee; --card: #ffffff; --ink: #1f2328; --muted: #6b6f76;
+    --ne: #b8432f; --ci: #2f6db8; --line: #e3ded6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181a; --card: #222427; --ink: #ececec; --muted: #9aa0a6;
+            --ne: #e0735f; --ci: #6ea3e6; --line: #33363a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: .95rem; text-align: center; }
+  .scene { width: 100%; max-width: 440px; height: 260px; perspective: 1000px; cursor: pointer; }
+  .card { position: relative; width: 100%; height: 100%; transition: transform .5s; transform-style: preserve-3d; }
+  .card.flipped { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+          background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          padding: 24px; text-align: center; box-shadow: 0 4px 18px rgba(0,0,0,.06); }
+  .back { transform: rotateY(180deg); }
+  .verb { font-size: 1.8rem; font-weight: 600; }
+  .gloss { color: var(--muted); margin-top: 8px; }
+  .hint { position: absolute; bottom: 12px; font-size: .8rem; color: var(--muted); }
+  .answer { font-size: 1.7rem; font-weight: 700; }
+  .answer.ne { color: var(--ne); } .answer.ci { color: var(--ci); }
+  .ex { margin-top: 14px; font-size: 1.05rem; line-height: 1.5; }
+  .note { margin-top: 10px; font-size: .9rem; color: var(--muted); }
+  .controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  button { font: inherit; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line);
+           background: var(--card); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  .count { margin-top: 14px; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+  <h1>Verbi con preposizione: ne o ci</h1>
+  <p class="sub">Tocca la carta per girarla. <b>di → ne</b> · <b>a, in, con, su → ci</b></p>
+
+  <div class="scene" id="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="verb" id="verb"></div>
+        <div class="gloss" id="gloss"></div>
+        <div class="hint">quale preposizione? ne o ci?</div>
+      </div>
+      <div class="face back">
+        <div class="answer" id="answer"></div>
+        <div class="ex" id="ex"></div>
+        <div class="note" id="note"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prev">← Indietro</button>
+    <button id="flip">Gira</button>
+    <button id="next">Avanti →</button>
+    <button id="shuffle">Mescola</button>
+  </div>
+  <div class="count" id="count"></div>
+
+<script>
+const cards = [
+  ["dimenticarsi", "to forget", "di → ne", "Mi dimentico delle chiavi → Me ne dimentico."],
+  ["pensare", "to think about", "a → ci", "Penso al viaggio → Ci penso.", "Ma: \"Che ne pensi?\" = opinione."],
+  ["uscire", "to go out with", "con → ci", "Esco con gli amici → Ci esco."],
+  ["tuffarsi", "to dive into", "in → ci", "Mi tuffo in mare → Mi ci tuffo."],
+  ["avere bisogno", "to need", "di → ne", "Ho bisogno di aiuto → Ne ho bisogno."],
+  ["abituarsi", "to get used to", "a → ci", "Mi abituo al freddo → Mi ci abituo."],
+  ["innamorarsi", "to fall in love with", "di → ne", "Mi innamoro di Roma → Me ne innamoro.", "In inglese è \"with\", in italiano è DI."],
+  ["contare", "to count on", "su → ci", "Conto su di te → Ci conto."],
+  ["rendersi conto", "to realize", "di → ne", "Mi rendo conto del problema → Me ne rendo conto."],
+  ["riuscire", "to manage to", "a → ci", "Riesco a finire → Ci riesco."],
+  ["vedersi", "to meet up with", "con → ci", "Si vede con Michele → Ci si vede."],
+  ["parlare (di un tema)", "to talk about", "di → ne", "Parlo di politica → Ne parlo.", "Ma: parlo con Luca → Ci parlo."],
+  ["trovarsi bene", "to feel good in", "in → ci", "Mi trovo bene in ufficio → Mi ci trovo bene."],
+  ["avere paura", "to be afraid of", "di → ne", "Ho paura dei cani → Ne ho paura."],
+  ["tenere", "to care about", "a → ci", "Tengo alla famiglia → Ci tengo."],
+  ["andare d'accordo", "to get along with", "con → ci", "Vado d'accordo con Vale → Ci vado d'accordo."],
+  ["occuparsi", "to take care of", "di → ne", "Mi occupo della cena → Me ne occupo."],
+  ["credere", "to believe in", "in / a → ci", "Credo nei / ai fantasmi → Ci credo."],
+  ["rinunciare", "to give up", "a → ci", "Rinuncio al dolce → Ci rinuncio."],
+  ["accorgersi", "to notice", "di → ne", "Mi accorgo dell'errore → Me ne accorgo."]
+];
+
+let order = cards.map((_, i) => i);
+let pos = 0;
+const $ = id => document.getElementById(id);
+
+function render() {
+  const [verb, gloss, ans, ex, note] = cards[order[pos]];
+  $("card").classList.remove("flipped");
+  $("verb").textContent = verb + " ___";
+  $("gloss").textContent = gloss;
+  $("answer").textContent = ans;
+  $("answer").className = "answer " + (ans.includes("ne") ? "ne" : "ci");
+  $("ex").textContent = ex;
+  $("note").textContent = note || "";
+  $("count").textContent = (pos + 1) + " / " + cards.length;
+}
+
+$("scene").onclick = () => $("card").classList.toggle("flipped");
+$("flip").onclick = () => $("card").classList.toggle("flipped");
+$("next").onclick = () => { pos = (pos + 1) % cards.length; render(); };
+$("prev").onclick = () => { pos = (pos - 1 + cards.length) % cards.length; render(); };
+$("shuffle").onclick = () => {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  pos = 0; render();
+};
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") $("next").click();
+  if (e.key === "ArrowLeft") $("prev").click();
+  if (e.key === " ") { e.preventDefault(); $("flip").click(); }
+});
+render();
+</script>
+</body>
+</html>
