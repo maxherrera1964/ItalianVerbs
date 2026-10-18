@@ -147,7 +147,7 @@ concat="$RA_WORK/segaiff/${b}.concat.txt"
 for a in "$RA_WORK/segaiff/${b}__"*.aiff; do
   printf "file '%s'\n" "$a" >> "$concat"
 done
-ffmpeg -y -loglevel error -f concat -safe 0 -i "$concat" -c copy "$RA_WORK/aiff/$b.aiff"
+ffmpeg -y -loglevel error -f concat -safe 0 -i "$concat" $RA_FLOOR "$RA_WORK/aiff/$b.aiff"
 afconvert -f m4af -d aac -s 2 -b "$RA_BITRATE" "$RA_WORK/aiff/$b.aiff" "$RA_OUT/per-verbo/$b.m4a"
 echo "  $b"
 HELPER
@@ -155,6 +155,14 @@ chmod +x "$WORK/render_one.sh"
 
 # Values go through the environment: `xargs -I` caps the built command at 255
 # chars, which long iCloud paths overrun.
+# Noise floor: a very faint pink hiss (~-70 dB, inaudible) mixed under the
+# whole track so it never contains pure digital silence. Bluetooth headphones,
+# AirPods and car stereos go to sleep during long stretches of exact silence
+# and need ~0.5 s to wake — which swallowed the first word after each pause
+# ("Passato prossimo" heard as just "prossimo"). amix halves each input, so
+# volume=2 restores the speech to its original level.
+RA_FLOOR='-f lavfi -i anoisesrc=color=pink:amplitude=0.002:sample_rate=22050 -filter_complex [0:a][1:a]amix=inputs=2:duration=first,volume=2'
+export RA_FLOOR
 export RA_VOICE="$VOICE" RA_EN_VOICE="$EN_VOICE" RA_WORK="$WORK" RA_BITRATE="$BITRATE" RA_OUT="$OUT"
 find "$WORK/parts" -name '*.txt' -print0 | xargs -0 -P 6 -n 1 "$WORK/render_one.sh"
 
@@ -162,7 +170,7 @@ find "$WORK/parts" -name '*.txt' -print0 | xargs -0 -P 6 -n 1 "$WORK/render_one.
 # order — the "NN_verb__SSS.lang" naming sorts correctly as plain text since
 # both the verb index and the segment index are zero-padded.
 find "$WORK/segaiff" -name '*.aiff' | sort | while IFS= read -r f; do printf "file '%s'\n" "$f"; done > "$WORK/concat.txt"
-ffmpeg -y -loglevel error -f concat -safe 0 -i "$WORK/concat.txt" -c copy "$WORK/full.aiff"
+ffmpeg -y -loglevel error -f concat -safe 0 -i "$WORK/concat.txt" $RA_FLOOR "$WORK/full.aiff"
 afconvert -f m4af -d aac -s 2 -b "$BITRATE" "$WORK/full.aiff" "$OUT/completo.m4a"
 
 DUR=$(afinfo "$OUT/completo.m4a" | awk -F': ' '/estimated duration/{printf "%d", $2}')
