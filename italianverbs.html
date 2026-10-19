@@ -197,6 +197,23 @@
   .badge.trv{background:#102a38;color:var(--accent2);margin-left:6px}
   .badge.ess{background:#241a38;color:#c4b5fd;margin-left:6px}
   .why{font-size:13px;color:var(--dim);line-height:1.5;margin-top:8px}
+  .chip.part{border-color:var(--accent)}
+  .chip .fc{opacity:.6;margin-left:4px;font-size:11px}
+  .famBox{border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden}
+  .famBox .fh{padding:10px 14px;background:var(--panel2);font-size:13px;line-height:1.5}
+  .famBox .fh a{color:var(--accent);cursor:pointer;font-weight:650}
+  .famBox .fn{padding:8px 14px;font-size:12px;color:var(--dim);line-height:1.5;border-top:1px solid var(--line)}
+  .famTbl{width:100%;border-collapse:collapse;font-size:13px}
+  .famTbl th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);font-weight:600;text-align:left;padding:6px 8px}
+  .famTbl td{padding:6px 8px;border-top:1px solid var(--line);white-space:nowrap}
+  .famTbl td:first-child{font-weight:650}
+  .famTbl tr.cur td{background:var(--panel2)}
+  .famTbl tr.base td:first-child::before{content:"🌳 "}
+  .famTbl tr.go td:first-child{color:var(--accent);cursor:pointer}
+  .famTbl tr.out td{opacity:.55}
+  .famTbl tr.out td.add{opacity:1}
+  .famTbl .fadd{background:none;border:1px solid var(--line);color:var(--accent);border-radius:8px;padding:2px 8px;font-size:12px;cursor:pointer}
+  .famScroll{overflow-x:auto}
   .rulebox{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
   .rulebox h3{margin:0;padding:10px 14px;background:var(--panel2);font-size:12px;
     text-transform:uppercase;letter-spacing:1.1px;color:var(--accent)}
@@ -289,6 +306,13 @@
   <div class="sheetbox">
     <h2>Tenses</h2>
     <div class="chips" id="tenseChips"></div>
+    <h2>Base verbs</h2>
+    <div class="addhint" style="margin-top:0">Learn the base verb and you've learned its family — every member conjugates the same way, just with a prefix (venire → intervenire, prevenire…). These two buttons are filters: they combine with Travel, Regular/Irregular and Essere/Avere (and the tenses you pick) as an intersection. Tapping a single base below adds or removes its family — only the members that pass the active filters.</div>
+    <div class="row">
+      <button class="btn" id="baseOnlyV">🌳 Base verbs only</button>
+      <button class="btn" id="baseFamV">Bases + families</button>
+    </div>
+    <div class="chips" id="famChips" style="margin-top:10px"></div>
     <h2>Verbs</h2>
     <div class="row">
       <button class="btn" id="travV">✈︎ Travel</button>
@@ -309,6 +333,7 @@
       <span><i class="dot irr"></i>irregular</span>
       <span><b class="essmark">ⓔ</b> takes essere</span>
       <span>✈︎ travel verb</span>
+      <span>🌳 base verb</span>
     </div>
     <div class="chips" id="verbChips" style="margin-top:10px"></div>
 
@@ -5378,6 +5403,7 @@ function genVerb(spec, r){
 }
 
 function materialize(spec){
+  if (spec.fam) return famMaterialize(spec);          // a member of a base-verb family: copy the base's forms
   if (VERBS.some(v => v.inf === spec.inf)) return null;
   const r = conjugate(spec.inf);
   if (!r || !r.ok) return null;
@@ -5388,6 +5414,241 @@ function materialize(spec){
   VERBS.push(v);
   return v;
 }
+
+
+/* ============ BASE-VERB FAMILIES ============
+   A base verb plus the verbs built on it with a prefix. Every member conjugates
+   form-for-form like its base — swap the prefix and you have it:
+     venire → intervenire:  vengo → intervengo · verrò → interverrò · venni → intervenni · venuto → intervenuto
+   `stem` is the shared tail the prefixes attach to (apparire's family shares -parire).
+   Member rows: [infinitive, English base form(s) separated by " / ", auxiliary "a" | "e"].
+   Members already in VERBS keep their own hand-written data; the rest can be added
+   to the deck in one tap and are conjugated by copying the base's forms (famClone).
+   Bases marked `virtual` (porre, trarre…) aren't hand-written verbs — they are built
+   the same way, by stripping the prefix off a member that is. */
+const FAMILIES = [
+  {base:"venire", stem:"venire",
+   note:"Every <b>-venire</b> verb copies venire form for form — the irregular presente (vengo, vieni, vengono), the future <b>verr-</b>, the passato remoto <b>venni</b> and the participle <b>venuto</b>. Most take <b>essere</b> like venire; the one that takes a direct object (<b>prevenire</b> = to prevent) switches to <b>avere</b>.",
+   members:[["avvenire","happen","e"],["convenire","be worth it / agree","e"],["divenire","become","e"],
+            ["intervenire","intervene","e"],["pervenire","arrive / reach","e"],["prevenire","prevent","a"],
+            ["provenire","come from","e"],["svenire","faint","e"]]},
+  {base:"tenere", stem:"tenere",
+   note:"tengo, tieni, tiene, tengono · future <b>terr-</b> · passato remoto <b>tenni</b> · participle <b>tenuto</b>. The imperativo tu follows the presente: tieni → <b>mantieni!</b>, <b>sostieni!</b> The family takes <b>avere</b>.",
+   members:[["appartenere","belong","a"],["attenere","pertain","a"],["contenere","contain","a"],
+            ["detenere","hold / detain","a"],["intrattenere","entertain","a"],["mantenere","keep / maintain","a"],
+            ["ottenere","get / obtain","a"],["ritenere","consider / believe","a"],["sostenere","support / maintain","a"],
+            ["trattenere","hold back","a"]]},
+  {base:"fare", stem:"fare",
+   note:"faccio, fai, fa · <b>feci</b> · <b>fatto</b> · the old stem <b>fac-</b> in facevo, facendo, facessi. The accent carries over: fa → <b>rifà</b>. One difference: only fare has the short imperativo <b>fa'</b> — derivatives use the full form (<b>rifai!</b>). Soddisfare also has newer, regular-looking forms (soddisfo, soddisfi).",
+   members:[["contraffare","counterfeit / fake","a"],["disfare","undo / unpack","a"],["rifare","redo / do again","a"],
+            ["soddisfare","satisfy","a"],["sopraffare","overwhelm","a"]]},
+  {base:"dire", stem:"dire",
+   note:"dico, dici · <b>dissi</b> · <b>detto</b> · the old stem <b>dic-</b> in dicevo, dicendo, dicessi — all inherited. One difference: only dire has the short imperativo <b>di'</b>; derivatives use the full form (<b>contraddici!</b>, <b>benedici!</b>).",
+   members:[["benedire","bless","a"],["contraddire","contradict","a"],["disdire","cancel","a"],
+            ["maledire","curse","a"],["predire","predict","a"],["ridire","say again / object","a"]]},
+  {base:"porre", stem:"porre", virtual:true, b:"put / place", aux:"a", comp:["una domanda","a question"],
+   note:"pongo, poni, pongono · future <b>porr-</b> · passato remoto <b>posi</b> · participle <b>posto</b>, and the Latin stem <b>pon-</b> everywhere else (ponevo, ponendo, ponessi). Porre itself is formal; its family is everyday Italian.",
+   members:[["comporre","compose","a"],["deporre","lay down / testify","a"],["disporre","arrange","a"],
+            ["esporre","expose / exhibit","a"],["imporre","impose","a"],["opporre","oppose","a"],
+            ["proporre","propose","a"],["supporre","suppose","a"]]},
+  {base:"trarre", stem:"trarre", virtual:true, b:"draw / pull", aux:"a", comp:["una conclusione","a conclusion"],
+   note:"traggo, trai, trae, traggono · future <b>trarr-</b> · passato remoto <b>trassi</b> · participle <b>tratto</b>, and the Latin stem <b>tra-</b> (traevo, traendo).",
+   members:[["attrarre","attract","a"],["contrarre","contract","a"],["distrarre","distract","a"],
+            ["estrarre","extract","a"],["ritrarre","portray","a"],["sottrarre","subtract / take away","a"]]},
+  {base:"condurre", stem:"durre",
+   note:"Every <b>-durre</b> verb runs on the Latin stem <b>-duc-</b> (conduco, conducevo, conducendo) plus three irregular pieces: future <b>-durr-</b>, passato remoto <b>-dussi</b>, participle <b>-dotto</b>.",
+   members:[["dedurre","deduce","a"],["indurre","induce / lead to","a"],["introdurre","introduce","a"],
+            ["produrre","produce","a"],["ridurre","reduce","a"],["sedurre","seduce","a"],["tradurre","translate","a"]]},
+  {base:"mettere", stem:"mettere",
+   note:"Only two irregular pieces — passato remoto <b>misi</b> and participle <b>messo</b> — and every -mettere verb copies them: promisi, promesso.",
+   members:[["ammettere","admit","a"],["commettere","commit","a"],["compromettere","compromise","a"],
+            ["dimettere","discharge","a"],["permettere","allow / permit","a"],["promettere","promise","a"],
+            ["rimettere","put back","a"],["scommettere","bet","a"],["smettere","stop / quit","a"],
+            ["trasmettere","broadcast / transmit","a"]]},
+  {base:"prendere", stem:"prendere",
+   note:"Passato remoto <b>presi</b>, participle <b>preso</b>; everything else is regular -ere. Careful: <b>pretendere</b> and <b>intendere</b> only look related — they follow <b>tendere</b> (tesi, teso).",
+   members:[["apprendere","learn","a"],["comprendere","understand / include","a"],["intraprendere","undertake","a"],
+            ["riprendere","resume / take back","a"],["sorprendere","surprise","a"]]},
+  {base:"tendere", stem:"tendere", virtual:true, b:"stretch out / tend", aux:"a", comp:["la mano","a hand"],
+   note:"Passato remoto <b>tesi</b>, participle <b>teso</b>; the rest is regular -ere. False friend: <b>attendere</b> = to wait for, not \"to attend\".",
+   members:[["attendere","wait for / expect","a"],["estendere","extend","a"],["intendere","intend / mean","a"],
+            ["pretendere","demand / expect","a"],["stendere","spread out / hang out","a"]]},
+  {base:"scrivere", stem:"scrivere",
+   note:"Passato remoto <b>scrissi</b>, participle <b>scritto</b> — copied by every member.",
+   members:[["descrivere","describe","a"],["iscrivere","enroll / register","a"],["prescrivere","prescribe","a"],
+            ["sottoscrivere","sign / subscribe","a"],["trascrivere","transcribe","a"]]},
+  {base:"vedere", stem:"vedere",
+   note:"Future <b>vedr-</b>, passato remoto <b>vidi</b>, participle <b>visto</b>. Prevedere is also commonly heard with the regular future (prevederò). Look-alike: <b>provvedere</b> keeps a regular future (provvederò) and participle (provveduto).",
+   members:[["intravedere","glimpse / make out","a"],["prevedere","foresee / predict","a"],["rivedere","see again / review","a"]]},
+  {base:"rompere", stem:"rompere",
+   note:"Passato remoto <b>ruppi</b>, participle <b>rotto</b>.",
+   members:[["corrompere","corrupt / bribe","a"],["interrompere","interrupt","a"],["irrompere","burst in","a"]]},
+  {base:"muovere", stem:"muovere",
+   note:"Passato remoto <b>mossi</b>, participle <b>mosso</b>.",
+   members:[["commuovere","move / touch","a"],["promuovere","promote","a"],["rimuovere","remove","a"],["smuovere","shift / budge","a"]]},
+  {base:"nascere", stem:"nascere",
+   note:"Passato remoto <b>nacqui</b>, participle <b>nato</b>, auxiliary <b>essere</b>.",
+   members:[["rinascere","be reborn","e"]]},
+  {base:"piacere", stem:"piacere",
+   note:"piaccio, piacciono · passato remoto <b>piacqui</b> · participle <b>piaciuto</b> · auxiliary <b>essere</b>. Like piacere, dispiacere is usually used with an indirect object: <i>mi dispiace</i>.",
+   members:[["dispiacere","be sorry / displease","e"]]},
+  {base:"ridere", stem:"ridere",
+   note:"Passato remoto <b>risi</b>, participle <b>riso</b>.",
+   members:[["deridere","mock","a"],["sorridere","smile","a"]]},
+  {base:"vivere", stem:"vivere",
+   note:"Future <b>vivr-</b>, passato remoto <b>vissi</b>, participle <b>vissuto</b>. Sopravvivere takes <b>essere</b>.",
+   members:[["convivere","live together","a"],["rivivere","relive","a"],["sopravvivere","survive","e"]]},
+  {base:"uscire", stem:"uscire",
+   note:"The stem flips to <b>esc-</b> when stressed (esco, esci, esce, escono) and back to <b>usc-</b> for noi/voi (usciamo, uscite). Riuscire copies it exactly: riesco, riusciamo.",
+   members:[["riuscire","manage / succeed","e"]]},
+  {base:"salire", stem:"salire",
+   note:"A <b>-g-</b> appears before -o and -a: salgo, salgono, salga.",
+   members:[["risalire","go back up / date back","e"]]},
+  {base:"apparire", stem:"parire",
+   note:"appaio, appari, appare, appaiono · passato remoto <b>apparvi</b> · participle <b>apparso</b> · auxiliary <b>essere</b>. Look-alike: <b>sparire</b> is not in this family — it's a regular -isc- verb (sparisco, sparito).",
+   members:[["comparire","appear","e"],["scomparire","disappear","e"]]},
+  {base:"coprire", stem:"coprire",
+   note:"Only the participle is irregular: <b>coperto</b>. Aprire (aperto), offrire (offerto) and soffrire (sofferto) share the pattern without being relatives.",
+   members:[["ricoprire","cover / hold (a role)","a"],["scoprire","discover","a"]]},
+  {base:"conoscere", stem:"conoscere",
+   note:"Passato remoto <b>conobbi</b>, participle <b>conosciuto</b> (the -i- keeps the soft \"sh\" sound).",
+   members:[["riconoscere","recognize","a"]]},
+  {base:"giungere", stem:"giungere", virtual:true, b:"arrive / reach", aux:"e", comp:["a destinazione","at the destination"],
+   note:"Passato remoto <b>giunsi</b>, participle <b>giunto</b>. Giungere takes essere; the members take an object, so <b>avere</b>.",
+   members:[["aggiungere","add","a"],["raggiungere","reach / join","a"]]},
+  {base:"rispondere", stem:"spondere",
+   note:"Passato remoto <b>risposi</b>, participle <b>risposto</b>.",
+   members:[["corrispondere","correspond","a"]]},
+  {base:"vincere", stem:"vincere",
+   note:"Passato remoto <b>vinsi</b>, participle <b>vinto</b>.",
+   members:[["convincere","convince","a"]]},
+  {base:"cadere", stem:"cadere", virtual:true, b:"fall", aux:"e",
+   note:"Future <b>cadr-</b> (no -e-), passato remoto <b>caddi</b>, regular participle <b>caduto</b>. The whole family takes <b>essere</b>.",
+   members:[["accadere","happen","e"],["decadere","decline / lapse","e"],["scadere","expire","e"]]},
+  {base:"volgere", stem:"volgere", virtual:true, b:"turn", aux:"a", comp:["gli occhi al cielo","their eyes to the sky"],
+   note:"Passato remoto <b>volsi</b>, participle <b>volto</b>; the rest is regular -ere.",
+   members:[["coinvolgere","involve","a"],["rivolgere","turn / address","a"],["svolgere","carry out / unfold","a"],
+            ["travolgere","sweep away / run over","a"]]},
+  {base:"cogliere", stem:"cogliere", virtual:true, b:"seize / pick", aux:"a", comp:["l'occasione","the opportunity"],
+   note:"colgo, cogli, coglie, colgono — <b>-gli-</b> becomes <b>-lg-</b> before -o and -a · passato remoto <b>colsi</b> · participle <b>colto</b>. Togliere, sciogliere and scegliere follow the same pattern without being relatives.",
+   members:[["accogliere","welcome","a"],["raccogliere","gather / pick up","a"]]},
+  {base:"correre", stem:"correre",
+   note:"Passato remoto <b>corsi</b>, participle <b>corso</b>. Occorrere (to be needed) takes <b>essere</b>; the others take an object, so <b>avere</b>.",
+   members:[["occorrere","be needed","e"],["percorrere","cover / travel along","a"],["rincorrere","chase","a"],
+            ["soccorrere","rescue / help","a"],["trascorrere","spend (time)","a"]]},
+  {base:"chiudere", stem:"chiudere",
+   note:"Passato remoto <b>chiusi</b>, participle <b>chiuso</b>.",
+   members:[["rinchiudere","lock up / shut in","a"],["socchiudere","half-close","a"]]},
+];
+const FAM = {}, FAM_OF = {}, FAM_MEMBER = {};
+FAMILIES.forEach(f=>{ FAM[f.base] = f; f.members.forEach(m=>{ FAM_OF[m[0]] = f.base; FAM_MEMBER[m[0]] = m; }); });
+
+/* English for verbs built here: irregular first words, then the generic helpers */
+const FAM_EN_IRR = {   // word: [3rd person, past, participle, -ing]
+  be:["is","was","been","being"], put:["puts","put","put","putting"], get:["gets","got","got","getting"],
+  bet:["bets","bet","bet","betting"], hold:["holds","held","held","holding"], keep:["keeps","kept","kept","keeping"],
+  lay:["lays","laid","laid","laying"], spend:["spends","spent","spent","spending"], spread:["spreads","spread","spread","spreading"],
+  hang:["hangs","hung","hung","hanging"], run:["runs","ran","run","running"], sweep:["sweeps","swept","swept","sweeping"],
+  see:["sees","saw","seen","seeing"], foresee:["foresees","foresaw","foreseen","foreseeing"],
+  undertake:["undertakes","undertook","undertaken","undertaking"], take:["takes","took","taken","taking"],
+  draw:["draws","drew","drawn","drawing"], fall:["falls","fell","fallen","falling"], catch:["catches","caught","caught","catching"],
+  burst:["bursts","burst","burst","bursting"], say:["says","said","said","saying"], "do":["does","did","done","doing"],
+  redo:["redoes","redid","redone","redoing"], undo:["undoes","undid","undone","undoing"], come:["comes","came","come","coming"],
+  become:["becomes","became","become","becoming"], shut:["shuts","shut","shut","shutting"], make:["makes","made","made","making"],
+  broadcast:["broadcasts","broadcast","broadcast","broadcasting"], lead:["leads","led","led","leading"], go:["goes","went","gone","going"],
+  understand:["understands","understood","understood","understanding"], mean:["means","meant","meant","meaning"],
+  stop:["stops","stopped","stopped","stopping"], quit:["quits","quit","quit","quitting"],
+  admit:["admits","admitted","admitted","admitting"], commit:["commits","committed","committed","committing"],
+  permit:["permits","permitted","permitted","permitting"], seize:["seizes","seized","seized","seizing"]
+};
+function famEnWord(w, k, fn){ return FAM_EN_IRR[w] ? FAM_EN_IRR[w][k] : fn(w); }
+function famEnAlt(b, k, fn){ return b.split(" / ").map(x=>_firstWord(x, w=>famEnWord(w,k,fn))).join(" / "); }
+function famEnglish(v, b){
+  b = String(b||"").replace(/(^|\/\s*)to\s+/g, "$1").trim();
+  v.en      = b ? "to " + b.split(" / ").join(" / to ") : "";
+  v.enBase  = b;
+  v.en3     = b ? famEnAlt(b, 0, _third) : "";
+  v.enPast  = b ? famEnAlt(b, 1, _ed) : "";
+  v.enPart  = b ? famEnAlt(b, 2, _ed) : "";
+  v.enFut   = "will " + b;
+  return b ? famEnAlt(b, 3, _ing) : "";
+}
+
+function famPrefix(inf, stem){ return inf.endsWith(stem) ? inf.slice(0, inf.length - stem.length) : null; }
+/* the hand-written verb whose forms the family copies: the base itself when it is
+   hand-written, otherwise the first hand-written member */
+function famModel(f){
+  const real = inf => VERBS.find(v => v.inf === inf && !v.famClone && !v.custom);
+  return real(f.base) || f.members.map(m=>real(m[0])).find(Boolean) || null;
+}
+const FAM_ACC = {a:"à", e:"è", i:"ì", o:"ò", u:"ù"};
+function famSwap(s, mp, np){
+  if(typeof s !== "string" || s.slice(0, mp.length) !== mp) return null;
+  let out = np + s.slice(mp.length);
+  // one-syllable base forms gain an accent once a prefix makes them longer: fa → rifà, sto → sottostò
+  if(!mp && np && /^[^aeiouàèéìòù]*[aeiou]$/.test(s)) out = out.slice(0,-1) + FAM_ACC[s.slice(-1)];
+  return out;
+}
+/* forms of any family verb without building it — for the Study-tab family table */
+function famForms(inf){
+  const real = VERBS.find(v=>v.inf===inf);
+  if(real) return {pres:real.pres[0], fut:real.fut[0], rem:passatoRemoto(real,0), pp:real.pp, aux:real.aux};
+  const f = FAM[inf] || FAM[FAM_OF[inf]]; if(!f) return null;
+  const M = famModel(f); if(!M) return null;
+  const mp = famPrefix(M.inf, f.stem), np = famPrefix(inf, f.stem);
+  if(mp === null || np === null) return null;
+  const sw = s => famSwap(s, mp, np);
+  const m = FAM_MEMBER[inf];
+  return {pres:sw(M.pres[0]), fut:sw(M.fut[0]), rem:sw(passatoRemoto(M,0)), pp:sw(M.pp),
+          aux: m ? (m[2]==="e" ? "essere" : "avere") : f.aux==="e" ? "essere" : "avere"};
+}
+/* Build a family verb by copying the model's forms with the prefix swapped. Writes the
+   per-verb exception tables too (passato remoto, imperfetto stems…), so every tense,
+   the deck, the Study tab and the audio export all treat it like a hand-written verb. */
+function famClone(inf, opts){
+  opts = opts || {};
+  const f = FAM[inf] || FAM[FAM_OF[inf]]; if(!f) return null;
+  const M = famModel(f); if(!M) return null;
+  const mp = famPrefix(M.inf, f.stem), np = famPrefix(inf, f.stem);
+  if(mp === null || np === null) return null;
+  const sw = s => famSwap(s, mp, np), swA = a => a.map(sw);
+  const pres = swA(M.pres), fut = swA(M.fut), pp = sw(M.pp);
+  if(pres.concat(fut, [pp]).some(x=>!x)) return null;
+  const v = {inf, pres, fut, pp, aux: opts.aux || M.aux, reg: M.reg, g: M.g,
+             travel:false, freq: FREQ_VERB[inf] || 0, famClone:true, custom: !!opts.custom};
+  if(M.latin) v.latin = sw(M.latin);
+  const ing = famEnglish(v, opts.b);
+  [CONG, REM_IRR, IMPF_IRR, CONGI_IRR].forEach(T=>{ if(T[M.inf]) T[inf] = swA(T[M.inf]); });
+  if(GER_IRR[M.inf]) GER_IRR[inf] = sw(GER_IRR[M.inf]);
+  if(IMP_TU_IRR[M.inf]) IMP_TU_IRR[inf] = pres[1];      // fa' / di' are the base's alone: rifai!, predici!
+  if(NO_PROG.includes(M.inf) && !NO_PROG.includes(inf)) NO_PROG.push(inf);   // dispiacere: no stare + gerundio, like piacere
+  if(NO_IMP.includes(M.inf) && !NO_IMP.includes(inf)) NO_IMP.push(inf);
+  ING[inf]  = ing;
+  COMP[inf] = (opts.comp && opts.comp[0]) ? opts.comp : ["spesso", "often"];
+  const B = VERBS.find(x=>x.inf===f.base) || M;
+  const pair = (a,b) => a===b ? "<b>"+b+"</b>" : a+" → <b>"+b+"</b>";
+  v.why = (FAM[inf]
+      ? "🌳 Base verb. "+f.note
+      : (opts.custom ? "Added by you from the <b>"+f.base+"</b> family. " : "") +
+        "Conjugates exactly like <b>"+f.base+"</b> — same irregular stems, just the prefix: "+
+        [pair(B.pres[0], pres[0]), pair(passatoRemoto(B,0), REM_IRR[inf] ? REM_IRR[inf][0] : passatoRemoto(v,0)), pair(B.pp, pp)].join(" · ")+".");
+  return v;
+}
+function famMaterialize(spec){
+  if (VERBS.some(v => v.inf === spec.inf)) return null;
+  const m = FAM_MEMBER[spec.inf];
+  const v = famClone(spec.inf, {b: spec.en || (m && m[1]), custom:true,
+                                aux: spec.aux || (m ? (m[2]==="e" ? "essere" : "avere") : null)});
+  if (!v) return null;
+  VERBS.push(v);
+  return v;
+}
+/* virtual bases (porre, trarre…) become ordinary built-in verbs */
+FAMILIES.filter(f=>f.virtual).forEach(f=>{
+  if (VERBS.some(v => v.inf === f.base)) return;
+  const v = famClone(f.base, {b:f.b, aux: f.aux==="e" ? "essere" : "avere", comp:f.comp});
+  if (v) VERBS.push(v);
+});
 
 const USER_KEY = "verbi_user_v1";
 let USER_SPECS = [];
@@ -5664,6 +5925,61 @@ function drawRules(){
     '</div>').join("");
   $("studySheet").querySelector(".sheetbox").scrollTop = 0;
 }
+/* Study tab: the verb's base-verb family, with the key irregular forms side by side
+   so the pattern transfer is visible at a glance */
+function famBox(v){
+  const f = FAM[v.inf] || FAM[FAM_OF[v.inf]];
+  if(!f) return "";
+  const rows = [f.base].concat(f.members.map(m=>m[0]));
+  const isBase = f.base === v.inf;
+  const nOut = rows.filter(inf=>!VERBS.some(x=>x.inf===inf)).length;
+  let h = '<div class="famBox"><div class="fh">'+
+    (isBase
+      ? '🌳 <b>Base verb.</b> Learn <b>'+v.inf+'</b> and you know '+(rows.length-1)+' more verb'+(rows.length>2?'s':'')+' — they conjugate the same way, just with a prefix.'
+      : '🌳 Family of <a data-goto="'+f.base+'">'+f.base+'</a> — <b>'+v.inf+'</b> conjugates exactly like it.')+
+    '</div><div class="famScroll"><table class="famTbl"><tr><th></th><th>presente</th><th>futuro</th><th>pass. remoto</th><th>participio</th><th></th></tr>';
+  rows.forEach(inf=>{
+    const fm = famForms(inf); if(!fm) return;
+    const inDeck = VERBS.some(x=>x.inf===inf);
+    const cls = [inf===v.inf?'cur':'', inf===f.base?'base':'', inDeck&&inf!==v.inf?'go':'', inDeck?'':'out'].join(' ');
+    const m = FAM_MEMBER[inf];
+    const en = (VERBS.find(x=>x.inf===inf)||{}).en || (m ? 'to '+m[1].split(' / ').join(' / to ') : '');
+    h += '<tr class="'+cls+'"'+(inDeck&&inf!==v.inf?' data-goto="'+inf+'"':'')+' data-en="'+esc(en)+'">'+
+         '<td>'+inf+(fm.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+'</td>'+
+         '<td>'+fm.pres+'</td><td>'+fm.fut+'</td><td>'+fm.rem+'</td><td>'+fm.pp+'</td>'+
+         '<td class="add">'+(inDeck?'':'<button class="fadd" data-add="'+inf+'">＋ deck</button>')+'</td></tr>';
+  });
+  h += '</table></div>';
+  h += '<div class="fn">'+f.note+'</div>';
+  if(nOut) h += '<div class="fn">Faded rows aren\'t in your deck yet — <b>＋ deck</b> adds one, already conjugated from <b>'+f.base+'</b> in every tense.</div>';
+  return h + '</div>';
+}
+function famGoto(inf){
+  if(!S.verbs.includes(inf)){ S.verbs.push(inf); save(); }
+  const i = studyList().findIndex(x=>x.inf===inf);
+  if(i >= 0) studyIdx = i;
+  drawStudy();
+}
+function famAdd(inf, cur){
+  const spec = {inf:inf, en:"", aux:null, fam:FAM_OF[inf]};
+  const v = materialize(spec);
+  if(!v){ toast("Couldn't add "+inf+"."); return; }
+  USER_SPECS.push(spec); saveUserSpecs(); sortVerbs();
+  if(!S.verbs.includes(inf)) S.verbs.push(inf);
+  save(); resetTenseCache();
+  const i = studyList().findIndex(x=>x.inf===cur);       // stay on the verb being studied
+  if(i >= 0) studyIdx = i;
+  toast("Added "+inf+" — conjugated from "+FAM_OF[inf]+" in every tense.");
+  drawStudy();
+}
+function wireFamBox(v){
+  const box = $("studyBody").querySelector(".famBox"); if(!box) return;
+  box.querySelectorAll("[data-goto]").forEach(el=>el.onclick=e=>{
+    if(e.target.closest(".fadd")) return;
+    famGoto(el.dataset.goto);
+  });
+  box.querySelectorAll(".fadd").forEach(el=>el.onclick=e=>{ e.stopPropagation(); famAdd(el.dataset.add, v.inf); });
+}
 function drawStudy(){
   if(studyTab === "rules") return drawRules();
   $("studyTitle").textContent = "Study";
@@ -5700,6 +6016,7 @@ function drawStudy(){
   html += '<div class="why">'+ (v.why ? v.why :
             (v.reg ? 'Follows the '+GROUP_LABEL[v.g]+' pattern exactly across every tense — see the Rules tab.'
                    : 'Irregular forms; learn them as they come.')) +'</div>';
+  html += famBox(v);
   show.forEach(t=>{
     if(!hasTense(v,t.id)){
       html += '<div class="tbl"><h3>'+t.label+'</h3><div class="note">'+
@@ -5823,6 +6140,7 @@ function drawStudy(){
     html += '</div>';
   });
   $("studyBody").innerHTML = html;
+  wireFamBox(v);
   $("studyBody").querySelectorAll(".r").forEach(el=>el.onclick=()=>speak(el.dataset.say));
   $("studySheet").querySelector(".sheetbox").scrollTop = 0;
 }
@@ -5854,7 +6172,8 @@ function drawChips(){
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
       '<i class="dot '+(irrInSelection(v)?'irr':'reg')+'"></i>'+v.inf+
       (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (v.travel?' ✈︎':'')+'</div>').join("");
+      (v.travel?' ✈︎':'')+(FAM[v.inf]?' 🌳':'')+'</div>').join("");
+  drawFamChips();
 
   $("tenseChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     const id=el.dataset.t;
@@ -5993,6 +6312,8 @@ function verbPasses(v){
   if(f.reg==="reg" && !regInSelection(v)) return false;
   if(f.reg==="irr" && !irrInSelection(v)) return false;
   if(f.aux && v.aux!==f.aux) return false;
+  if(f.base==="base" && !FAM[v.inf]) return false;                       // base verbs only
+  if(f.base==="fam" && !FAM[v.inf] && !FAM_OF[v.inf]) return false;      // bases + their families
   return true;
 }
 function applyFilters(){
@@ -6006,6 +6327,8 @@ function drawFilters(){
   $("irrV").classList.toggle("on", f.reg==="irr");
   $("essV").classList.toggle("on", f.aux==="essere");
   $("aveV").classList.toggle("on", f.aux==="avere");
+  $("baseOnlyV").classList.toggle("on", f.base==="base");
+  $("baseFamV").classList.toggle("on", f.base==="fam");
   const parts = [];
   if(f.travel) parts.push("travel");
   if(f.reg){
@@ -6014,9 +6337,36 @@ function drawFilters(){
     parts.push((f.reg==="reg" ? "regular" : "irregular") + where);
   }
   if(f.aux) parts.push("takes "+f.aux);
+  if(f.base) parts.push(f.base==="base" ? "base verbs" : "base verbs + families");
   $("filtStat").innerHTML = "<b>"+S.verbs.length+"</b> of "+VERBS.length+" verbs selected" +
     (parts.length ? " — filter: "+parts.join(" ∩ ") : "");
 }
+/* ---- base-verb families in the settings sheet ---- */
+function famInDeck(f){         // the family's verbs that exist in the deck: base first, then members
+  return [f.base].concat(f.members.map(m=>m[0])).filter(inf=>VERBS.some(v=>v.inf===inf));
+}
+function drawFamChips(){
+  const fams = FAMILIES.slice().sort((a,b)=>a.base.localeCompare(b.base,"it"));
+  $("famChips").innerHTML = fams.map(f=>{
+    const list = famInDeck(f), on = list.filter(x=>S.verbs.includes(x)).length;
+    const cls = on===list.length ? "sel" : on ? "part" : "";
+    const tip = f.members.map(m=>m[0]).join(", ");
+    return '<div class="chip '+cls+'" data-fam="'+f.base+'" data-en="'+esc(tip)+'">🌳 '+f.base+
+           (list.length>1 ? '<span class="fc">+'+(list.length-1)+'</span>' : '')+'</div>';
+  }).join("");
+  $("famChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
+    const list = famInDeck(FAM[el.dataset.fam])
+      .filter(inf=>verbPasses(VERBS.find(v=>v.inf===inf)));   // respect active filters: intersection, not union
+    const all = list.every(x=>S.verbs.includes(x));
+    S.verbs = all ? S.verbs.filter(x=>!list.includes(x))
+                  : S.verbs.concat(list.filter(x=>!S.verbs.includes(x)));
+    save(); drawChips();
+  });
+}
+// Base-verb filters stack with Travel / Regular-Irregular / Essere-Avere as an intersection,
+// and the two are mutually exclusive like the other pairs (tap the active one to switch it off).
+$("baseOnlyV").onclick = ()=>{ S.filt.base = S.filt.base==="base" ? null : "base"; applyFilters(); };
+$("baseFamV").onclick  = ()=>{ S.filt.base = S.filt.base==="fam"  ? null : "fam";  applyFilters(); };
 $("allV").onclick  = ()=>{ S.filt={travel:false,reg:null,aux:null}; applyFilters(); };
 $("noneV").onclick = ()=>{ S.filt={travel:false,reg:null,aux:null}; S.verbs=[]; save(); drawChips(); };
 $("travV").onclick = ()=>{ S.filt.travel = !S.filt.travel; applyFilters(); };
@@ -6265,6 +6615,7 @@ function addUserVerb(){
   if (!r || !r.ok){ niFeedback("nierr", (r && r.error) || "That doesn't look like an Italian infinitive."); return; }
   if (VERBS.some(v => v.inf === inf)){ niFeedback("nierr", "“" + inf + "” is already in the deck."); return; }
   const spec = { inf: inf, en: $("niEn").value.trim(), aux: (niAuxMode === "auto" ? null : niAuxMode) };
+  if (FAM_OF[inf]) spec.fam = FAM_OF[inf];             // e.g. prevenire → conjugated from venire
   const v = materialize(spec);
   if (!v){ niFeedback("nierr", "Couldn't add that verb."); return; }
   USER_SPECS.push(spec); saveUserSpecs(); sortVerbs();
@@ -6278,7 +6629,9 @@ function addUserVerb(){
 function removeUserVerb(inf){
   USER_SPECS = USER_SPECS.filter(s => s.inf !== inf); saveUserSpecs();
   const i = VERBS.findIndex(v => v.inf === inf); if (i >= 0) VERBS.splice(i, 1);
-  delete CONG[inf]; delete ING[inf]; delete COMP[inf]; resetTenseCache();
+  delete CONG[inf]; delete ING[inf]; delete COMP[inf];
+  delete REM_IRR[inf]; delete IMPF_IRR[inf]; delete CONGI_IRR[inf]; delete GER_IRR[inf]; delete IMP_TU_IRR[inf];
+  resetTenseCache();
   S.verbs = S.verbs.filter(x => x !== inf);
   Object.keys(S.stats).forEach(k => { if (k.indexOf(inf + "|") === 0) delete S.stats[k]; });
   save();
