@@ -327,6 +327,9 @@
       <button class="btn" id="essV">ⓔ Essere</button>
       <button class="btn" id="aveV">Avere</button>
     </div>
+    <div class="row">
+      <button class="btn" id="reflV">🔁 Reflexive</button>
+    </div>
     <div class="stat" id="filtStat"></div>
     <div class="legend">
       <span><i class="dot reg"></i>regular</span>
@@ -334,6 +337,7 @@
       <span><b class="essmark">ⓔ</b> takes essere</span>
       <span>✈︎ travel verb</span>
       <span>🌳 base verb</span>
+      <span>🔁 reflexive (-si)</span>
     </div>
     <div class="chips" id="verbChips" style="margin-top:10px"></div>
 
@@ -3411,6 +3415,7 @@ const TENSES = [
 /* gerundio: -are → -ando · -ere/-ire → -endo (a handful of irregular stems) */
 const GER_IRR = {fare:"facendo", dire:"dicendo", stare:"stando", essere:"essendo", dare:"dando", bere:"bevendo"};
 function gerund(v){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(GER_IRR[v.inf]) return GER_IRR[v.inf];
   if(v.latin) return v.latin + "endo";
   const stem = v.inf.slice(0,-3);
@@ -3617,6 +3622,7 @@ const ING = {
 
 // participle with agreement for essere-verbs: stato -> stato/a (sing), stati/e (plural)
 function participle(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(v.aux === "avere") return v.pp;
   const stem = v.pp.slice(0,-1);            // stat-, andat-, venut-
   return i < 3 ? stem+"o/a" : stem+"i/e";
@@ -3634,6 +3640,7 @@ const IMPF_IRR = {
   bere:   ["bevevo","bevevi","beveva","bevevamo","bevevate","bevevano"]
 };
 function imperfetto(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(IMPF_IRR[v.inf]) return IMPF_IRR[v.inf][i];
   const stem = v.latin ? v.latin : v.inf.slice(0,-3);
   const end = v.latin ? ["evo","evi","eva","evamo","evate","evano"]
@@ -3782,6 +3789,7 @@ const REM_IRR = {
   compiere: ["compii","compisti","compì","compimmo","compiste","compirono"]   // -ere spelling, -ire-style forms
 };
 function passatoRemoto(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(REM_IRR[v.inf]) return REM_IRR[v.inf][i];
   const stem = v.latin ? v.latin : v.inf.slice(0,-3);
   const end = v.latin ? ["ei","esti","é","emmo","este","erono"]
@@ -3796,6 +3804,7 @@ function passatoRemoto(v,i){
    is already baked into the stored futuro forms, so this needs no exceptions table. */
 const COND_END = ["ei","esti","ebbe","emmo","este","ebbero"];
 function condizionale(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   return v.fut[0].slice(0,-1) + COND_END[i];
 }
 // a few verbs read more naturally with an idiomatic English conditional
@@ -3882,6 +3891,7 @@ const CONG = {
   tradire:      ["tradisca","tradisca","tradisca","tradiamo","tradiate","tradiscano"]
 };
 function congiuntivo(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(CONG[v.inf]) return CONG[v.inf][i];
   // derive from the stored presente — correct for regular and stem-changing verbs
   const noi = v.pres[3];
@@ -3914,6 +3924,7 @@ const IMP_TU_IRR  = {andare:"va'", dare:"da'", fare:"fa'", stare:"sta'", dire:"d
 const IMP_VOI_IRR = {essere:"siate", avere:"abbiate", sapere:"sappiate", volere:"vogliate"};
 const NO_IMP = ["potere","dovere","piacere"];      // can't naturally command these — no imperativo forms
 function imperativo(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(i===0) return null;                                    // io has no imperativo
   if(i===1){
     if(IMP_TU_IRR[v.inf]) return IMP_TU_IRR[v.inf]+"!";
@@ -3940,6 +3951,7 @@ const CONGI_IRR = {
   bere:   ["bevessi","bevessi","bevesse","bevessimo","beveste","bevessero"]
 };
 function congiuntivoImpf(v,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(CONGI_IRR[v.inf]) return CONGI_IRR[v.inf][i];
   const stem = v.latin ? v.latin : v.inf.slice(0,-3);
   const end = v.latin ? ["essi","essi","esse","essimo","este","essero"]
@@ -3950,6 +3962,7 @@ function congiuntivoImpf(v,i){
 }
 
 function form(v,t,i){
+  if(v.refl) return reflForm(v,t,i);              // mi alzo, mi sono alzato/a, alzati!
   if(t==="presente")     return v.pres[i];
   if(t==="futuro")       return v.fut[i];
   if(t==="progressivo")  return STARE_PRES[i] + " " + gerund(v);
@@ -4519,28 +4532,32 @@ function genSubject(i, allowDrop){
 /* ---- Italian verb group for this card, with agreement, clitic, negation ---- */
 function genVerbIt(v,t,i,subj,o){
   o = o || {};
-  const refl = !!GEN_REFL[v.inf];
-  const vv = refl ? Object.assign({}, v, {aux:"essere"}) : v;
+  const refl = !!GEN_REFL[v.inf] || !!v.refl;
+  const pv = RB(v);
+  const vv = refl ? Object.assign({}, pv, {aux:"essere"}) : pv;
   let f = form(vv,t,i).replace(/!$/,"");
   // participle agreement with the actual subject
   f = f.replace(/(\S+)[oi]\/[ae](?=\s|$)/g, (m,stem)=> stem + (subj.pl ? (subj.g==="f"?"e":"i") : (subj.g==="f"?"a":"o")));
   let w = f.split(" ");
   if(o.adv && w.length>1) w.splice(1,0,o.adv);          // già / ancora sit between auxiliary and participle
   if(refl) w.unshift(REFL[i]);
+  if(v.tail) w.push(v.tail);                              // rendersi conto: mi rendo conto
   if(o.neg) w.unshift("non");
   return w.join(" ");
 }
 function genImperIt(v,i,neg){
-  const refl = !!GEN_REFL[v.inf];
-  let f = form(v,"imperativo",i).replace(/!$/,"");
+  const refl = !!GEN_REFL[v.inf] || !!v.refl;
+  const tail = v.tail ? " "+v.tail : "";
+  const pv = RB(v);
+  let f = form(pv,"imperativo",i).replace(/!$/,"");
   if(neg && i===1){                                        // tu: non + infinitive
-    return "non " + (refl ? v.inf.slice(0,-1)+"ti" : v.inf);
+    return "non " + (refl ? pv.inf.slice(0,-1)+"ti" : pv.inf) + tail;
   }
   if(refl){
     if(i===2||i===5) f = "si "+f;                          // Lei/Loro: proclitic
     else f = f + REFL[i];                                  // tu/noi/voi: attached (fidati, fidiamoci, fidatevi)
   }
-  return (neg ? "non " : "") + f;
+  return (neg ? "non " : "") + f + tail;
 }
 function genComp(v,subj){
   const c = GEN_REFL[v.inf] || GEN_COMP[v.inf] || COMP[v.inf] || ["",""];
@@ -4924,6 +4941,7 @@ const STEM_STRESS = {   // presente io/tu/lui/loro: stress sits on the stem — 
   0:"io", 1:"tu", 2:"lui/lei", 5:"loro"
 };
 function stress(v,t,i){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(t==="presente"){
     if(i===3) return "Stress the ending: -i<b>à</b>-mo.";
     if(i===4) return "Stress the ending: -<b>à</b>te / -<b>é</b>te / -<b>ì</b>te.";
@@ -5650,6 +5668,92 @@ FAMILIES.filter(f=>f.virtual).forEach(f=>{
   if (v) VERBS.push(v);
 });
 
+/* ============ REFLEXIVE VERBS ============
+   alzarsi, svegliarsi, sentirsi… are their own deck entries (inf ends in -si) but
+   borrow every form from their plain verb — the "body" — and add the reflexive pronoun:
+     presente / every other tense:  mi alzo · ti sei alzato/a · si alzerà · ci stiamo alzando
+     compound tenses:               always essere, so the participle agrees (mi sono alzato/a)
+     imperativo:                    attached to tu/noi/voi (alzati!, alziamoci!, alzatevi!),
+                                    in front for Lei/Loro (si alzi!, si alzino!)
+   The morphology functions call RB(v) first, so they always conjugate the body;
+   only form() adds the pronoun. English comes from the reflexive entry itself.
+   Rows: [reflexive, plain verb, English (base · 3rd · past · participle · -ing),
+          [complement it, complement en], extras] */
+const REFLEXIVES = [
+  ["alzarsi","alzare",["get up","gets up","got up","got up","getting up"],["presto","early"]],
+  ["svegliarsi","svegliare",["wake up","wakes up","woke up","woken up","waking up"],["alle sette","at seven"]],
+  ["chiamarsi","chiamare",["be called","is called","was called","been called","being called"],["Max","Max"],
+     {noProg:true, noImp:true, enPres:["am called","are called","is called","are called","are called","are called"],
+      enPastArr:["was called","were called","was called","were called","were called","were called"]}],
+  ["sentirsi","sentire",["feel","feels","felt","felt","feeling"],["bene","well"]],
+  ["ricordarsi","ricordare",["remember","remembers","remembered","remembered","remembering"],["di tutto","everything"]],
+  ["divertirsi","divertire",["have fun","has fun","had fun","had fun","having fun"],["al mare","at the beach"]],
+  ["preoccuparsi","preoccupare",["worry","worries","worried","worried","worrying"],["per il viaggio","about the trip"]],
+  ["sedersi","sedere",["sit down","sits down","sat down","sat down","sitting down"],["al tavolo","at the table"]],
+  ["vestirsi","vestire",["get dressed","gets dressed","got dressed","got dressed","getting dressed"],["in fretta","quickly"]],
+  ["lavarsi","lavare",["wash","washes","washed","washed","washing"],["con l'acqua fredda","with cold water"]],
+  ["innamorarsi","innamorare",["fall in love","falls in love","fell in love","fallen in love","falling in love"],["di Firenze","with Florence"]],
+  ["sposarsi","sposare",["get married","gets married","got married","got married","getting married"],["in Italia","in Italy"]],
+  ["arrabbiarsi","arrabbiare",["get angry","gets angry","got angry","got angry","getting angry"],["con il vicino","with the neighbor"]],
+  ["fermarsi","fermare",["stop","stops","stopped","stopped","stopping"],["a Roma","in Rome"]],
+  ["trovarsi","trovare",["feel at home","feels at home","felt at home","felt at home","feeling at home"],["bene a Firenze","in Florence"],
+     {en:"to find oneself / to be somewhere (mi trovo bene = I like it here)"}],
+  ["sbagliarsi","sbagliare",["be wrong","is wrong","was wrong","been wrong","being wrong"],["spesso","often"],
+     {noImp:true, enPres:["am wrong","are wrong","is wrong","are wrong","are wrong","are wrong"],
+      enPastArr:["was wrong","were wrong","was wrong","were wrong","were wrong","were wrong"]}],
+  ["addormentarsi","addormentare",["fall asleep","falls asleep","fell asleep","fallen asleep","falling asleep"],["sul divano","on the couch"]],
+  ["accorgersi","accorgere",["notice","notices","noticed","noticed","noticing"],["dell'errore","the mistake"]],
+  ["lamentarsi","lamentare",["complain","complains","complained","complained","complaining"],["del servizio","about the service"]],
+  ["rendersi conto","rendere",["realize","realizes","realized","realized","realizing"],["della situazione","the situation"],
+     {tail:"conto"}],
+];
+function RB(v){ return v && v.refl ? v.body : v; }
+function reflForm(v,t,i){
+  const f = form(v.body,t,i);
+  if(f == null) return f;
+  const tail = v.tail ? " "+v.tail : "";
+  if(t==="imperativo"){
+    const bare = String(f).replace(/!$/,"");
+    if(i===2 || i===5) return "si "+bare+tail+"!";        // Lei / Loro: pronoun in front
+    return bare+REFL[i]+tail+"!";                          // tu / noi / voi: attached
+  }
+  return REFL[i]+" "+f+tail;
+}
+function reflBody(baseInf){
+  const real = VERBS.find(x=>x.inf===baseInf && !x.refl);
+  if(real) return Object.assign({}, real, {aux:"essere", travel:false});
+  const r = conjugate(baseInf);                            // not in the deck as a plain verb (lavare, sedere…)
+  if(!r || !r.ok) return null;
+  if(!CONG[baseInf]) CONG[baseInf] = r.cong;
+  const b = {inf:baseInf, pres:r.pres, fut:r.fut, pp:r.pp, aux:"essere", g:r.g, reg:r.reg};
+  if(r.latin) b.latin = r.latin;
+  return b;
+}
+REFLEXIVES.forEach(([inf, baseInf, E, comp, x])=>{
+  x = x || {};
+  if(VERBS.some(v=>v.inf===inf)) return;
+  const body = reflBody(baseInf); if(!body) return;
+  const v = {inf, refl:true, body, base:baseInf, tail:x.tail||"",
+             en: x.en || "to "+E[0], enBase:E[0], en3:E[1], enPast:E[2], enPart:E[3], enFut:"will "+E[0],
+             pres:body.pres, fut:body.fut, pp:body.pp, aux:"essere", g:body.g, reg:body.reg,
+             travel:false, freq: FREQ_VERB[inf] || 0};
+  if(body.latin) v.latin = body.latin;
+  if(x.enPres) v.enPres = x.enPres;
+  if(x.enPastArr) v.enPastArr = x.enPastArr;
+  ING[inf] = E[4];
+  COMP[inf] = comp;
+  if(x.noProg) NO_PROG.push(inf);
+  if(x.noImp)  NO_IMP.push(inf);
+  const p0 = participle(body,0).replace(/\/a$/,"");
+  v.why = "🔁 Reflexive form of <b>"+baseInf+"</b>"+(VERBS.some(y=>y.inf===baseInf)?" (also in the deck on its own)":"")+
+    ". The pronoun mi / ti / si / ci / vi / si goes in front — <b>"+reflForm(v,"presente",0)+"</b>, <b>"+reflForm(v,"presente",3)+"</b> — "+
+    "and compound tenses always take <b>essere</b>, so the participle agrees with the subject: <b>mi sono "+p0+"/a</b>. "+
+    "In the imperativo the pronoun attaches to tu, noi and voi"+(x.noImp ? "" : " (<b>"+reflForm(v,"imperativo",1)+"</b>, <b>"+reflForm(v,"imperativo",3)+"</b>, <b>"+reflForm(v,"imperativo",4)+"</b>)")+
+    " but stays in front for Lei and Loro"+(x.noImp ? "" : " (<b>"+reflForm(v,"imperativo",2)+"</b>)")+"."+
+    (body.reg ? "" : " The plain verb is irregular, and the reflexive inherits all of it.");
+  VERBS.push(v);
+});
+
 const USER_KEY = "verbi_user_v1";
 let USER_SPECS = [];
 try { const raw = localStorage.getItem(USER_KEY); if (raw) USER_SPECS = JSON.parse(raw) || []; } catch (e) {}
@@ -6172,7 +6276,7 @@ function drawChips(){
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
       '<i class="dot '+(irrInSelection(v)?'irr':'reg')+'"></i>'+v.inf+
       (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (v.travel?' ✈︎':'')+(FAM[v.inf]?' 🌳':'')+'</div>').join("");
+      (v.travel?' ✈︎':'')+(FAM[v.inf]?' 🌳':'')+(v.refl?' 🔁':'')+'</div>').join("");
   drawFamChips();
 
   $("tenseChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
@@ -6267,6 +6371,7 @@ function regCandidates(inf,t){
   return out;
 }
 function calcIrregular(v,t){
+  v = RB(v);                                      // reflexive entries conjugate their plain verb
   const inf=v.inf;
   if(!/(are|ere|ire)$/.test(inf) || v.latin) return true;   // -urre, -arre, -orre: old Latin stems
   const st=inf.slice(0,-3);
@@ -6312,6 +6417,7 @@ function verbPasses(v){
   if(f.reg==="reg" && !regInSelection(v)) return false;
   if(f.reg==="irr" && !irrInSelection(v)) return false;
   if(f.aux && v.aux!==f.aux) return false;
+  if(f.refl && !v.refl) return false;                                     // reflexive (-si) verbs only
   if(f.base==="base" && !FAM[v.inf]) return false;                       // base verbs only
   if(f.base==="fam" && !FAM[v.inf] && !FAM_OF[v.inf]) return false;      // bases + their families
   return true;
@@ -6327,6 +6433,7 @@ function drawFilters(){
   $("irrV").classList.toggle("on", f.reg==="irr");
   $("essV").classList.toggle("on", f.aux==="essere");
   $("aveV").classList.toggle("on", f.aux==="avere");
+  $("reflV").classList.toggle("on", !!f.refl);
   $("baseOnlyV").classList.toggle("on", f.base==="base");
   $("baseFamV").classList.toggle("on", f.base==="fam");
   const parts = [];
@@ -6337,6 +6444,7 @@ function drawFilters(){
     parts.push((f.reg==="reg" ? "regular" : "irregular") + where);
   }
   if(f.aux) parts.push("takes "+f.aux);
+  if(f.refl) parts.push("reflexive");
   if(f.base) parts.push(f.base==="base" ? "base verbs" : "base verbs + families");
   $("filtStat").innerHTML = "<b>"+S.verbs.length+"</b> of "+VERBS.length+" verbs selected" +
     (parts.length ? " — filter: "+parts.join(" ∩ ") : "");
@@ -6365,6 +6473,7 @@ function drawFamChips(){
 }
 // Base-verb filters stack with Travel / Regular-Irregular / Essere-Avere as an intersection,
 // and the two are mutually exclusive like the other pairs (tap the active one to switch it off).
+$("reflV").onclick = ()=>{ S.filt.refl = !S.filt.refl; applyFilters(); };
 $("baseOnlyV").onclick = ()=>{ S.filt.base = S.filt.base==="base" ? null : "base"; applyFilters(); };
 $("baseFamV").onclick  = ()=>{ S.filt.base = S.filt.base==="fam"  ? null : "fam";  applyFilters(); };
 $("allV").onclick  = ()=>{ S.filt={travel:false,reg:null,aux:null}; applyFilters(); };
