@@ -401,7 +401,8 @@ const PERSONS = ["io","tu","lui / lei","noi","voi","loro"];
 const EN_SUBJ  = ["I","you","he / she","we","you (pl)","they"];
 /* imperativo doesn't have a real lui/lei or loro — those slots are the
    formal Lei/Loro command, borrowed from congiuntivo presente */
-function personLabel(t,i){
+function personLabel(t,i,v){
+  if(v && typeof IMPERS!=="undefined" && IMPERS.includes(v.inf)) return i===5 ? "3rd pl. (loro)" : "3rd sing. (esso)";
   if(t==="imperativo"){
     if(i===2) return "Lei (formal)";
     if(i===5) return "Loro (formal)";
@@ -1712,11 +1713,11 @@ VERBS.push(
    pp:"sorriso", aux:"avere",
    enBase:"smile", en3:"smiles", enPast:"smiled", enPart:"smiled", enFut:"will smile"},
 
-  {inf:"importare", en:"to matter / to care / to import",
+  {inf:"importare", en:"to import (impersonal: non importa = it doesn't matter)",
    pres:["importo","importi","importa","importiamo","importate","importano"],
    fut:["importerò","importerai","importerà","importeremo","importerete","importeranno"],
    pp:"importato", aux:"avere",
-   enBase:"matter", en3:"matters", enPast:"mattered", enPart:"mattered", enFut:"will matter"},
+   enBase:"import", en3:"imports", enPast:"imported", enPart:"imported", enFut:"will import"},
 
   {inf:"separare", en:"to separate",
    pres:["separo","separi","separa","separiamo","separate","separano"],
@@ -2587,11 +2588,11 @@ VERBS.push(
    pp:"rivisto", aux:"avere",
    enBase:"see again", en3:"sees again", enPast:"saw again", enPart:"seen again", enFut:"will see again"},
 
-  {inf:"convenire", en:"to be worth / to be convenient",
+  {inf:"convenire", en:"to gather / to agree (impersonal: conviene = it's worth it)",
    pres:["convengo","convieni","conviene","conveniamo","convenite","convengono"],
    fut:["converrò","converrai","converrà","converremo","converrete","converranno"],
    pp:"convenuto", aux:"essere",
-   enBase:"be worth", en3:"is worth", enPast:"was worth", enPart:"been worth", enFut:"will be worth"},
+   enBase:"gather", en3:"gathers", enPast:"gathered", enPart:"gathered", enFut:"will gather"},
 
   {inf:"scadere", en:"to expire / to fall due",
    pres:["scado","scadi","scade","scadiamo","scadete","scadono"],
@@ -3388,7 +3389,7 @@ const EN_BE      = ["am","are","is","are","are","are"];
    and the order tenses are narrated in exported audio. */
 const TENSES = [
   // — built on the presente stem —
-  {id:"presente",     label:"Presente"},
+  {id:"presente",     label:"Presente indicativo"},
   {id:"congiuntivo",  label:"Congiuntivo presente"},
   // — no stem of its own: tu/noi/voi borrow presente, Lei/Loro borrow congiuntivo presente —
   {id:"imperativo",   label:"Imperativo"},
@@ -3415,7 +3416,7 @@ const TENSES = [
 ];
 
 /* gerundio: -are → -ando · -ere/-ire → -endo (a handful of irregular stems) */
-const GER_IRR = {fare:"facendo", dire:"dicendo", stare:"stando", essere:"essendo", dare:"dando", bere:"bevendo"};
+const GER_IRR = {fare:"facendo", dire:"dicendo", contraddire:"contraddicendo", stare:"stando", essere:"essendo", dare:"dando", bere:"bevendo"};
 function gerund(v){
   v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(GER_IRR[v.inf]) return GER_IRR[v.inf];
@@ -3425,7 +3426,8 @@ function gerund(v){
 }
 /* verbs that don't normally take stare + gerundio (states / modals) */
 const NO_PROG = ["essere","avere","stare","potere","volere","dovere","sapere",
-                 "credere","preferire","piacere"];   // stative verbs: no stare + gerundio
+                 "credere","preferire","piacere",
+                 "amare","appartenere","esistere","possedere","meritare","odiare","temere","intendere","valere"];   // stative verbs: no stare + gerundio
 const ING = {
   fare:"doing / making", dire:"saying", vedere:"seeing", andare:"going", venire:"coming",
   dare:"giving", parlare:"speaking", prendere:"taking", mettere:"putting", trovare:"finding",
@@ -3482,13 +3484,13 @@ const ING = {
   sciogliere:"melting", spegnere:"turning off", accorgere:"noticing",
   estrarre:"extracting", condurre:"conducting", apparire:"appearing",
   trattenere:"holding back", sostenere:"supporting", contraddire:"contradicting",
-  conoscere:"knowing", risalire:"going back up", appartenere:"belonging",
+  conoscere:"getting to know", risalire:"going back up", appartenere:"belonging",
   incontrare:"meeting", ritrovare:"finding again", circondare:"surrounding",
   ritenere:"considering", vendicare:"avenging", subire:"suffering", valere:"being worth",
   inventare:"making up", rimediare:"remedying", diventare:"becoming", attrarre:"attracting",
   odiare:"hating", seguire:"following", ricevere:"receiving", corrompere:"bribing",
   disporre:"arranging", ringraziare:"thanking", sfruttare:"exploiting", fidare:"trusting",
-  sorridere:"smiling", importare:"mattering", separare:"separating", accettare:"accepting",
+  sorridere:"smiling", importare:"importing", separare:"separating", accettare:"accepting",
   sottolineare:"emphasizing", inquinare:"polluting", fuggire:"fleeing", confessare:"confessing",
   assicurare:"assuring", insinuare:"insinuating", attenere:"abiding by", confermare:"confirming",
   nascere:"being born", confrontare:"comparing", litigare:"arguing", sbattere:"slamming",
@@ -3592,7 +3594,7 @@ const ING = {
   riconoscere:"recognizing",
   crescere:"growing up",
   rivedere:"seeing again",
-  convenire:"being worth",
+  convenire:"gathering",
   scadere:"expiring",
   muovere:"moving",
   rimuovere:"removing",
@@ -3640,6 +3642,7 @@ const IMPF_IRR = {
   essere: ["ero","eri","era","eravamo","eravate","erano"],
   fare:   ["facevo","facevi","faceva","facevamo","facevate","facevano"],
   dire:   ["dicevo","dicevi","diceva","dicevamo","dicevate","dicevano"],
+  contraddire: ["contraddicevo","contraddicevi","contraddiceva","contraddicevamo","contraddicevate","contraddicevano"],
   bere:   ["bevevo","bevevi","beveva","bevevamo","bevevate","bevevano"]
 };
 function imperfetto(v,i){
@@ -3950,6 +3953,7 @@ const CONGI_IRR = {
   dare:   ["dessi","dessi","desse","dessimo","deste","dessero"],
   stare:  ["stessi","stessi","stesse","stessimo","steste","stessero"],
   fare:   ["facessi","facessi","facesse","facessimo","faceste","facessero"],
+  contraddire: ["contraddicessi","contraddicessi","contraddicesse","contraddicessimo","contraddiceste","contraddicessero"],
   dire:   ["dicessi","dicessi","dicesse","dicessimo","diceste","dicessero"],
   bere:   ["bevessi","bevessi","bevesse","bevessimo","beveste","bevessero"]
 };
@@ -4006,7 +4010,12 @@ function auxTable(t){
 const CONG_CHE = ["congiuntivo","congiuntivoPassato"];        // Che io …!
 const CONG_SE  = ["congiuntivoImpf","congiuntivoTrapassato"]; // Se io …
 /* imperativo has no io — every card-building loop asks this instead of assuming 0..5 */
-function personIdxs(t){ return t==="imperativo" ? [1,2,3,4,5] : [0,1,2,3,4,5]; }
+/* impersonal verbs (volerci: ci vuole un'ora, ci vogliono due ore) only have the 3rd person, singular and plural */
+const IMPERS = [];
+function personIdxs(t, v){
+  if(v && IMPERS.includes(v.inf)) return t==="imperativo" ? [] : [2,5];
+  return t==="imperativo" ? [1,2,3,4,5] : [0,1,2,3,4,5];
+}
 function resetTenseCache(){ for(const k in HAS_T) delete HAS_T[k]; }
 function hasTense(v,t){
   const key = v.inf+"|"+t;
@@ -4017,7 +4026,9 @@ function hasTense(v,t){
   else if(COMPOUND_AUX[t] && (!v.pp || !auxTable(t)[v.aux])) ok = false;   // needs a participle and a known auxiliary
   else {
     try{
-      for(const i of personIdxs(t)){
+      const idx = personIdxs(t,v);
+      if(!idx.length) ok = false;
+      for(const i of idx){
         const f = form(v,t,i);
         // \b guards real words: "annullato" contains "null" but has no boundary there
         if(!f || !String(f).trim() || /\b(undefined|null|NaN)\b/.test(f)){ ok = false; break; }
@@ -4026,17 +4037,26 @@ function hasTense(v,t){
   }
   return (HAS_T[key] = ok);
 }
+/* states read as a simple past in the imperfetto: conoscevo = I knew, not "I was knowing" */
+const IMPF_STATE = ["amare","appartenere","capire","comprendere","conoscere","credere","crederci","dubitare","esistere",
+  "intendere","intendersene","meritare","odiare","possedere","preferire","riconoscere","ricordare","ricordarsi",
+  "saperla lunga","sperare","temere","valere","convenire"];
+function ingFor(v){                                     // "being wrong" → "wrong" after was/am/will be (but "being born" stays)
+  const g = ING[v.inf] || "";
+  return /^being /.test(g) && !/^being born/.test(g) ? g.slice(6) : g;
+}
 function english(v,t,i){
-  const s = EN_SUBJ[i];
+  const s = IMPERS.includes(v.inf) ? (i===5 ? "they" : "it") : EN_SUBJ[i];
   if(t==="presente"){
     const w = v.enPres ? v.enPres[i] : (i===2 ? v.en3 : v.enBase);
     return s+" "+w;
   }
-  if(t==="progressivo") return s+" "+EN_BE[i]+" "+(ING[v.inf]||"");
-  if(t==="futuroProgressivo") return s+" will be "+(ING[v.inf]||"");
+  if(t==="progressivo") return s+" "+EN_BE[i]+" "+ingFor(v);
+  if(t==="futuroProgressivo") return s+" will be "+ingFor(v);
   if(t==="imperfetto"){
     if(IMPF_EN[v.inf]) return s+" "+IMPF_EN[v.inf][i];
-    return s+" "+EN_WAS[i]+" "+(ING[v.inf]||v.enBase);
+    if(IMPF_STATE.includes(v.inf)) return s+" "+cut(v.enPastArr ? v.enPastArr[i] : v.enPast);
+    return s+" "+EN_WAS[i]+" "+(ingFor(v)||v.enBase);
   }
   if(t==="condizionale") return s+" "+(COND_EN[v.inf] || ("would "+baseForm(v)));
   if(t==="congiuntivo") return "that "+s+" "+(CONG_EN[v.inf] || (v.inf==="essere" ? "be" : baseForm(v)));
@@ -4060,7 +4080,7 @@ function english(v,t,i){
   if(t==="congiuntivoPassato")    return "that "+s+" "+(i===2?"has":"have")+" "+cut(v.enPart);
   if(t==="congiuntivoTrapassato") return "if "+s+" had "+cut(v.enPart);
   if(t==="condizionalePassato")   return s+" would have "+cut(v.enPart);
-  if(t==="imperfettoProgressivo") return s+" "+EN_WAS[i]+" "+(ING[v.inf]||"");
+  if(t==="imperfettoProgressivo") return s+" "+EN_WAS[i]+" "+ingFor(v);
   return s+" "+(v.enPastArr ? v.enPastArr[i] : v.enPast);  // passato prossimo ≈ simple past / present perfect
 }
 
@@ -4479,7 +4499,7 @@ const GEN_EN = {
   arrabbiare:{b:"get angry",t3:"gets angry",p:"got angry",pp:"gotten angry",g:"getting angry"},
   incazzare:{b:"get mad",t3:"gets mad",p:"got mad",pp:"gotten mad",g:"getting mad"},
   fidare:{b:"trust",t3:"trusts",p:"trusted",pp:"trusted",g:"trusting"},
-  convenire:{b:"agree",t3:"agrees",p:"agreed",pp:"agreed",g:"agreeing"},
+  convenire:{b:"gather",t3:"gathers",p:"gathered",pp:"gathered",g:"gathering"},
   importare:{b:"import",t3:"imports",p:"imported",pp:"imported",g:"importing"},
   mancare:{be:"away"},
   valere:{b:"be worth",be:"worth"},
@@ -4755,7 +4775,8 @@ function genSentence(v,t,i,opt){
     const neg = RNG()<0.35;
     const subj = {i:i, pl:i>=3, g:"m", poss:["","your","your","our","your","your"][i]};
     const C = genComp(v,subj);
-    const end = pick(neg ? [[", per favore","please"],["",""]] : [[", per favore","please"],[" subito","right away"],["",""]]);
+    let end = pick(neg ? [[", per favore","please"],["",""]] : [[", per favore","please"],[" subito","right away"],["",""]]);
+    if(end[0]===" subito" && /subito$/.test(C.it)) end = ["",""];      // no "Smettiamola subito subito!"
     const it = cap1(genImperIt(v,i,neg)) + (C.it?" "+C.it:"") + end[0] + "!";
     const base = E.be!==undefined ? "be"+(E.be?" "+E.be:"") : E.modal ? "be able to" : E.b;
     let en = i===3 ? (neg ? "Let's not " : "Let's ") + base : (neg ? "Don't " + base : cap1(base));
@@ -6024,7 +6045,7 @@ const CUR_LAST = {
     cgt:["Se {S} {V} con noi, sarebbe stato tutto più bello.","If {S} {V} with us, everything would have been nicer."],
     pr:["L'anno dopo {S} {V} in Italia con tutta la famiglia.","The next year {S} {V} to Italy with the whole family."]},
   stare:{fa:["Ormai {S} {V} in quell'albergo una decina di volte.","By now {S} must have stayed in that hotel about ten times."],
-    cgp:["È un peccato che {S} {V} male tutta la settimana.","It's a shame that {S} {V} sick all week.",null,{be:"sick"}],
+    cgp:["È un peccato che {S} {V} male tutta la settimana.","It's a shame that {S} {V} all week.",null,{be:"sick"}],
     cgt:["Se {S} {V} zitt{o}, nessuno si sarebbe arrabbiato.","If {S} {V} quiet, nobody would have gotten angry."],
     pr:["Quell'estate {S} {V} un mese intero a Capri.","That summer {S} {V} a whole month in Capri."]},
   dire:{fa:["Entro domani {S} {V} a tutti la bella notizia.","By tomorrow {S} {V} everyone the good news."],
@@ -6410,15 +6431,15 @@ Object.keys(CUR_LAST).forEach(k=>{ Object.assign(CURATED[k], CUR_LAST[k]); });
 const CUR_PROG_FRAMES = {
   pg: [["In questo momento {S} {V}{O}.","At the moment {S} {V}{O}."],["Guarda, {S} {V}{O}!","Look, {S} {V}{O}!"]],
   ipg:[["Quando Luca ha chiamato, {S} {V}{O}.","When Luca called, {S} {V}{O}."],["Mentre fuori pioveva, {S} {V}{O}.","While it was raining outside, {S} {V}{O}."]],
-  fpg:[["Domani a quest'ora {S} {V}{O}.","This time tomorrow {S} {V}{O}."],["Quando arriverete, {S} {V}{O}.","When you arrive, {S} {V}{O}."]]
+  fpg:[["Domani a quest'ora {S} {V}{O}.","This time tomorrow {S} {V}{O}."],["Quando arriverà Luca, {S} {V}{O}.","When Luca arrives, {S} {V}{O}."]]
 };
 const CUR_PROG = {
   fare:["la spesa al mercato","the shopping at the market"], andare:["al lavoro in bicicletta","to work by bike"],
-  venire:["da Luca","to Luca's"], dire:["alla nonna tutta la verità","grandma the whole truth"],
+  venire:["alla festa","to the party"], dire:["alla nonna tutta la verità","grandma the whole truth"],
   vedere:["un film italiano","an Italian movie",{g:"watching"}], dare:["una mano ai vicini","the neighbors a hand"],
   parlare:["con il direttore dell'albergo","with the hotel manager"], prendere:["un caffè al bar","a coffee at the café",{g:"having"}],
   mettere:["in ordine la cucina","the kitchen in order"], pensare:["alle vacanze","about the vacation"],
-  sentire:["la musica dalla finestra","the music from the window"], capire:["finalmente il congiuntivo","the subjunctive at last"],
+  sentire:["la musica dalla finestra","to the music from the window",{b:"listen",t3:"listens",p:"listened",pp:"listened",g:"listening"}], capire:["finalmente il congiuntivo","the subjunctive at last"],
   lavorare:["a un nuovo progetto","on a new project"], mangiare:["una pizza con gli amici","a pizza with friends"],
   bere:["un caffè al bancone","a coffee at the counter"], chiamare:["il ristorante per prenotare","the restaurant to book"],
   aspettare:["l'autobus alla fermata","for the bus at the stop"], tornare:["a casa a piedi","back home on foot"],
@@ -6432,7 +6453,7 @@ const CUR_PROG = {
   cucinare:["il ragù per domenica","the ragù for Sunday"],
   alzarsi:["dal letto","out of bed"], svegliarsi:["piano piano","slowly"], sentirsi:["meglio","better"],
   ricordarsi:["tutto pian piano","everything little by little"], divertirsi:["",""], preoccuparsi:["per il viaggio","about the trip"],
-  vestirsi:["per la festa","for the party"], lavarsi:["le mani","up"], innamorarsi:["di questa città","with this city"],
+  vestirsi:["per la festa","for the party"], lavarsi:["prima di cena","up before dinner"], innamorarsi:["di questa città","with this city"],
   sposarsi:["in chiesa","in church"], arrabbiarsi:["con il cameriere","with the waiter"], fermarsi:["a fare benzina","for gas"],
   trovarsi:["benissimo qui","right at home here"], addormentarsi:["sul divano","on the couch"],
   accorgersi:["dell'errore","the mistake"], lamentarsi:["del rumore","about the noise"], "rendersi conto":["della situazione","the situation"],
@@ -6449,9 +6470,10 @@ const CUR_PROG = {
        for each tense (Di solito… / Ieri… / A quei tempi… / Domani… / È importante che… / Se…, sarebbe meglio …).
        Row: [italian complement, english complement, english verb override / flags (optional)].
        noImp = no natural command form, so the imperativo keeps the generated sentence;
-       neg = the command only makes sense negated (Non rompere un bicchiere!). ---- */
+       neg = mishaps and bad behavior: the command is negated (Non rompere un bicchiere!), never "better" or planned;
+       bad = done on purpose, so no "senza volerlo". ---- */
 const EVERYDAY = {
-  abbandonare:["la riunione prima della fine","the meeting before the end",{"b":"leave","t3":"leaves","p":"left","pp":"left","g":"leaving","cls":"O","neg":true}],
+  abbandonare:["la riunione prima della fine","the meeting before the end",{"b":"leave","t3":"leaves","p":"left","pp":"left","g":"leaving","cls":"O","neg":true,"bad":true}],
   abbassare:["il volume della TV","the TV volume",{"b":"turn down","t3":"turns down","p":"turned down","pp":"turned down","g":"turning down"}],
   accendere:["il riscaldamento in salotto","the heating in the living room"],
   accettare:["l'invito a cena dei vicini","the neighbors' dinner invitation"],
@@ -6475,27 +6497,27 @@ const EVERYDAY = {
   apparire:["in televisione","on TV",{"noImp":true}],
   appartenere:["a un circolo di tennis","to a tennis club",{"cls":"S","noImp":true}],
   approfondire:["l'argomento con qualche libro","the topic with a few books",{"b":"read up on","t3":"reads up on","p":"read up on","pp":"read up on","g":"reading up on"}],
-  arrestare:["il ladro davanti alla banca","the thief in front of the bank"],
+  arrestare:["un ladro davanti alla banca","a thief in front of the bank"],
   ascoltare:["la radio in macchina","to the radio in the car"],
   assaggiare:["il sugo prima di servirlo","the sauce before serving it"],
   assicurare:["la macchina online","the car online",{"b":"insure","t3":"insures","p":"insured","pp":"insured","g":"insuring","cls":"O"}],
-  assolvere:["l'imputato per mancanza di prove","the defendant for lack of evidence"],
+  assolvere:["un imputato per mancanza di prove","a defendant for lack of evidence"],
   assumere:["una baby-sitter per il weekend","a babysitter for the weekend",{"cls":"O"}],
   attaccare:["un poster in camera","a poster in the bedroom",{"b":"put up","t3":"puts up","p":"put up","pp":"put up","g":"putting up"}],
   attrarre:["l'attenzione di tutti","everyone's attention"],
-  augurare:["buon compleanno alla nonna","grandma a happy birthday"],
+  augurare:["buon viaggio ai vicini","the neighbors a good trip"],
   aumentare:["il prezzo delle camere","the price of the rooms",{"b":"raise","t3":"raises","p":"raised","pp":"raised","g":"raising"}],
   autorizzare:["il pagamento con il telefono","the payment on the phone",{"b":"approve","t3":"approves","p":"approved","pp":"approved","g":"approving"}],
   avvertire:["i vicini prima della festa","the neighbors before the party"],
   avvisare:["il capo del ritardo","the boss about the delay",{"b":"tell","t3":"tells","p":"told","pp":"told","g":"telling"}],
   baciare:["la nonna sulle guance","grandma on the cheeks"],
-  ballare:["la salsa fino a tardi","salsa until late"],
+  ballare:["la salsa in piazza","salsa in the square"],
   battere:["tutti a carte","everyone at cards"],
   beccare:["una multa per eccesso di velocità","a speeding ticket",{"b":"get","t3":"gets","p":"got","pp":"gotten","g":"getting","neg":true}],
   bruciare:["la torta nel forno","the cake in the oven",{"neg":true}],
   cambiare:["treno a Bologna","trains in Bologna"],
   cenare:["in terrazza","on the terrace"],
-  circondare:["il giardino con una siepe","the garden with a hedge"],
+  circondare:["il giardino con una siepe","the garden with a hedge",{"cls":"O"}],
   citare:["un proverbio della nonna","one of grandma's sayings",{"b":"quote","t3":"quotes","p":"quoted","pp":"quoted","g":"quoting"}],
   coinvolgere:["anche i bambini nei preparativi","the kids in the preparations too"],
   collaborare:["con il team di Milano","with the team in Milan",{"b":"work","t3":"works","p":"worked","pp":"worked","g":"working","cls":"S"}],
@@ -6505,34 +6527,33 @@ const EVERYDAY = {
   commentare:["le foto degli amici su Instagram","friends' photos on Instagram"],
   commettere:["un errore di distrazione","a careless mistake",{"b":"make","t3":"makes","p":"made","pp":"made","g":"making","neg":true}],
   compiere:["il giro del lago in bici","a lap of the lake by bike",{"b":"do","t3":"does","p":"did","pp":"done","g":"doing"}],
-  comprendere:["le istruzioni in tedesco","the instructions in German",{"cls":"S","noImp":true}],
+  comprendere:["le istruzioni in tedesco","the instructions in German",{"noImp":true}],
   comunicare:["la notizia alla famiglia","the news with the family",{"b":"share","t3":"shares","p":"shared","pp":"shared","g":"sharing"}],
   concedere:["un giorno di ferie ai dipendenti","the staff a day off",{"b":"give","t3":"gives","p":"gave","pp":"given","g":"giving"}],
   concentrare:["tutte le energie sull'esame","all the energy on the exam",{"b":"focus","t3":"focuses","p":"focused","pp":"focused","g":"focusing"}],
   concludere:["la riunione con un brindisi","the meeting with a toast",{"b":"end","t3":"ends","p":"ended","pp":"ended","g":"ending"}],
   condurre:["una vita tranquilla in campagna","a quiet life in the country",{"b":"lead","t3":"leads","p":"led","pp":"led","g":"leading","cls":"S"}],
   confermare:["la prenotazione per telefono","the reservation by phone"],
-  confessare:["tutto alla mamma","everything to mom",{"cls":"O"}],
+  confessare:["tutto alla nonna","everything to grandma",{"cls":"O"}],
   confondere:["i nomi dei gemelli","the twins' names",{"b":"mix up","t3":"mixes up","p":"mixed up","pp":"mixed up","g":"mixing up","neg":true}],
   confrontare:["i prezzi online","prices online"],
   congelare:["il pane avanzato","the leftover bread"],
   contare:["i soldi prima di pagare","the money before paying"],
   contestare:["la multa","the fine",{"b":"dispute","t3":"disputes","p":"disputed","pp":"disputed","g":"disputing"}],
-  continuare:["a studiare l'italiano","studying Italian",{"b":"keep","t3":"keeps","p":"kept","pp":"kept","g":"keeping"}],
-  contraddire:["il capo davanti a tutti","the boss in front of everyone",{"neg":true}],
+  continuare:["a studiare l'italiano","to study Italian",{"b":"continue","t3":"continues","p":"continued","pp":"continued","g":"continuing","cls":"S","rows":{"f":["Anche l'anno prossimo {S} {V} a studiare l'italiano.","Next year too {S} {V} to study Italian."]}}],
+  contraddire:["il capo davanti a tutti","the boss in front of everyone",{"neg":true,"bad":true}],
   controllare:["la posta prima di uscire","the mail before going out"],
-  convenire:["con gli altri su questo punto","with the others on this point",{"noImp":true}],
+  convenire:["a Roma per il congresso","in Rome for the conference",{"b":"gather","t3":"gathers","p":"gathered","pp":"gathered","g":"gathering","noImp":true,"rows":{"i":["Ogni anno {S} {V} a Roma per il congresso.","Every year {S} {V} in Rome for the conference."]}}],
   convincere:["gli altri a restare","the others to stay"],
   convocare:["una riunione per lunedì","a meeting for Monday",{"b":"call","t3":"calls","p":"called","pp":"called","g":"calling"}],
   coprire:["la pentola con un coperchio","the pot with a lid"],
   correre:["al parco","in the park"],
   corrispondere:["con un'amica di penna in Giappone","with a pen pal in Japan",{"cls":"S","noImp":true}],
-  corrompere:["il bambino con un gelato","the kid with an ice cream",{"neg":true}],
+  corrompere:["il bambino con un gelato","the kid with an ice cream",{"neg":true,"bad":true}],
   costringere:["tutti ad aspettare","everyone wait",{"b":"make","t3":"makes","p":"made","pp":"made","g":"making"}],
   costruire:["una casetta sull'albero","a treehouse",{"cls":"O"}],
   creare:["un gruppo WhatsApp per la cena","a WhatsApp group for the dinner",{"b":"set up","t3":"sets up","p":"set up","pp":"set up","g":"setting up"}],
   credere:["alle scuse del vicino","the neighbor's excuses",{"cls":"S","noImp":true}],
-  crescere:["in campagna","in the country",{"noImp":true,"cls":"S"}],
   danneggiare:["la macchina in parcheggio","the car in the parking lot",{"neg":true}],
   decidere:["la meta delle vacanze","where to go on vacation",{"cls":"O"}],
   demolire:["il vecchio garage","the old garage",{"b":"tear down","t3":"tears down","p":"tore down","pp":"torn down","g":"tearing down","cls":"O"}],
@@ -6548,7 +6569,7 @@ const EVERYDAY = {
   dirigere:["il traffico all'incrocio","the traffic at the intersection"],
   discutere:["di politica a cena","politics at dinner"],
   disporre:["i bicchieri sul tavolo","the glasses on the table"],
-  distinguere:["i gemelli a fatica","the twins apart with some effort",{"b":"tell","t3":"tells","p":"told","pp":"told","g":"telling","noImp":true}],
+  distinguere:["i gemelli","the twins apart",{"b":"tell","t3":"tells","p":"told","pp":"told","g":"telling","noImp":true}],
   distrarre:["i colleghi con le chiacchiere","the coworkers with chit-chat",{"neg":true}],
   distruggere:["il castello di sabbia","the sandcastle",{"b":"knock down","t3":"knocks down","p":"knocked down","pp":"knocked down","g":"knocking down"}],
   diventare:["famos{o} su Instagram","famous on Instagram",{"cls":"O"}],
@@ -6556,7 +6577,7 @@ const EVERYDAY = {
   dubitare:["della sincerità del venditore","the salesman's honesty",{"cls":"S","noImp":true}],
   emergere:["dall'acqua con una conchiglia","out of the water with a shell",{"b":"come up","t3":"comes up","p":"came up","pp":"come up","g":"coming up"}],
   entrare:["in casa senza fare rumore","the house without making a sound",{"b":"come into","t3":"comes into","p":"came into","pp":"come into","g":"coming into"}],
-  esistere:["solo per il lavoro","only for work",{"b":"live","t3":"lives","p":"lived","pp":"lived","g":"living","noImp":true,"cls":"S"}],
+  esistere:["solo per il lavoro","only for work",{"b":"live","t3":"lives","p":"lived","pp":"lived","g":"living","noImp":true,"cls":"S","neg":true}],
   esitare:["prima di rispondere","before answering",{"neg":true}],
   esporre:["i quadri in una galleria","the paintings in a gallery",{"b":"exhibit","t3":"exhibits","p":"exhibited","pp":"exhibited","g":"exhibiting","cls":"S"}],
   esprimere:["un desiderio davanti alla torta","a wish in front of the cake",{"b":"make","t3":"makes","p":"made","pp":"made","g":"making"}],
@@ -6566,16 +6587,16 @@ const EVERYDAY = {
   fingere:["di non vedere il vicino","not to see the neighbor"],
   fissare:["un appuntamento dal dentista","a dentist appointment",{"b":"make","t3":"makes","p":"made","pp":"made","g":"making"}],
   fondare:["una piccola azienda di famiglia","a small family business",{"b":"start","t3":"starts","p":"started","pp":"started","g":"starting","cls":"O"}],
-  fregare:["il parcheggio a un altro","someone else's parking spot",{"b":"steal","t3":"steals","p":"stole","pp":"stolen","g":"stealing","neg":true}],
+  fregare:["il parcheggio a un altro","someone else's parking spot",{"b":"steal","t3":"steals","p":"stole","pp":"stolen","g":"stealing","neg":true,"bad":true}],
   frequentare:["un corso di italiano","an Italian class",{"b":"take","t3":"takes","p":"took","pp":"taken","g":"taking","cls":"S"}],
   fuggire:["dal caldo della città","the heat of the city",{"b":"escape","t3":"escapes","p":"escaped","pp":"escaped","g":"escaping"}],
   fumare:["sul balcone","on the balcony"],
-  funzionare:["solo dopo il primo caffè","only after the first coffee",{"b":"function","t3":"functions","p":"functioned","pp":"functioned","g":"functioning","noImp":true}],
+  funzionare:["bene in squadra","well in a team",{"b":"work","t3":"works","p":"worked","pp":"worked","g":"working","noImp":true,"cls":"S"}],
   garantire:["la qualità del prodotto","the quality of the product"],
   gestire:["un piccolo bar in centro","a small café downtown",{"b":"run","t3":"runs","p":"ran","pp":"run","g":"running","cls":"S"}],
   gettare:["la spazzatura nel cassonetto","the trash in the dumpster"],
   giocare:["a calcio con i bambini","soccer with the kids"],
-  girare:["il mondo in camper","the world in a camper van",{"cls":"O"}],
+  girare:["il centro storico in bici","the old town by bike",{"b":"ride around","t3":"rides around","p":"rode around","pp":"ridden around","g":"riding around","rows":{"fa":["Prima di cena {S} {V} il centro storico in bici.","Before dinner {S} {V} the old town by bike."]}}],
   giurare:["di dire la verità","to tell the truth"],
   guadagnare:["qualche soldo con le ripetizioni","some money tutoring",{"b":"earn","t3":"earns","p":"earned","pp":"earned","g":"earning"}],
   guardare:["la partita al bar","the game at the bar"],
@@ -6585,23 +6606,22 @@ const EVERYDAY = {
   importare:["vino dalla Francia","wine from France",{"cls":"S"}],
   incastrare:["tutti gli impegni in una giornata","all the appointments into one day",{"b":"fit","t3":"fits","p":"fit","pp":"fit","g":"fitting"}],
   incolpare:["il cane del disastro","the dog for the mess"],
-  incontrare:["i vecchi compagni di scuola","old school friends",{"b":"run into","t3":"runs into","p":"ran into","pp":"run into","g":"running into"}],
-  indagare:["sul furto della bici","the bike theft",{"b":"look into","t3":"looks into","p":"looked into","pp":"looked into","g":"looking into"}],
-  indebolire:["la squadra con un cambio sbagliato","the team with a bad substitution",{"b":"weaken","t3":"weakens","p":"weakened","pp":"weakened","g":"weakening"}],
+  incontrare:["i vecchi compagni di scuola","old school friends",{"b":"meet up with","t3":"meets up with","p":"met up with","pp":"met up with","g":"meeting up with"}],
+  indagare:["sui furti di bici in zona","the bike thefts in the area",{"b":"look into","t3":"looks into","p":"looked into","pp":"looked into","g":"looking into"}],
+  indebolire:["la squadra con un cambio sbagliato","the team with a bad substitution",{"b":"weaken","t3":"weakens","p":"weakened","pp":"weakened","g":"weakening","neg":true}],
   indicare:["la strada a un turista","a tourist the way",{"b":"show","t3":"shows","p":"showed","pp":"shown","g":"showing"}],
   individuare:["l'errore nel conto","the mistake on the bill",{"b":"spot","t3":"spots","p":"spotted","pp":"spotted","g":"spotting"}],
-  indossare:["la giacca nuova","the new jacket"],
+  indossare:["la giacca nuova","the new jacket",{"b":"put on","t3":"puts on","p":"put on","pp":"put on","g":"putting on"}],
   influenzare:["le decisioni del gruppo","the group's decisions"],
   informare:["i clienti del nuovo orario","the customers about the new opening hours"],
   iniziare:["un corso di yoga","a yoga class",{"cls":"O"}],
-  inquinare:["meno andando in bici","less by cycling"],
+  inquinare:["meno andando in bici","less by cycling",{"cls":"S"}],
   insegnare:["l'italiano agli stranieri","Italian to foreigners",{"cls":"S"}],
-  insinuare:["qualcosa sul nuovo collega","something about the new coworker",{"neg":true}],
-  insultare:["l'arbitro dalla tribuna","the referee from the stands",{"neg":true}],
-  intendere:["cambiare lavoro","to change jobs",{"b":"intend","t3":"intends","p":"intended","pp":"intended","g":"intending","cls":"S","noImp":true}],
+  insinuare:["qualcosa sul nuovo collega","something about the new coworker",{"neg":true,"bad":true}],
+  insultare:["l'arbitro dalla tribuna","the referee from the stands",{"neg":true,"bad":true}],
   interessare:["i ragazzi alla storia","the kids interested in history",{"b":"get","t3":"gets","p":"got","pp":"gotten","g":"getting"}],
   interrogare:["gli studenti sui verbi","the students on verbs",{"b":"quiz","t3":"quizzes","p":"quizzed","pp":"quizzed","g":"quizzing"}],
-  interrompere:["la riunione per una telefonata","the meeting for a phone call",{"neg":true}],
+  interrompere:["la riunione per una telefonata","the meeting for a phone call",{"neg":true,"bad":true}],
   intervenire:["nella discussione","the discussion",{"b":"jump into","t3":"jumps into","p":"jumped into","pp":"jumped into","g":"jumping into"}],
   inventare:["una scusa per non andare","an excuse not to go"],
   investire:["un po' di soldi in borsa","some money in the stock market",{"b":"invest","t3":"invests","p":"invested","pp":"invested","g":"investing"}],
@@ -6610,20 +6630,20 @@ const EVERYDAY = {
   legare:["la bici al palo","the bike to the pole",{"b":"lock","t3":"locks","p":"locked","pp":"locked","g":"locking"}],
   liberare:["il tavolo per la cena","the table for dinner",{"b":"clear","t3":"clears","p":"cleared","pp":"cleared","g":"clearing"}],
   limitare:["gli zuccheri","sugar",{"b":"cut back on","t3":"cuts back on","p":"cut back on","pp":"cut back on","g":"cutting back on"}],
-  litigare:["con il vicino per il parcheggio","with the neighbor about parking",{"neg":true}],
-  mancare:["alla riunione","the meeting",{"b":"miss","t3":"misses","p":"missed","pp":"missed","g":"missing","neg":true}],
+  litigare:["con il vicino per il parcheggio","with the neighbor about parking",{"neg":true,"bad":true}],
+  mancare:["alla riunione","the meeting",{"b":"miss","t3":"misses","p":"missed","pp":"missed","g":"missing","neg":true,"rows":{"tr":["Dopo che {S} {V} alla riunione, il capo si arrabbiò.","After {S} {V} the meeting, the boss got angry."]}}],
   mandare:["un messaggio alla mamma","a text to mom"],
-  mentire:["sul prezzo del vestito","about the price of the dress",{"neg":true}],
-  meritare:["una pausa","a break",{"cls":"S","noImp":true}],
+  mentire:["sul prezzo del vestito","about the price of the dress",{"neg":true,"bad":true}],
+  meritare:["una pausa","a break",{"cls":"S","noImp":true,"rows":{"fa":["Dopo questa settimana, {S} {V} una pausa.","After this week, {S} {V} a break.",null,{"b":"earn","t3":"earns","p":"earned","pp":"earned","g":"earning"}],"tr":["Dopo che {S} {V} la promozione, le cose cambiarono.","After {S} {V} the promotion, things changed.",null,{"b":"earn","t3":"earns","p":"earned","pp":"earned","g":"earning"}]}}],
   minacciare:["di chiamare la polizia","to call the police"],
   mollare:["il lavoro in banca","the bank job",{"cls":"O"}],
-  morire:["dal ridere","laughing",{"noImp":true}],
+  morire:["dal ridere","laughing",{"noImp":true,"rows":{"tr":["Dopo che {S} {V} dal ridere per mezz'ora, tornammo seri.","After {S} {V} laughing for half an hour, we got serious again."]}}],
   mostrare:["le foto del viaggio","the trip photos"],
   muovere:["i mobili del salotto","the living room furniture",{"b":"move","t3":"moves","p":"moved","pp":"moved","g":"moving"}],
-  negare:["tutto davanti alle prove","everything in the face of the evidence",{"neg":true}],
+  negare:["tutto davanti alle prove","everything in the face of the evidence",{"neg":true,"bad":true}],
   obbligare:["i bambini a mangiare la verdura","the kids eat vegetables",{"b":"make","t3":"makes","p":"made","pp":"made","g":"making"}],
   odiare:["il traffico del lunedì","Monday traffic",{"cls":"S","noImp":true}],
-  offendere:["il cuoco con un commento","the chef with a comment",{"neg":true}],
+  offendere:["il cuoco con un commento","the chef with a comment",{"neg":true,"bad":true}],
   offrire:["da bere a tutti","everyone a drink",{"b":"buy","t3":"buys","p":"bought","pp":"bought","g":"buying"}],
   operare:["un paziente al ginocchio","a patient's knee",{"b":"operate on","t3":"operates on","p":"operated on","pp":"operated on","g":"operating on"}],
   opporre:["resistenza al cambiamento","resistance to change"],
@@ -6631,7 +6651,7 @@ const EVERYDAY = {
   parcheggiare:["davanti a casa","in front of the house"],
   partecipare:["alla festa del paese","in the town festival"],
   pedinare:["il gatto per tutto il giardino","the cat all around the garden"],
-  peggiorare:["in matematica","at math",{"b":"get worse","t3":"gets worse","p":"got worse","pp":"gotten worse","g":"getting worse","noImp":true,"cls":"O"}],
+  peggiorare:["in matematica","at math",{"b":"get worse","t3":"gets worse","p":"got worse","pp":"gotten worse","g":"getting worse","noImp":true,"cls":"O","rows":{"f":["Senza esercizio, {S} {V} in matematica.","Without practice, {S} {V} at math."],"pp":["Quest'anno {S} {V} in matematica.","This year {S} {V} at math."],"pr":["Quell'anno {S} {V} in matematica.","That year {S} {V} at math."],"cg":["È possibile che {S} {V} in matematica.","It's possible that {S} {V} at math."],"fa":["Con tutte quelle assenze, {S} {V} in matematica, scommetto.","With all those absences, I bet {S} {V} at math.","past"],"tp":["Alla fine dell'anno {S} {V} in matematica.","By the end of the year {S} {V} at math."],"tr":["Dopo che {S} {V} in matematica, arrivò un insegnante privato.","After {S} {V} at math, a private tutor arrived."],"pg":["Purtroppo in questo periodo {S} {V} in matematica.","Unfortunately, these days {S} {V} at math."],"ipg":["In quel periodo {S} {V} in matematica.","At that time {S} {V} at math."],"fpg":["Senza esercizio, fra qualche mese {S} {V} in matematica.","Without practice, in a few months {S} {V} at math."]}}],
   percepire:["uno stipendio fisso","a steady salary",{"b":"earn","t3":"earns","p":"earned","pp":"earned","g":"earning","cls":"S","noImp":true}],
   perdere:["il treno delle otto","the eight o'clock train",{"neg":true}],
   perdonare:["gli amici per il ritardo","friends for being late"],
@@ -6645,7 +6665,7 @@ const EVERYDAY = {
   preferire:["il treno alla macchina","the train to the car",{"cls":"S","noImp":true}],
   pregare:["in chiesa","in church"],
   prenotare:["un tavolo per quattro","a table for four"],
-  preoccupare:["la mamma tornando tardi","mom by coming home late",{"neg":true}],
+  preoccupare:["la nonna tornando tardi","grandma by coming home late",{"neg":true}],
   preparare:["la cena per tutti","dinner for everyone",{"b":"make","t3":"makes","p":"made","pp":"made","g":"making"}],
   presentare:["il nuovo collega a tutti","the new coworker to everyone",{"b":"introduce","t3":"introduces","p":"introduced","pp":"introduced","g":"introducing"}],
   pretendere:["un rimborso dal negozio","a refund from the store"],
@@ -6662,16 +6682,16 @@ const EVERYDAY = {
   ragionare:["con calma prima di decidere","calmly before deciding",{"b":"think","t3":"thinks","p":"thought","pp":"thought","g":"thinking"}],
   rappresentare:["la scuola alla gara","the school at the competition"],
   reagire:["con calma alla notizia","calmly to the news"],
-  recuperare:["il sonno perso nel fine settimana","lost sleep on the weekend",{"b":"catch up on","t3":"catches up on","p":"caught up on","pp":"caught up on","g":"catching up on"}],
+  recuperare:["il sonno perso","lost sleep",{"b":"catch up on","t3":"catches up on","p":"caught up on","pp":"caught up on","g":"catching up on"}],
   reggere:["la scala al vicino","the ladder for the neighbor"],
   regolare:["la temperatura del forno","the oven temperature",{"b":"adjust","t3":"adjusts","p":"adjusted","pp":"adjusted","g":"adjusting"}],
   rendere:["i libri alla biblioteca","the books to the library",{"b":"return","t3":"returns","p":"returned","pp":"returned","g":"returning"}],
   respirare:["l'aria di montagna","the mountain air",{"b":"breathe in","t3":"breathes in","p":"breathed in","pp":"breathed in","g":"breathing in"}],
-  restare:["a casa con il raffreddore","at home with a cold"],
-  ricattare:["i colleghi con una foto imbarazzante","the coworkers with an embarrassing photo",{"cls":"O","neg":true}],
-  ricevere:["un pacco dall'Italia","a package from Italy",{"b":"get","t3":"gets","p":"got","pp":"gotten","g":"getting","noImp":true}],
+  restare:["a casa con il raffreddore","at home with a cold",{"rows":{"tp":["Quando Luca ha chiamato, {S} {V} a casa tutto il giorno.","When Luca called, {S} {V} at home all day."]}}],
+  ricattare:["i colleghi con una foto imbarazzante","the coworkers with an embarrassing photo",{"cls":"O","neg":true,"bad":true,"noImp":true}],
+  ricevere:["un pacco dalla nonna","a package from grandma",{"b":"get","t3":"gets","p":"got","pp":"gotten","g":"getting","noImp":true}],
   ricominciare:["a studiare dopo le vacanze","studying after the vacation",{"b":"go back to","t3":"goes back to","p":"went back to","pp":"gone back to","g":"going back to","cls":"O"}],
-  riconoscere:["un vecchio amico per strada","an old friend in the street",{"noImp":true}],
+  riconoscere:["un vecchio amico per strada","an old friend in the street",{"noImp":true,"rows":{"f":["Vedrai, alla festa {S} {V} subito un vecchio amico.","You'll see, at the party {S} {V} an old friend right away."]}}],
   ricordare:["i compleanni di tutti","everyone's birthday"],
   ricoverare:["un paziente con la febbre alta","a patient with a high fever",{"b":"admit","t3":"admits","p":"admitted","pp":"admitted","g":"admitting"}],
   ridere:["delle battute del nonno","at grandpa's jokes"],
@@ -6693,11 +6713,11 @@ const EVERYDAY = {
   rischiare:["una multa","a fine",{"neg":true}],
   risolvere:["il cruciverba della domenica","the Sunday crossword"],
   risparmiare:["per le vacanze","for vacation",{"b":"save up","t3":"saves up","p":"saved up","pp":"saved up","g":"saving up"}],
-  rispettare:["le regole del condominio","the building rules",{"b":"follow","t3":"follows","p":"followed","pp":"followed","g":"following"}],
+  rispettare:["le regole del condominio","the building rules",{"b":"follow","t3":"follows","p":"followed","pp":"followed","g":"following","cls":"S"}],
   rispondere:["alle mail di lavoro","work emails"],
   risultare:["simpatic{o} a tutti","as nice to everyone",{"b":"come across","t3":"comes across","p":"came across","pp":"come across","g":"coming across","noImp":true}],
   ritenere:["giusta la decisione","the decision fair",{"cls":"S","noImp":true}],
-  ritrovare:["le chiavi perse","the lost keys"],
+  ritrovare:["le chiavi perse","the lost keys",{"rows":{"f":["Vedrai, prima o poi {S} {V} le chiavi perse.","You'll see, sooner or later {S} {V} the lost keys."]}}],
   riuscire:["a parcheggiare al primo colpo","to park on the first try",{"b":"manage","t3":"manages","p":"managed","pp":"managed","g":"managing","noImp":true}],
   rivedere:["gli amici dell'università","college friends again",{"b":"see","t3":"sees","p":"saw","pp":"seen","g":"seeing"}],
   rivelare:["il finale del film","the ending of the movie",{"neg":true}],
@@ -6710,7 +6730,7 @@ const EVERYDAY = {
   salvare:["i documenti sulla chiavetta","the files on the USB stick"],
   sbagliare:["strada","the wrong road",{"neg":true}],
   sbattere:["la porta uscendo","the door on the way out",{"b":"slam","t3":"slams","p":"slammed","pp":"slammed","g":"slamming","neg":true}],
-  scadere:["nel banale","into cliché",{"b":"slip","t3":"slips","p":"slipped","pp":"slipped","g":"slipping","noImp":true,"cls":"O"}],
+  scadere:["nel banale","into cliché",{"b":"slip","t3":"slips","p":"slipped","pp":"slipped","g":"slipping","noImp":true,"neg":true}],
   scappare:["a casa per il temporale","home because of the storm",{"b":"rush","t3":"rushes","p":"rushed","pp":"rushed","g":"rushing"}],
   scegliere:["il vino per la cena","the wine for dinner"],
   scendere:["dal treno","off the train"],
@@ -6718,7 +6738,7 @@ const EVERYDAY = {
   scopare:["il pavimento della cucina","the kitchen floor"],
   scoprire:["un ristorante nuovo in centro","a new restaurant downtown"],
   scordare:["il compleanno della zia","auntie's birthday",{"neg":true}],
-  screditare:["il collega con il capo","the coworker in front of the boss",{"neg":true}],
+  screditare:["il collega con il capo","the coworker in front of the boss",{"neg":true,"bad":true}],
   sedurre:["tutti con un sorriso","everyone with a smile",{"b":"charm","t3":"charms","p":"charmed","pp":"charmed","g":"charming"}],
   seguire:["una serie su Netflix","a series on Netflix"],
   separare:["i rifiuti per la raccolta differenziata","the trash for recycling",{"b":"sort","t3":"sorts","p":"sorted","pp":"sorted","g":"sorting"}],
@@ -6728,33 +6748,33 @@ const EVERYDAY = {
   sfogare:["lo stress in palestra","stress at the gym",{"b":"work off","t3":"works off","p":"worked off","pp":"worked off","g":"working off"}],
   sfruttare:["il bel tempo per una gita","the nice weather for a day trip",{"b":"make the most of","t3":"makes the most of","p":"made the most of","pp":"made the most of","g":"making the most of"}],
   sfuggire:["alla folla del centro","the crowds downtown",{"b":"escape","t3":"escapes","p":"escaped","pp":"escaped","g":"escaping"}],
-  smettere:["di fumare","smoking",{"b":"quit","t3":"quits","p":"quit","pp":"quit","g":"quitting","cls":"O"}],
-  soffrire:["il mal di mare","seasickness",{"b":"suffer from","t3":"suffers from","p":"suffered from","pp":"suffered from","g":"suffering from","cls":"S","noImp":true}],
+  smettere:["di fumare","smoking",{"b":"quit","t3":"quits","p":"quit","pp":"quit","g":"quitting","cls":"O","rows":{"ipg":["In quel periodo {S} {V} di fumare.","At that time {S} {V} smoking."]}}],
+  soffrire:["il mal di mare","seasickness",{"b":"suffer from","t3":"suffers from","p":"suffered from","pp":"suffered from","g":"suffering from","cls":"S","noImp":true,"neg":true,"rows":{"ipg":["Durante la traversata per Capri, {S} {V} il mal di mare.","During the crossing to Capri, {S} {V} seasickness."]}}],
   sorridere:["ai clienti","at the customers"],
   sostenere:["la squadra della città","the local team",{"cls":"S"}],
   sostituire:["la lampadina in bagno","the light bulb in the bathroom"],
   sottolineare:["le parole nuove nel libro","the new words in the book",{"b":"underline","t3":"underlines","p":"underlined","pp":"underlined","g":"underlining"}],
-  spacciare:["una copia per l'originale","a copy off as the original",{"b":"pass","t3":"passes","p":"passed","pp":"passed","g":"passing","neg":true}],
+  spacciare:["una copia per l'originale","a copy off as the original",{"b":"pass","t3":"passes","p":"passed","pp":"passed","g":"passing","neg":true,"bad":true}],
   sparire:["dopo cena senza salutare","after dinner without saying goodbye",{"neg":true}],
-  spaventare:["i bambini con una maschera","the kids with a mask",{"b":"scare","t3":"scares","p":"scared","pp":"scared","g":"scaring","neg":true}],
+  spaventare:["i bambini con una maschera","the kids with a mask",{"b":"scare","t3":"scares","p":"scared","pp":"scared","g":"scaring","neg":true,"bad":true}],
   spedire:["un pacco alla nonna","a package to grandma"],
   spegnere:["la luce prima di uscire","the light before going out"],
   spendere:["troppo al supermercato","too much at the supermarket",{"neg":true}],
-  sperare:["in una giornata di sole","for a sunny day"],
-  spiare:["i vicini dalla finestra","the neighbors from the window",{"neg":true}],
+  sperare:["in una giornata di sole","for a sunny day",{"cls":"S","rows":{"f":["Domenica, per il picnic, {S} {V} in una giornata di sole.","On Sunday, for the picnic, {S} {V} for a sunny day."]}}],
+  spiare:["i vicini dalla finestra","the neighbors from the window",{"neg":true,"bad":true}],
   spiegare:["le regole del gioco ai bambini","the rules of the game to the kids"],
   spingere:["la macchina in panne","the broken-down car"],
-  sposare:["una persona conosciuta in vacanza","someone from a vacation romance",{"cls":"O"}],
-  squillare:["al vicino due volte","the neighbor twice",{"b":"ring","t3":"rings","p":"rang","pp":"rung","g":"ringing"}],
+  sposare:["una persona di Palermo","someone from Palermo",{"cls":"O","noImp":true,"pl":["persone di Palermo","people from Palermo"]}],
+  squillare:["alla vicina prima di salire","the neighbor before coming up",{"b":"ring","t3":"rings","p":"rang","pp":"rung","g":"ringing"}],
   stancare:["i bambini con una lunga passeggiata","the kids with a long walk",{"b":"tire out","t3":"tires out","p":"tired out","pp":"tired out","g":"tiring out"}],
   subire:["un piccolo intervento","a minor operation",{"b":"undergo","t3":"undergoes","p":"underwent","pp":"undergone","g":"undergoing","cls":"O","noImp":true}],
   suggerire:["un buon ristorante agli amici","a good restaurant to friends",{"b":"recommend","t3":"recommends","p":"recommended","pp":"recommended","g":"recommending"}],
   superare:["l'esame di guida","the driving test",{"b":"pass","t3":"passes","p":"passed","pp":"passed","g":"passing","cls":"O"}],
-  svegliare:["i bambini per la scuola","the kids for school"],
+  svegliare:["i bambini per la scuola","the kids for school",{"rows":{"pr":["Quella mattina {S} {V} i bambini all'alba.","That morning {S} {V} the kids at dawn."]}}],
   svolgere:["i compiti in biblioteca","homework in the library",{"b":"do","t3":"does","p":"did","pp":"done","g":"doing"}],
   tacere:["per non litigare","to avoid an argument",{"b":"keep quiet","t3":"keeps quiet","p":"kept quiet","pp":"kept quiet","g":"keeping quiet"}],
   tagliare:["il pane per la cena","the bread for dinner"],
-  tardare:["all'appuntamento","for the appointment",{"be":"late","neg":true}],
+  tardare:["all'appuntamento","for the appointment",{"be":"late","neg":true,"rows":{"tp":["Anche quella volta {S} {V} all'appuntamento.","That time too {S} {V} for the appointment."],"fa":["Quando Luca chiamerà, {S} {V} di nuovo all'appuntamento.","By the time Luca calls, {S} {V} for the appointment again."],"pg":["Oh no, {S} {V} all'appuntamento!","Oh no, {S} {V} for the appointment!",null,{"b":"run late","t3":"runs late","p":"ran late","pp":"run late","g":"running late"}],"ipg":["Quando Luca ha chiamato, {S} {V} all'appuntamento.","When Luca called, {S} {V} for the appointment.",null,{"b":"run late","t3":"runs late","p":"ran late","pp":"run late","g":"running late"}],"fpg":["Di questo passo, fra poco {S} {V} all'appuntamento.","At this rate, soon {S} {V} for the appointment.",null,{"b":"run late","t3":"runs late","p":"ran late","pp":"run late","g":"running late"}]}}],
   temere:["il giudizio degli altri","other people's judgment",{"cls":"S","noImp":true}],
   tenere:["la porta aperta per la signora","the door open for the lady"],
   tentare:["di nuovo l'esame","the exam again",{"b":"attempt","t3":"attempts","p":"attempted","pp":"attempted","g":"attempting","cls":"O"}],
@@ -6762,16 +6782,16 @@ const EVERYDAY = {
   tirare:["la palla al cane","the ball for the dog"],
   toccare:["le opere al museo","the artwork at the museum",{"neg":true}],
   togliere:["la neve dalla macchina","the snow off the car",{"b":"brush","t3":"brushes","p":"brushed","pp":"brushed","g":"brushing"}],
-  tormentare:["la maestra con mille domande","the teacher with a thousand questions",{"b":"pester","t3":"pesters","p":"pestered","pp":"pestered","g":"pestering","neg":true}],
-  tradire:["la fiducia del gruppo","the group's trust",{"cls":"O","neg":true}],
+  tormentare:["la maestra con mille domande","the teacher with a thousand questions",{"b":"pester","t3":"pesters","p":"pestered","pp":"pestered","g":"pestering","neg":true,"bad":true}],
+  tradire:["la fiducia del gruppo","the group's trust",{"cls":"O","neg":true,"bad":true}],
   trascinare:["la valigia per le scale","the suitcase up the stairs"],
   trascurare:["il giardino per il lavoro","the garden because of work",{"cls":"S","noImp":true}],
   trasformare:["il garage in uno studio","the garage into a studio",{"b":"turn","t3":"turns","p":"turned","pp":"turned","g":"turning","cls":"O"}],
   trattare:["i clienti con gentilezza","the customers kindly"],
-  trattenere:["le lacrime al matrimonio","tears at the wedding"],
+  trattenere:["le lacrime al matrimonio di mia cugina","tears at my cousin's wedding",{"rows":{"p":["Ai matrimoni {S} {V} le lacrime a fatica.","At weddings {S} {V} tears with difficulty."],"i":["A quei tempi {S} {V} a fatica le lacrime ai matrimoni.","Back then {S} {V} tears at weddings with difficulty."]}}],
   turbare:["i bambini con una storia di paura","the kids with a scary story",{"neg":true}],
   tutelare:["la privacy dei clienti","the customers' privacy"],
-  uccidere:["una zanzara in camera","a mosquito in the bedroom"],
+  uccidere:["una zanzara in camera","a mosquito in the bedroom",{"rows":{"fpg":["Stanotte, invece di dormire, {S} {V} zanzare.","Tonight, instead of sleeping, {S} {V} mosquitoes."]}}],
   usare:["la bici per andare al lavoro","the bike to get to work"],
   valere:["molto per la squadra","to the team",{"be":"worth a lot","noImp":true,"cls":"S"}],
   vendere:["la vecchia macchina online","the old car online",{"cls":"O"}],
@@ -6780,13 +6800,13 @@ const EVERYDAY = {
   vestire:["i bambini per la festa","the kids dressed for the party",{"b":"get","t3":"gets","p":"got","pp":"gotten","g":"getting"}],
   viaggiare:["in treno per l'Italia","around Italy by train"],
   vincere:["una partita a carte","a game of cards"],
-  violare:["il divieto di sosta","the no-parking rule",{"b":"break","t3":"breaks","p":"broke","pp":"broken","g":"breaking","neg":true}],
+  violare:["il divieto di sosta","the no-parking rule",{"b":"break","t3":"breaks","p":"broke","pp":"broken","g":"breaking","neg":true,"bad":true}],
   visitare:["i musei della città","the city's museums"],
-  voltare:["a destra al semaforo","right at the traffic light"],
+  voltare:["a destra al semaforo","right at the traffic light",{"rows":{"tp":["Quando ci siamo accorti dell'errore, {S} {VG} a destra.","When we noticed the mistake, {S} {VA} right."],"fa":["Quando Luca chiamerà, {S} {VG} a destra al semaforo.","By the time Luca calls, {S} {VA} right at the traffic light."]}}],
   porre:["una domanda al professore","the teacher a question",{"b":"ask","t3":"asks","p":"asked","pp":"asked","g":"asking"}],
   trarre:["una conclusione affrettata","a hasty conclusion",{"neg":true}],
   tendere:["la mano al nuovo vicino","a hand to the new neighbor",{"b":"hold out","t3":"holds out","p":"held out","pp":"held out","g":"holding out"}],
-  giungere:["a destinazione in serata","at the destination in the evening",{"noImp":true}],
+  giungere:["a destinazione","at the destination",{"noImp":true}],
   cadere:["dalla bicicletta","off the bike",{"neg":true}],
   volgere:["lo sguardo verso il mare","out toward the sea",{"b":"look","t3":"looks","p":"looked","pp":"looked","g":"looking"}],
   cogliere:["l'occasione per riposare","the chance to rest",{"b":"take","t3":"takes","p":"took","pp":"taken","g":"taking"}],
@@ -6794,15 +6814,17 @@ const EVERYDAY = {
   incazzarsi:["con i vicini per il rumore","at the neighbors about the noise",{"neg":true}],
   fidarsi:["del meccanico sotto casa","the mechanic around the corner",{"cls":"S"}],
   invaghirsi:["di un attore famoso","a famous actor",{"cls":"O","noImp":true}],
-  prostituirsi:["per un po' di fama","for a bit of fame",{"cls":"O","neg":true,"noImp":true}]
+  prostituirsi:["pur di andare in TV","just to get on TV",{"cls":"O","neg":true,"noImp":true}],
+  "farsene una ragione":["senza drammi","without any drama"],
+  bersela:["senza fare domande","without asking questions",{"neg":true}]
 };
 const EV_FRAMES = {
   p:  [["Di solito {S} {V} {O}.","Usually {S} {V} {O}."],["Ogni tanto {S} {V} {O}.","Every now and then {S} {V} {O}."]],
   pp: [["Ieri {S} {V} {O}.","Yesterday {S} {V} {O}."],["La settimana scorsa {S} {V} {O}.","Last week {S} {V} {O}."]],
   i:  [["A quei tempi {S} {V} spesso {O}.","Back then {S} often {V} {O}."],["Quando abitavamo a Roma, {S} {V} spesso {O}.","When we lived in Rome, {S} often {V} {O}."]],
   f:  [["Domani {S} {V} {O}.","Tomorrow {S} {V} {O}."],["La settimana prossima {S} {V} {O}.","Next week {S} {V} {O}."]],
-  c:  [["Con più tempo, {S} {V} {O}.","With more time, {S} {V} {O}."],["In quel caso {S} {V} {O}.","In that case {S} {V} {O}."]],
-  cp: [["Con più tempo, {S} {V} {O}.","With more time, {S} {V} {O}."],["In quel caso {S} {V} {O}.","In that case {S} {V} {O}."]],
+  c:  [["Al posto di Luca, {S} {V} {O}.","In Luca's place, {S} {V} {O}."],["In quel caso {S} {V} {O}.","In that case {S} {V} {O}."]],
+  cp: [["Al posto di Luca, {S} {V} {O}.","In Luca's place, {S} {V} {O}."],["In quel caso {S} {V} {O}.","In that case {S} {V} {O}."]],
   cg: [["È importante che {S} {V} {O}.","It's important that {S} {V} {O}."],["Sembra che {S} {V} {O}.","It seems that {S} {V} {O}."]],
   ci: [["Se {S} {V} {O}, sarebbe meglio.","If {S} {V} {O}, it would be better."],["Pensavano che {S} {V} {O}.","They thought {S} {V} {O}.","past"]],
   cgp:[["È possibile che {S} {V} {O}.","It's possible that {S} {V} {O}."],["Mi sembra strano che {S} {V} {O}.","It seems strange to me that {S} {V} {O}."]],
@@ -6819,11 +6841,31 @@ const EV_FRAMES_S = {
   f:  [["Un giorno {S} {V} {O}.","One day {S} {V} {O}."],["Fra qualche anno {S} {V} {O}.","In a few years {S} {V} {O}."]],
   tp: [["Prima di allora {S} {V} {O}.","Before then {S} {V} {O}."],["Fino a quel momento {S} {V} {O}.","Up to then {S} {V} {O}."]],
   fa: [["{S} {V} {O}, immagino.","I imagine {S} {V} {O}.","past"]],
+  fa0:[["A fine anno {S} {V} {O} per dieci anni.","By the end of the year {S} {V} {O} for ten years."]],   // io: no guessing about yourself
+  c:  [["In quel caso {S} {V} {O}.","In that case {S} {V} {O}."]],
+  cp: [["In quel caso {S} {V} {O}.","In that case {S} {V} {O}."]],
+  cg: [["Sembra che {S} {V} {O}.","It seems that {S} {V} {O}."],["Pare che {S} {V} {O}.","Apparently {S} {V} {O}."]],
+  tr: [["Dopo che {S} {V} {O} per tanti anni, le cose cambiarono.","After {S} {V} {O} for so many years, things changed."]],
   pr: [["Per molti anni {S} {V} {O}.","For many years {S} {V} {O}."],["In quegli anni {S} {V} {O}.","In those years {S} {V} {O}."]]
 };
 const EV_PROG_S = {
   pg: [["In questo periodo {S} {V}{O}.","These days {S} {V}{O}."]],
   ipg:[["In quel periodo {S} {V}{O}.","At that time {S} {V}{O}."]]
+};
+/* mishaps (rompere, cadere, dimenticare…): nobody plans them, and they are never "better" */
+const EV_FRAMES_N = {
+  f:  [["Di questo passo {S} {V} {O}.","At this rate {S} {V} {O}."]],
+  fa: [["Di questo passo, entro stasera {S} {V} {O}.","At this rate, by tonight {S} {V} {O}."]],
+  c:  [["Così {S} {V} {O}.","That way {S} {V} {O}."]],
+  cp: [["Così {S} {V} {O}.","That way {S} {V} {O}."]],
+  cg: [["È strano che {S} {V} {O}.","It's strange that {S} {V} {O}."],["Sembra che {S} {V} {O}.","It seems that {S} {V} {O}."]],
+  ci: [["Se {S} {V} {O}, sarebbe un problema.","If {S} {V} {O}, it would be a problem."],["Pensavano che {S} {V} {O}.","They thought {S} {V} {O}.","past"]],
+  cgt:[["Se {S} {V} {O}, sarebbe stato un disastro.","If {S} {V} {O}, it would have been a disaster."],["Nessuno sapeva che {S} {V} {O}.","Nobody knew that {S} {V} {O}."]],
+  pg: [["Oh no, {S} {V} {O}!","Oh no, {S} {V} {O}!"]],
+  ipg:[["Senza volerlo, {S} {V} {O}.","Without meaning to, {S} {V} {O}."]],
+  fpg:[["Di questo passo, fra poco {S} {V} {O}.","At this rate, soon {S} {V} {O}."]],
+  p:  [["A volte, senza volerlo, {S} {V} {O}.","Sometimes, without meaning to, {S} {V} {O}."]],
+  tr: [["Dopo che {S} {V} {O}, ci fu un attimo di imbarazzo.","After {S} {V} {O}, there was an awkward moment."]]
 };
 const EV_FRAMES_O = {
   p:  [["Lo sai? {S} {V} {O}.","Guess what? {S} {V} {O}.","prog"],["Quest'anno {S} {V} {O}.","This year {S} {V} {O}.","prog"]],
@@ -6844,80 +6886,177 @@ CURATED.nascere = {
   pr:["{S} {V} a Firenze nel 1990.","{S} {V} in Florence in 1990."]
 };
 
+/* volerci only lives in the 3rd person: one row for "ci vuole" (singular) and one for "ci vogliono" (plural).
+   The time nouns are masculine on purpose, so the participle agrees: ci è voluto un mese, ci sono voluti sei mesi. */
+CURATED.volerci = {
+  p:[["Per andare in centro a piedi {V} un quarto d'ora.","It takes a quarter of an hour to walk downtown."],
+     ["Per arrivare a Napoli {V} tre ore di treno.","It takes three hours by train to get to Naples."]],
+  pp:[["Per finire i lavori in casa {V} un mese intero.","It took a whole month to finish the work on the house."],
+      ["Per imparare a guidare {V} sei mesi.","It took six months to learn to drive."]],
+  i:[["Una volta per andare a Roma {V} un giorno intero.","It used to take a whole day to get to Rome."],
+     ["A quei tempi {V} due giorni per ricevere una lettera.","Back then it used to take two days to get a letter."]],
+  f:[["Per il visto {V} almeno un mese.","The visa will take at least a month."],
+     ["Per ristrutturare la casa {V} due anni.","Renovating the house will take two years."]],
+  c:[["Per questo lavoro {V} un esperto.","This job would need an expert."],
+     ["Per convincerlo {V} giorni di discussioni.","It would take days of arguing to convince him."]],
+  cp:[["Senza la metro {V} un sacco di tempo.","Without the metro it would have taken ages."],
+      ["In macchina {V} cinque minuti.","By car it would have taken five minutes."]],
+  cg:[["Credo che {V} un po' di pazienza.","I think it takes a bit of patience."],
+      ["Penso che {V} due giorni per arrivare.","I think it takes two days to get there."]],
+  ci:[["Se {V} meno tempo, verrei più spesso.","If it took less time, I'd come more often."],
+      ["Se non {V} tre ore di treno, verremmo ogni weekend.","If it didn't take three hours by train, we'd come every weekend."]],
+  tp:[["Ero stanco: per trovare parcheggio {V} un sacco di tempo.","I was tired: finding a parking spot had taken ages."],
+      ["Eravamo esausti: {V} tre giorni di viaggio.","We were exhausted: it had taken three days of travel."]],
+  tr:[["Dopo che {V} un anno intero di lavori, il ponte fu finalmente aperto.","After a whole year of work, the bridge was finally opened."],
+      ["Dopo che {V} tre giorni di cammino, arrivarono al villaggio.","After three days of walking, they reached the village."]],
+  fa:[["{V} un sacco di tempo per costruirlo.","It must have taken ages to build it."],
+      ["{V} dieci anni per finire la cattedrale.","It must have taken ten years to finish the cathedral."]],
+  cgp:[["Mi sembra che {V} troppo tempo.","I feel it took too long."],
+       ["Pare che {V} tre anni per restaurarlo.","Apparently it took three years to restore it."]],
+  cgt:[["Se {V} meno tempo, saremmo arrivati in orario.","If it had taken less time, we would have arrived on time."],
+       ["Se non {V} venti minuti di fila, avremmo preso il treno.","If it hadn't taken twenty minutes in line, we would have caught the train."]],
+  pr:[["Per costruire il Duomo di Firenze {V} più di un secolo.","Building Florence Cathedral took more than a century."],
+      ["Per affrescare la volta della Sistina {V} quattro anni.","Painting the Sistine Chapel ceiling took four years."]]
+};
+
+CURATED["averne abbastanza"] = {
+  p:["Basta, {S} {V} di questo caldo!","That's it, {S} {V} with this heat!"],
+  pp:["Dopo tre ore di fila {S} {V}.","After three hours in line {S} {V}."],
+  i:["Ad agosto {S} {V} del caldo di città, ogni anno.","In August {S} {V} with the city heat, every year."],
+  f:["Dopo una settimana di pioggia, {S} {V}.","After a week of rain, {S} {V}."],
+  c:["Con un capo così, {S} {V} dopo un giorno.","With a boss like that, {S} {V} after one day."],
+  cp:["Con tutto quel rumore, {S} {V} dopo un'ora.","With all that noise, {S} {V} after an hour."],
+  cg:["È normale che {S} {V} di questo traffico.","It's normal that {S} {V} with this traffic."],
+  ci:["Era chiaro che {S} {V} di quella storia.","It was clear that {S} {V} with that story.","past"],
+  cgp:["Mi dispiace che {S} {V} di questa città.","I'm sorry that {S} {V} with this city."],
+  cgt:["Nessuno sapeva che {S} {V} di quel lavoro.","Nobody knew that {S} {V} with that job."],
+  tp:["Quando finalmente è arrivato l'autobus, {S} {V} da un pezzo.","When the bus finally came, {S} {V} for a while."],
+  tr:["Dopo che {S} {V} di quella vita, tutto cambiò.","After {S} {V} with that life, everything changed."],
+  fa:["{S} {V} di aspettare, immagino.","I guess {S} {V} with waiting.","past"],
+  pr:["Alla fine {S} {V} di quella vita.","In the end {S} {V} with that life."]
+};
+
+
+/* ---- review pass: rows that fill the last gaps and replace sentences flagged as odd ---- */
+const CUR_FIX = {"accorgersi": {"pr": ["Solo allora {S} {V} del pericolo.", "Only then did {S} notice the danger."]}, "alzarsi": {"fa": ["{S} {V} presto: fuori è ancora buio.", "{S} must have gotten up early: it's still dark outside."]}, "arrabbiarsi": {"pr": ["Quel giorno {S} {V} moltissimo.", "That day {S} {V} really angry.", null, {"b": "get", "t3": "gets", "p": "got", "pp": "gotten", "g": "getting"}], "tp": ["Luca non capiva perché {S} {V} così tanto.", "Luca didn't understand why {S} {V} so angry.", null, {"b": "get", "t3": "gets", "p": "got", "pp": "gotten", "g": "getting"}], "tr": ["Dopo che {S} {V} con tutti, calò il silenzio.", "After {S} {V} with everyone, silence fell."]}, "arrivare": {"fa": ["Quando ti sveglierai, {S} {V} a Napoli.", "By the time you wake up, {S} {V} in Naples."], "i": ["A scuola {S} {V} sempre all'ultimo minuto.", "At school {S} always {V} at the last minute.", "past"]}, "capirci": {"cgt": ["Se {S} {V} qualcosa, avremmo potuto aiutare.", "If {S} {V} anything, we could have helped.", null, {"b": "understand", "t3": "understands", "p": "understood", "pp": "understood", "g": "understanding"}], "pr": ["Quel giorno finalmente {S} {V} qualcosa di matematica.", "That day {S} finally {V} something about math.", null, {"b": "understand", "t3": "understands", "p": "understood", "pp": "understood", "g": "understanding"}], "tr": ["Dopo che {S} {V} qualcosa, la lezione sembrò più facile.", "After {S} {V} something, the lesson seemed easier.", null, {"b": "understand", "t3": "understands", "p": "understood", "pp": "understood", "g": "understanding"}]}, "capire": {"pr": ["Solo allora {S} {V} quanto era importante.", "Only then did {S} understand how important it was."]}, "cercare": {"ci": ["Se {S} {V} con calma, le chiavi salterebbero fuori.", "If {S} {V} calmly, the keys would turn up.", null, {"b": "look", "t3": "looks", "p": "looked", "pp": "looked", "g": "looking"}], "cgp": ["È possibile che {S} {V} nel posto sbagliato.", "It's possible that {S} {V} in the wrong place.", null, {"b": "look", "t3": "looks", "p": "looked", "pp": "looked", "g": "looking"}], "cgt": ["Se {S} {V} meglio, avremmo trovato il portafoglio.", "If {S} {V} more carefully, we would have found the wallet.", null, {"b": "look", "t3": "looks", "p": "looked", "pp": "looked", "g": "looking"}], "tr": ["Dopo che {S} {V} dappertutto, il portafoglio saltò fuori dalla borsa.", "After {S} {V} everywhere, the wallet turned up in the bag.", null, {"b": "look", "t3": "looks", "p": "looked", "pp": "looked", "g": "looking"}]}, "chiamarsi": {"p": ["{S} {V} come il nonno.", "{S} {V} after grandpa.", null, {"be": "named"}], "pp": ["Per anni {S} {V} con il cognome di un parente.", "For years {S} {V} the surname of a relative.", null, {"b": "go by", "t3": "goes by", "p": "went by", "pp": "gone by", "g": "going by"}], "i": ["Prima del trasloco in America {S} {V} Russo, non Rossi.", "Before the move to America {S} {V} Russo, not Rossi.", "past"], "cg": ["È curioso che {S} {V} Rossi come i vicini.", "It's funny that {S} {V} Rossi like the neighbors.", null, {"be": "called"}], "c": ["In America {S} {V} con un nome più semplice.", "In America {S} {V} a simpler name.", null, {"b": "go by", "t3": "goes by", "p": "went by", "pp": "gone by", "g": "going by"}], "cp": ["In America {S} {V} con un nome più semplice.", "In America {S} {V} a simpler name.", null, {"b": "go by", "t3": "goes by", "p": "went by", "pp": "gone by", "g": "going by"}], "f": ["Sul nuovo passaporto {S} {V} con il doppio cognome.", "On the new passport {S} {V} both surnames.", null, {"b": "go by", "t3": "goes by", "p": "went by", "pp": "gone by", "g": "going by"}], "ci": ["Pensavano che {S} {V} Rossi, non Russo.", "They thought {S} {V} Rossi, not Russo.", "past"], "cgp": ["Pare che prima {S} {V} Russo, non Rossi.", "Apparently {S} {V} Russo before, not Rossi.", "past"], "cgt": ["Se {S} {V} Rossi, saremmo stati parenti.", "If {S} {V} Rossi, we would have been related."], "tp": ["Prima del trasloco in America, {S} {V} Russo.", "Before the move to America, {S} {V} Russo."], "tr": ["Dopo che {S} {V} Russo per vent'anni, cambiammo cognome.", "After {S} {V} Russo for twenty years, we changed our surname."], "fa": ["Al prossimo compleanno {S} {V} Rossi per vent'anni.", "By the next birthday {S} {V} Rossi for twenty years."], "pr": ["Alla nascita {S} {V} Russo.", "At birth {S} {V} Russo."]}, "cominciare": {"cgp": ["È possibile che {S} {V} senza di loro.", "It's possible that {S} {V} without them."], "tp": ["Quando sono arrivati gli ospiti, {S} {V} a cucinare da un'ora.", "When the guests arrived, {S} {V} cooking an hour earlier."]}, "contarci": {"p": ["Per la cena di sabato {S} {V}: non mancare!", "For Saturday's dinner {S} {V}: don't miss it!", "prog"], "pg": ["Mi raccomando, non mancare: {S} {V}!", "Don't miss it: {S} {V}!"], "ipg": ["Quando hanno annullato la festa, {S} {V} tanto.", "When they called off the party, {S} {V}."], "fpg": ["Domani {S} {V}, quindi non mancare.", "Tomorrow {S} {V}, so don't miss it."], "pr": ["Quella volta {S} {V} davvero, ma nessuno venne.", "That time {S} {V}, but nobody came."], "tr": ["Dopo che {S} {V} per settimane, la festa fu annullata.", "After {S} {V} for weeks, the party was called off."]}, "crederci": {"e": {"b": "believe in it", "t3": "believes in it", "p": "believed in it", "pp": "believed in it", "g": "believing in it"}, "tr": ["Dopo che {S} {V} fino in fondo, il progetto riuscì.", "After {S} {V} all the way, the project succeeded."]}, "dovere": {"f": ["La settimana prossima {S} {V} rinnovare i documenti.", "Next week {S} {V} renew the documents.", "fut"], "fa": ["{S} {V} lavorare fino a tardi, immagino.", "I imagine {S} had to work late.", "past"], "tr": ["Dopo che {S} {V} rinunciare alla vacanza, restammo in città.", "After {S} {V} give up the vacation, we stayed in town."]}, "entrarci": {"cg": ["Sembra che {S} non {V} niente.", "It seems that {S} {NV} at all."], "cgp": ["Pare che {S} non {V} niente con il furto.", "Apparently {S} {NV} with the theft.", "past"], "cgt": ["Nessuno credeva che {S} non {V} niente con quella storia.", "Nobody believed that {S} {NV} in that story.", "past"], "fa": ["Secondo la polizia, {S} {V} qualcosa con il furto.", "According to the police, {S} {V} in the theft somehow.", "past"], "pr": ["In quella storia {S} non {V} niente.", "{S} {NV} in that story at all.", "past"], "tp": ["Alla fine si è scoperto che {S} non {V} niente con il furto.", "In the end it turned out {S} {NV} in the theft."], "tr": ["Dopo che {S} {V} in quella storia, niente fu più come prima.", "After {S} {V} in that story, nothing was the same again."]}, "farla finita": {"cp": ["Al posto di Luca, {S} {V} con quel capo molto prima.", "In Luca's place, {S} {V} with that boss much sooner."], "i": ["A quei tempi {S} {V} con le sigarette ogni gennaio.", "Back then {S} {V} cigarettes every January.", null, {"b": "quit", "t3": "quits", "p": "quit", "pp": "quit", "g": "quitting"}], "fa": ["Entro dicembre {S} {V} con questa storia.", "By December {S} {V} with this business."], "pr": ["Quell'anno {S} {V} con le sigarette.", "That year {S} {V} cigarettes.", null, {"b": "quit", "t3": "quits", "p": "quit", "pp": "quit", "g": "quitting"}], "tr": ["Dopo che {S} {V} con quel lavoro, ci trasferimmo al mare.", "After {S} {V} with that job, we moved to the seaside."]}, "farla franca": {"tr": ["Dopo che {S} {V} ancora una volta, nessuno disse niente.", "After {S} {V} once again, nobody said anything."]}, "farne a meno": {"fa": ["Fra un mese {S} {V} senza problemi, vedrai.", "A month from now {S} {V} without any trouble, you'll see."], "pr": ["Quell'estate {S} {V} senza problemi.", "That summer {S} {V} without any trouble."], "tr": ["Dopo che {S} {V} per un mese, nessuno ne sentì più la mancanza.", "After {S} {V} for a month, nobody missed it anymore."]}, "fermarsi": {"tr": ["Dopo che {S} {V} a fare benzina, ripartimmo per Roma.", "After {S} {V} for gas, we set off for Rome again."]}, "finire": {"pp": ["Ieri sera {S} {V} il libro che Luca ci aveva regalato a Natale.", "Last night {S} {V} the book Luca had given us for Christmas."]}, "finirla": {"fa": ["Entro stasera {S} {V} con le scuse.", "By tonight {S} {V} with the excuses.", null, {"b": "stop it", "t3": "stops it", "p": "stopped it", "pp": "stopped it", "g": "stopping it"}], "pr": ["Alla fine {S} {V} con le scuse.", "In the end {S} {V} with the excuses.", null, {"b": "stop it", "t3": "stops it", "p": "stopped it", "pp": "stopped it", "g": "stopping it"}], "tp": ["Quando Luca è arrivato, {S} {VG} con le scuse.", "When Luca arrived, {S} {VA} with the excuses.", null, {"b": "stop it", "t3": "stops it", "p": "stopped it", "pp": "stopped it", "g": "stopping it"}], "tr": ["Dopo che {S} {V} con le scuse, si poté parlare seriamente.", "After {S} {V} with the excuses, we could talk seriously.", null, {"b": "stop it", "t3": "stops it", "p": "stopped it", "pp": "stopped it", "g": "stopping it"}]}, "fregarsene": {"pg": ["Guarda, {S} {V} delle regole!", "Look, {S} {V} the rules!", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "ipg": ["Quando è arrivato il vigile, {S} {V} delle regole.", "When the traffic cop arrived, {S} {V} the rules.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "fpg": ["Vedrai, fra un'ora {S} {V} di nuovo delle regole.", "You'll see, in an hour {S} {V} the rules again.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "pr": ["Da giovan{e} {S} {V} delle regole.", "When young, {S} {NV} about the rules."], "tr": ["Dopo che {S} {V} delle regole per anni, arrivò la multa.", "After {S} {V} the rules for years, the fine arrived.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}]}, "infischiarsene": {"pg": ["Guarda, {S} {V} dei pettegolezzi!", "Look, {S} {V} the gossip!", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "ipg": ["Quando sono usciti gli articoli, {S} {V} dei pettegolezzi.", "When the articles came out, {S} {V} the gossip.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "fpg": ["Domani, mentre tutti parleranno, {S} {V} dei pettegolezzi.", "Tomorrow, while everyone is talking, {S} {V} the gossip.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "cgt": ["Se {S} {V} dei pettegolezzi, sarebbe stato meglio.", "If {S} {V} the gossip, it would have been better.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "fa": ["Come sempre, {S} {V} dei pettegolezzi.", "As usual, I bet {S} {NV} about the gossip.", "past"], "tp": ["Anche quella volta {S} {V} dei pettegolezzi.", "That time too {S} {V} the gossip.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}], "pr": ["Da giovan{e} {S} {V} dei pettegolezzi.", "When young, {S} {NV} about gossip."], "tr": ["Dopo che {S} {V} dei pettegolezzi, tutti smisero di parlarne.", "After {S} {V} the gossip, everyone stopped talking about it.", null, {"b": "ignore", "t3": "ignores", "p": "ignored", "pp": "ignored", "g": "ignoring"}]}, "intendersene": {"cgp": ["Pare che da giovan{e} {S} {V} di vino.", "Apparently {S} {V} about wine when young.", "past"], "cgt": ["Nessuno sapeva che {S} {V} così tanto di vino.", "Nobody knew {S} {V} so much about wine.", null, {"b": "know", "t3": "knows", "p": "knew", "pp": "known", "g": "knowing"}], "fa": ["Con tutti quei viaggi in Toscana, {S} {V} di vino, immagino.", "With all those trips to Tuscany, I imagine {S} {V} about wine.", "past"], "pr": ["Da giovan{e} {S} {V} di vino.", "When young, {S} {V} about wine."], "tp": ["Prima di quel corso, {S} non {V} per niente di vino.", "Before that course, {S} {NV} anything about wine.", null, {"b": "know", "t3": "knows", "p": "knew", "pp": "known", "g": "knowing"}], "tr": ["Dopo che {S} {V} di vino per anni, aprimmo un'enoteca.", "After {S} {V} about wine for years, we opened a wine shop."]}, "lavarsi": {"fa": ["{S} {V} con l'acqua fredda, immagino: la caldaia è rotta.", "I imagine {S} washed up with cold water: the boiler is broken.", "past"]}, "lavorare": {"tr": ["Dopo che {S} {V} tutto il giorno, andammo a mangiare una pizza.", "After {S} {V} all day, we went out for a pizza."]}, "legarsela al dito": {"fa": ["Conoscendo il tipo, {S} {V}.", "Knowing the type, I bet {S} {V}.", "past"], "tr": ["Dopo che {S} {V}, non ci parlammo per anni.", "After {S} {V}, we didn't speak for years."]}, "leggere": {"ci": ["Se {S} {V} il giornale ogni giorno, sarebbe un ottimo esercizio.", "If {S} {V} the paper every day, it would be great practice."]}, "mangiare": {"fa": ["Quando arriverai, {S} {VG}: è tardissimo.", "By the time you arrive, {S} {VA}: it's very late."]}, "mettercela tutta": {"tr": ["Dopo che {S} {V}, vincemmo la partita.", "After {S} {V}, we won the game."]}, "metterci": {"tr": ["Dopo che {S} {V} un'ora a trovare parcheggio, arrivammo finalmente.", "After {S} {V} an hour to find parking, we finally arrived."]}, "nascere": {"cg": ["Nella recita è previsto che {S} {V} nel primo atto.", "In the play, the plan is that {S} {V} in the first act."], "i": ["Nella recita di Natale {S} {V} sempre nel primo atto.", "In the Christmas play {S} {V} in the first act every time."], "fa": ["Secondo la mamma, {S} {V} verso mezzanotte.", "According to mom, {S} {V} around midnight.", "past"], "tr": ["Dopo che {S} {V}, la famiglia si trasferì a Roma.", "After {S} {V}, the family moved to Rome."]}, "passarsela bene": {"pr": ["In quegli anni {S} {V} a Londra.", "In those years {S} {V} in London."], "tr": ["Dopo che {S} {V} a Londra per anni, tornammo in Italia.", "After {S} {V} in London for years, we came back to Italy."]}, "pensarci": {"tr": ["Dopo che {S} {V} tutta la notte, prendemmo una decisione.", "After {S} {V} all night, we made a decision."]}, "piantarla": {"cgp": ["Pare che finalmente {S} {V} con gli scherzi.", "Apparently {S} finally {V} with the jokes.", "past"], "fa": ["Entro stasera {S} {V} con gli scherzi, spero.", "By tonight {S} {V} with the jokes, I hope."], "pr": ["Alla fine {S} {V} con gli scherzi.", "In the end {S} {V} with the jokes."], "tp": ["Quando è arrivato il professore, {S} {VG} con gli scherzi.", "When the teacher arrived, {S} {VA} with the jokes."], "tr": ["Dopo che {S} {V} con gli scherzi, la riunione cominciò.", "After {S} {V} with the jokes, the meeting began."]}, "potere": {"ci": ["Se {S} {V} scegliere, vivremmo tutti al mare.", "If {S} {V} choose, we would all live by the sea."], "cgt": ["Se {S} {V} scegliere, sarebbe stato tutto più facile.", "If {S} {V} choose, everything would have been easier."], "fa": ["Entro le sei {S} {V} finire tutto, spero.", "By six {S} {V} finish everything, I hope."], "tr": ["Dopo che {S} {V} riposare un po', ripartimmo.", "After {S} {V} rest a bit, we set off again."]}, "poterne più": {"tr": ["Dopo che {S} {V} di aspettare, ce ne andammo.", "After {S} {V} with waiting, we left."]}, "prenderla male": {"fa": ["{S} {V}, immagino.", "I imagine {S} took it badly.", "past"], "tr": ["Dopo che {S} {V}, nessuno disse più niente.", "After {S} {V}, nobody said anything else."]}, "prendersela": {"fa": ["{S} {V} per quella battuta, immagino.", "I imagine {S} got upset about that joke.", "past"], "pr": ["Quella volta {S} {V} moltissimo.", "That time {S} got really upset."], "tr": ["Dopo che {S} {V} per quella battuta, la cena finì in silenzio.", "After {S} {V} over that joke, dinner ended in silence."]}, "preoccuparsi": {"tr": ["Dopo che {S} {V} per tutta la sera, Luca finalmente chiamò.", "After {S} {V} all evening, Luca finally called."]}, "pagare": {"c": ["{S} {V} volentieri di più per una camera con vista.", "{S} {V} more for a room with a view, happily."], "cp": ["{S} {V} volentieri di più per una camera con vista.", "{S} {V} more for a room with a view, happily."]}, "provarci": {"cp": ["{S} {V} volentieri, ma era troppo tardi.", "{S} {V} with pleasure, but it was too late."], "tr": ["Dopo che {S} {V} tre volte, finalmente funzionò.", "After {S} {V} three times, it finally worked."]}, "rendersi conto": {"pp": ["Al ristorante {S} {V} che il portafoglio era rimasto a casa.", "At the restaurant {S} {V} that the wallet was still at home."], "pr": ["Solo anni dopo {S} {V} di quanto fosse importante quel giorno.", "Only years later did {S} realize how important that day had been."], "p": ["Solo adesso {S} {V} di quanto sia bello vivere qui.", "It's only now that {S} {V} how beautiful it is to live here."], "tr": ["Appena {S} {V} del pericolo, chiamammo aiuto.", "As soon as {S} {V} the danger, we called for help."]}, "ricordarsi": {"pr": ["Solo allora {S} {V} di quella promessa.", "Only then did {S} remember that promise."]}, "rimanere": {"pg": ["Accidenti, {S} {V} senza batteria!", "Darn, {S} {V} out of battery!", null, {"b": "run", "t3": "runs", "p": "ran", "pp": "run", "g": "running"}], "ipg": ["Quando ha chiamato Luca, {S} {V} senza soldi.", "When Luca called, {S} {V} out of money.", null, {"b": "run", "t3": "runs", "p": "ran", "pp": "run", "g": "running"}], "fpg": ["Di questo passo, fra poco {S} {V} senza benzina.", "At this rate, soon {S} {V} out of gas.", null, {"b": "run", "t3": "runs", "p": "ran", "pp": "run", "g": "running"}]}, "rimetterci": {"tr": ["Dopo che {S} {V} un sacco di soldi, chiudemmo il negozio.", "After {S} {V} a lot of money, we closed the shop."]}, "sapere": {"pr": ["Solo il giorno dopo {S} {V} la verità.", "Only the next day did {S} learn the truth."], "tr": ["Dopo che {S} {V} la verità, niente fu più come prima.", "After {S} {V} the truth, nothing was the same again.", null, {"b": "find out", "t3": "finds out", "p": "found out", "pp": "found out", "g": "finding out"}]}, "saperla lunga": {"cgp": ["Pare che da giovan{e} {S} {V} sul vino.", "Apparently {S} {V} about wine when young.", "past"], "cgt": ["Nessuno sapeva che {S} {V} sul vino.", "Nobody knew {S} {V} about wine."], "fa": ["Con tutti quei viaggi, {S} {V} sul vino, scommetto.", "With all those trips, I bet {S} {V} about wine.", "past"], "pr": ["Da giovan{e} {S} {V} sul vino.", "When young, {S} {V} about wine."], "tp": ["Già da ragazz{o} {S} {V} sul vino.", "Even as a kid, {S} {V} about wine."], "tr": ["Dopo che {S} {V} sul vino per anni, ci diedero un premio.", "After {S} {V} about wine for years, they gave us a prize."]}, "sbagliarsi": {"pg": ["Aspetta, {S} {V}: il treno parte alle nove!", "Wait, {S} {V}: the train leaves at nine!", null, {"b": "make a mistake", "t3": "makes a mistake", "p": "made a mistake", "pp": "made a mistake", "g": "making a mistake"}], "ipg": ["Quando Luca ha controllato, {S} {V} sull'orario.", "When Luca checked, {S} {V} about the schedule.", null, {"b": "make a mistake", "t3": "makes a mistake", "p": "made a mistake", "pp": "made a mistake", "g": "making a mistake"}], "fpg": ["Di questo passo, fra poco {S} {V} nei conti.", "At this rate, soon {S} {V} in the accounts.", null, {"b": "make a mistake", "t3": "makes a mistake", "p": "made a mistake", "pp": "made a mistake", "g": "making a mistake"}], "tr": ["Dopo che {S} {V} sull'orario, perdemmo il treno.", "After {S} {V} about the schedule, we missed the train."]}, "sbrigarsela": {"tr": ["Dopo che {S} {V} senza aiuto, tutti furono contenti.", "After {S} {V} without help, everyone was happy."]}, "sedersi": {"pg": ["Guarda, {S} {V} in prima fila!", "Look, {S} {V} in the front row!"], "ipg": ["Quando è cominciato il film, {S} {V} in platea.", "When the movie started, {S} {V} in the stalls."], "fpg": ["Domani a quest'ora {S} {V} a tavola per il pranzo di Natale.", "This time tomorrow {S} {V} at the table for Christmas lunch."]}, "sentire": {"f": ["Domani {S} {V} Luca per organizzare la cena.", "Tomorrow {S} {V} Luca to organize the dinner.", null, {"b": "call", "t3": "calls", "p": "called", "pp": "called", "g": "calling"}], "tp": ["Luca era sorpreso perché {S} non {VM} quella canzone.", "Luca was surprised because {S} had never heard that song."]}, "sentirci": {"fa": ["Con tutto quel rumore, {S} non {V} niente, immagino.", "With all that noise, I imagine {S} {NV} anything.", "past"], "pr": ["Quel giorno, per il rumore, {S} non {V} più niente.", "That day, because of the noise, {S} {NV} anything anymore."], "tp": ["Dopo il concerto {S} non {V} bene per ore.", "After the concert {S} {NV} well for hours."], "tr": ["Dopo che {S} non {V} bene per giorni, andammo dal medico.", "After {S} {NV} well for days, we went to the doctor."]}, "sentirsi": {"cgp": ["Luca pensa che ieri sera {S} non {V} bene.", "Luca thinks {S} {NV} well last night.", "past"]}, "smetterla": {"fa": ["Quando arriverà Luca, {S} {V} con le battute.", "By the time Luca arrives, {S} {V} with the jokes."], "pr": ["Alla fine {S} {V} con le battute.", "In the end {S} {V} with the jokes."], "tr": ["Dopo che {S} {V} con le battute, la cena diventò seria.", "After {S} {V} with the jokes, dinner got serious."]}, "spassarsela": {"tr": ["Dopo che {S} {V} tutta l'estate, tornare al lavoro fu dura.", "After {S} {V} all summer, going back to work was tough."]}, "sposarsi": {"fa": ["Entro giugno {S} {V}.", "By June {S} {V}."]}, "squagliarsela": {"tr": ["Dopo che {S} {V} dalla festa, nessuno se ne accorse.", "After {S} {V} from the party, nobody noticed."]}, "starci": {"fa": ["Con una proposta così, {S} {V} subito, scommetto.", "With an offer like that, I bet {S} {V} right away.", "past"], "pr": ["Quella volta {S} {V} subito.", "That time {S} {V} right away."], "tp": ["La volta prima, quando Luca l'aveva proposto, {S} {V} subito.", "The time before, when Luca had suggested it, {S} {V} right away."], "tr": ["Dopo che {S} {V}, organizzammo la gita.", "After {S} {V}, we organized the trip."]}, "stare": {"tr": ["Dopo che {S} {V} a Sorrento per un mese, ripartimmo per Roma.", "After {S} {V} in Sorrento for a month, we left for Rome."]}, "starsene": {"tr": ["Dopo che {S} {V} a casa tutto l'inverno, la primavera fu una festa.", "After {S} {V} at home all winter, spring was a celebration."]}, "svegliarsi": {"tr": ["Appena {S} {V} di soprassalto, accendemmo la luce.", "As soon as {S} {V} with a start, we turned on the light."]}, "tenerci": {"fa": ["{S} {V} molto, immagino.", "I imagine {S} {V} a lot.", "past"], "pr": ["Quella volta {S} {V} tanto.", "That time {S} {V} a lot."], "tp": ["Era chiaro che {S} {V} tanto.", "It was clear that {S} {V} a lot."], "tr": ["Dopo che {S} {V} così tanto, il risultato fu una delusione.", "After {S} {V} so much, the result was a letdown."]}, "tirarsela": {"pr": ["Quell'estate {S} {V} con la macchina nuova.", "That summer {S} {V} with the new car."], "tr": ["Dopo che {S} {V} tutta la sera, nessuno ci invitò più.", "After {S} {V} all evening, nobody invited us anymore."]}, "tornare": {"c": ["{S} {V} a Sorrento anche domani, se fosse possibile.", "{S} {V} back to Sorrento tomorrow, if it were possible."], "pr": ["Dopo vent'anni {S} {V} in Sicilia.", "After twenty years {S} {V} back to Sicily."]}, "tornarsene": {"tr": ["Dopo che {S} {V} in paese, la città sembrò vuota.", "After {S} {V} to the village, the city felt empty."]}, "trovarsi": {"i": ["Nel vecchio ufficio {S} {V} male con i colleghi.", "At the old office {S} {NV} along with the colleagues.", "past", {"b": "get", "t3": "gets", "p": "got", "pp": "gotten", "g": "getting"}], "tr": ["Dopo che {S} {V} bene a Firenze per tanto tempo, ripartire fu triste.", "After {S} had felt at home in Florence for so long, leaving was sad."]}, "uscirsene": {"fa": ["{S} {V} con una delle solite battute, immagino.", "I imagine {S} {V} with one of the usual jokes.", "past"], "tr": ["Dopo che {S} {V} con quella battuta, nessuno rise.", "After {S} {V} with that joke, nobody laughed."]}, "vederci": {"fa": ["Al buio {S} non {V} niente, immagino.", "In the dark, I imagine {S} {NV} anything.", "past"], "pr": ["Quella notte, senza luna, {S} non {V} niente.", "That night, with no moon, {S} {NV} anything."], "tp": ["Prima dell'operazione {S} non {V} bene per anni.", "Before the operation {S} {NV} well for years."], "tr": ["Dopo che {S} non {V} bene per mesi, andammo dall'oculista.", "After {S} {NV} well for months, we went to the eye doctor."]}, "vedere": {"tp": ["Prima di quel viaggio, {S} non {VM} il mare.", "Before that trip, {S} had never seen the sea."]}, "vedersela brutta": {"tr": ["Dopo che {S} {V} in mare, non uscimmo più in barca.", "After {S} {V} at sea, we never went out in a boat again."]}, "venire": {"ci": ["Sarebbe bello se {S} {V} a Capri con Luca.", "It would be nice if {S} {V} to Capri with Luca."]}, "vivere": {"cgp": ["È possibile che {S} {V} a Napoli da giovan{e}.", "It's possible that {S} {V} in Naples when young.", "past"], "pg": ["In questo periodo {S} {V} a Firenze.", "These days {S} {V} in Florence."], "ipg": ["In quel periodo {S} {V} a Napoli.", "At that time {S} {V} in Naples."], "fpg": ["Fra un anno {S} {V} al mare, speriamo.", "A year from now {S} {V} by the sea, hopefully."], "tr": ["Dopo che {S} {V} in Francia per anni, tornammo in Italia.", "After {S} {V} in France for years, we came back to Italy."]}, "volere": {"tr": ["Dopo che {S} {V} vedere il mare a tutti i costi, partimmo all'alba.", "After {S} {V} to see the sea at all costs, we left at dawn."]}, "andarsene": {"tr": ["Dopo che {S} {V}, la festa finì presto.", "After {S} {V}, the party ended early."]}, "approfittarsene": {"tr": ["Dopo che {S} {V} ancora una volta, gli altri si stancarono.", "After {S} {V} once again, the others got fed up."]}, "arrivarci": {"pr": ["Alla fine {S} {V} senza aiuto.", "In the end {S} {V} without help."], "tr": ["Dopo che {S} {V}, tutto fu più chiaro.", "After {S} {V}, everything was clearer."]}, "avercela": {"pr": ["Per anni {S} {V} con il vicino.", "For years {S} {V} at the neighbor."], "tr": ["Dopo che {S} {V} con il vicino per mesi, facemmo pace.", "After {S} {V} at the neighbor for months, we made peace."]}, "avere": {"tr": ["Dopo che {S} {V} la conferma della prenotazione, partimmo.", "After {S} {V} the booking confirmation, we left."]}, "cascarci": {"pg": ["Guarda, {S} {V} di nuovo!", "Look, {S} {V} again!"], "ipg": ["Quando Luca ha scoperto il trucco, {S} {V} anche stavolta.", "When Luca discovered the trick, {S} {V} this time too."], "fpg": ["Vedrai, fra un minuto {S} {V} di nuovo.", "You'll see, in a minute {S} {V} again."], "tr": ["Dopo che {S} {V} per l'ennesima volta, tutti risero.", "After {S} {V} for the umpteenth time, everyone laughed."]}, "cavarsela": {"tr": ["Dopo che {S} {V} da sol{o} per un mese, tutto diventò più facile.", "After {S} {V} alone for a month, everything got easier."]}, "cercarsela": {"cgt": ["Pensavamo che {S} {V} anche quella volta.", "We thought {S} {V} that time too."], "tr": ["Dopo che {S} {V} ancora una volta, nessuno ebbe pietà.", "After {S} {V} once again, nobody felt sorry."]}, "conoscere": {"pg": ["In questo periodo {S} {V} un sacco di gente nuova.", "These days {S} {V} lots of new people."], "ipg": ["In quel periodo {S} {V} gente nuova ogni giorno.", "At that time {S} {V} new people every day."], "fpg": ["Fra un mese {S} {V} gente nuova all'università.", "A month from now {S} {V} new people at the university."]}, "divertirsi": {"tr": ["Dopo che {S} {V} tutta la sera, tornammo a casa stanchi morti.", "After {S} {V} all evening, we went home dead tired."]}, "essere": {"tr": ["Dopo che {S} {V} in vacanza per un mese, tornare al lavoro fu dura.", "After {S} {V} on vacation for a month, going back to work was tough."]}, "farcela": {"tr": ["Dopo che {S} {V} da sol{o}, tutti applaudirono.", "After {S} {V} alone, everyone applauded."]}, "filarsela": {"tr": ["Dopo che {S} {V} in silenzio, nessuno se ne accorse.", "After {S} {V} quietly, nobody noticed."]}, "godersela": {"tr": ["Dopo che {S} {V} al mare per un mese, tornammo in città.", "After {S} {V} at the beach for a month, we came back to the city."]}, "crescere": {"p": ["Con il basket {S} {V} a vista d'occhio.", "With basketball {S} {V} taller by the day.", "prog", {"b": "grow", "t3": "grows", "p": "grew", "pp": "grown", "g": "growing"}], "pp": ["{S} {V} in un piccolo paese di montagna.", "{S} {V} in a small mountain village.", "past"], "i": ["A quei tempi {S} {V} in campagna, tra galline e conigli.", "Back then {S} {V} in the country, among chickens and rabbits.", "pastProg"], "f": ["Con questa vita all'aria aperta, {S} {V} seren{o}.", "With this outdoor life, {S} {V} happy and calm."], "c": ["In un'altra famiglia {S} {V} diversamente.", "In another family {S} {V} differently."], "cp": ["In un'altra città {S} {V} con altre abitudini.", "In another city {S} {V} with other habits."], "cg": ["È bello che {S} {V} con i nonni vicino.", "It's nice that {S} {V} with the grandparents nearby.", "prog"], "ci": ["Se {S} {V} in campagna, sarebbe più sano.", "If {S} {V} in the country, it would be healthier."], "cgp": ["Pare che {S} {V} a Napoli.", "Apparently {S} {V} in Naples.", "past"], "cgt": ["Nessuno sapeva che {S} {V} in Argentina.", "Nobody knew that {S} {V} in Argentina."], "tp": ["Prima del trasloco a Milano, {S} {V} in Sicilia.", "Before the move to Milan, {S} {V} in Sicily."], "tr": ["Dopo che {S} {V} in campagna, la città sembrò enorme.", "After {S} {V} in the country, the city seemed huge."], "fa": ["{S} {V} in Sicilia, a giudicare dall'accento.", "Judging by the accent, {S} {V} in Sicily.", "past"], "pr": ["{S} {V} in un paese vicino a Bari.", "{S} {V} in a village near Bari."], "pg": ["In questo periodo {S} {V} molto.", "These days {S} {V} a lot.", null, {"b": "grow", "t3": "grows", "p": "grew", "pp": "grown", "g": "growing"}], "ipg": ["In quegli anni {S} {V} in fretta.", "In those years {S} {V} fast.", null, {"b": "grow", "t3": "grows", "p": "grew", "pp": "grown", "g": "growing"}], "fpg": ["L'anno prossimo, a quest'ora, {S} {V} in un'altra città.", "Next year, at this time, {S} {V} in another city."]}, "intendere": {"p": ["Domani {S} {V} parlare con il capo.", "Tomorrow {S} {V} to talk to the boss."], "pp": ["Ieri {S} {V} chiedere scusa, ma non c'è stato tempo.", "Yesterday {S} {V} to apologize, but there wasn't time.", "past"], "i": ["{S} {V} partire presto, ma poi è cominciato a piovere.", "{S} {V} to leave early, but then it started to rain.", "past"], "f": ["Se va male, {S} {V} fare ricorso.", "If it goes badly, {S} {V} to appeal.", null, {"b": "want", "t3": "wants", "p": "wanted", "pp": "wanted", "g": "wanting"}], "c": ["{S} {V} cambiare casa, se fosse possibile.", "{S} {V} to move, if it were possible.", null, {"b": "like", "cond": "would like"}], "cp": ["{S} {V} restare di più, ma il volo partiva alle sei.", "{S} {V} to stay longer, but the flight left at six.", null, {"b": "want", "t3": "wants", "p": "wanted", "pp": "wanted", "g": "wanting"}], "cg": ["Non è chiaro che cosa {S} {V} fare.", "It's not clear what {S} {V} to do."], "ci": ["Se {S} {V} partire davvero, dovremmo prenotare subito.", "If {S} {V} to leave for real, we should book right away."], "cgp": ["Non so che cosa {S} {V} dire con quella frase.", "I don't know what {S} {V} to say with that sentence.", "past"], "cgt": ["Pensavo che {S} {V} restare più a lungo.", "I thought {S} {V} to stay longer."], "tp": ["{S} {V} dirlo prima, ma non c'era stato tempo.", "{S} {V} to say it earlier, but there hadn't been time."], "tr": ["Dopo che {S} {V} le ragioni di Luca, la discussione finì.", "After {S} {V} Luca's reasons, the argument ended.", null, {"b": "understand", "t3": "understands", "p": "understood", "pp": "understood", "g": "understanding"}], "fa": ["{S} {V} dire un'altra cosa, immagino.", "I imagine {S} {V} to say something else.", "past"], "pr": ["Quella volta {S} {V} scherzare, ma nessuno rise.", "That time {S} {V} to joke, but nobody laughed."]}};
+Object.keys(CUR_FIX).forEach(k=>{ CURATED[k] = Object.assign(CURATED[k] || {}, CUR_FIX[k]); });
+/* imperativo: [italian after the verb, english verb phrase, negative?] */
+const IMP_ROWS = {"accorgersi": ["dell'errore prima di pagare", "notice the mistake before paying", 0], "addormentarsi": ["sul divano", "fall asleep on the couch", 1], "alzarsi": ["presto domani", "get up early tomorrow", 0], "andare": ["al mercato prima che chiuda", "go to the market before it closes", 0], "andarsene": ["senza salutare", "leave without saying goodbye", 1], "approfittarsene": ["", "take advantage of it", 1], "aprire": ["la finestra", "open the window", 0], "arrabbiarsi": ["con il vicino", "get angry with the neighbor", 1], "arrivare": ["in orario domani", "arrive on time tomorrow", 0], "aspettare": ["qui un attimo", "wait here a moment", 0], "avere": ["pazienza", "be patient", 0], "bere": ["un bicchiere d'acqua", "drink a glass of water", 0], "cavarsela": ["senza di me", "manage without me", 0], "cercare": ["le chiavi in cucina", "look for the keys in the kitchen", 0], "chiamare": ["un taxi", "call a taxi", 0], "chiedere": ["il conto al cameriere", "ask the waiter for the bill", 0], "chiudere": ["la porta a chiave", "lock the door", 0], "cominciare": ["a mangiare senza di me", "start eating without me", 0], "comprare": ["il pane", "buy the bread", 0], "crederci": ["fino in fondo", "believe in it all the way", 0], "credere": ["a me", "believe me", 0], "cucinare": ["la pasta per tutti", "cook pasta for everyone", 0], "dare": ["una mano ai vicini", "give the neighbors a hand", 0], "dire": ["la verità", "tell the truth", 0], "divertirsi": ["al mare", "have fun at the beach", 0], "dormire": ["un po'", "get some sleep", 0], "essere": ["puntual{e}", "be on time", 0], "fare": ["una foto al Colosseo", "take a photo of the Colosseum", 0], "farla finita": ["con queste scuse", "be done with these excuses", 0], "farne a meno": ["per una settimana", "do without it for a week", 0], "fermarsi": ["a fare benzina", "stop for gas", 0], "filarsela": ["in silenzio", "sneak off quietly", 0], "finire": ["i compiti prima di cena", "finish the homework before dinner", 0], "finirla": ["con queste scuse", "stop it with these excuses", 0], "godersela": ["al mare", "enjoy it at the beach", 0], "innamorarsi": ["di Firenze", "fall in love with Florence", 0], "lamentarsi": ["del servizio", "complain about the service", 1], "lavarsi": ["le mani prima di mangiare", "wash your hands before eating", 0], "lavorare": ["troppo", "work too much", 1], "legarsela al dito": ["", "hold a grudge", 1], "leggere": ["questo libro", "read this book", 0], "mangiare": ["qualcosa prima di partire", "eat something before leaving", 0], "mettercela tutta": ["per vincere", "give it everything to win", 0], "metterci": ["tutto il tempo che serve", "take all the time you need", 0], "mettere": ["il cappotto", "put on a coat", 0], "pagare": ["il conto alla cassa", "pay the bill at the register", 0], "parlare": ["più piano", "speak more slowly", 0], "partire": ["presto per evitare il traffico", "leave early to avoid the traffic", 0], "pensarci": ["bene prima di decidere", "think it over carefully before deciding", 0], "pensare": ["alla salute", "think about your health", 0], "piangere": ["", "cry", 1], "piantarla": ["con questi scherzi", "cut it out with these jokes", 0], "prendere": ["l'ombrello", "take an umbrella", 0], "preoccuparsi": ["per il viaggio", "worry about the trip", 1], "provarci": ["ancora una volta", "give it one more try", 0], "rendersi conto": ["della situazione", "realize what the situation is", 0], "ricordarsi": ["di chiudere il gas", "remember to turn off the gas", 0], "rimanere": ["a cena stasera", "stay for dinner tonight", 0], "sbrigarsela": ["senza aiuto", "handle it without help", 0], "scrivere": ["una cartolina alla nonna", "write grandma a postcard", 0], "sedersi": ["a tavola", "sit down at the table", 0], "sentire": ["questa canzone", "listen to this song", 0], "sentirsi": ["a casa", "feel at home", 0], "smetterla": ["con queste battute", "stop it with these jokes", 0], "spassarsela": ["in vacanza", "have a great time on vacation", 0], "sposarsi": ["in Italia", "get married in Italy", 0], "squagliarsela": ["prima che arrivi il capo", "slip away before the boss arrives", 0], "stare": ["tranquill{o}", "stay calm", 0], "starsene": ["a casa stasera", "stay at home tonight", 0], "studiare": ["un po' ogni giorno", "study a bit every day", 0], "svegliarsi": ["alle sette", "wake up at seven", 0], "temere": ["il giudizio degli altri", "fear other people's judgment", 1], "tornare": ["presto", "come back soon", 0], "tornarsene": ["a casa a riposare", "head home to rest", 0], "trascurare": ["la salute", "neglect your health", 1], "trovare": ["un buon ristorante per stasera", "find a good restaurant for tonight", 0], "uscire": ["a prendere un po' d'aria", "go out for some fresh air", 0], "vedere": ["un po' chi c'è alla porta", "see who's at the door", 0], "venire": ["alla festa sabato", "come to the party on Saturday", 0], "vestirsi": ["in fretta", "get dressed quickly", 0], "insinuare": ["niente sul nuovo collega", "insinuate anything about the new coworker", 1], "restare": ["a casa stasera", "stay home tonight", 0], "continuare": ["a studiare l'italiano", "keep studying Italian", 0], "incontrare": ["i vecchi compagni di scuola", "meet up with your old school friends", 0]};
+/* no natural command form / no stare + gerundio for these: those cards are left out */
+["amare","apparire","appartenere","capire","comprendere","conoscere","convenire","corrispondere","crescere","desiderare","distinguere","dubitare","esistere","farcela","funzionare","giungere","intendere","meritare","morire","nascere","odiare","peggiorare","percepire","possedere","preferire","ricevere","riconoscere","risultare","ritenere","riuscire","sapere","scadere","soffrire","starci","subire","trovarsi","valere","vivere","volere","contarci","arrestare","assolvere"].forEach(x=>{ if(!NO_IMP.includes(x)) NO_IMP.push(x); });
+Object.keys(EVERYDAY).forEach(k=>{ const o = EVERYDAY[k][2]; if(o && o.noImp && !IMP_ROWS[k] && !NO_IMP.includes(k)) NO_IMP.push(k); });
+["ritrovare","riconoscere","riuscire","ritenere","smetterla","scordare","farla finita","farla franca","legarsela al dito","uscirsene","piantarla","trovare","nascere","intendere","comprendere","squillare"].forEach(x=>{ if(!NO_PROG.includes(x)) NO_PROG.push(x); });
+resetTenseCache();
+
 /* subjects for the hand-written sentences: dropped for io/tu/noi/voi, as in real speech */
 const CUR_SUBJ = [
   {it:"",en:"I",g:"m",pl:false}, {it:"",en:"you",g:"m",pl:false},
   {it:"Marco",en:"Marco",g:"m",pl:false}, {it:"",en:"we",g:"m",pl:true},
   {it:"",en:"you",g:"m",pl:true}, {it:"i miei genitori",en:"my parents",g:"m",pl:true}
 ];
+/* imperativo built from a hand-written ending: "Apri la finestra, per favore!" / "Please open the window!" */
+function imperSentence(v,i,tail,enPhrase,neg){
+  if(i===0) return null;
+  const pl = i>=3;
+  const obj = (tail||"").replace("{o}", pl?"i":"o").replace("{e}", pl?"i":"e");
+  const it = cap1(genImperIt(v,i,neg)) + (obj ? " "+obj : "") + (i===3 ? "!" : ", per favore!");
+  const en = (i===3 ? (neg ? "Let's not " : "Let's ") : (neg ? "Please don't " : "Please ")) + enPhrase + "!"
+           + (i===2 ? " (formal)" : i===4 ? " (you all)" : i===5 ? " (formal, pl.)" : "");
+  return {it:it.replace(/\s+/g," ").replace(/\s,/g,","), en:en.replace(/\s+/g," "), note:"", curated:true};
+}
 /* imperativo for the rest of the deck: "Accetta l'invito a cena dei vicini, per favore!" */
 function everydayImper(v,i,ev){
   const ov = Object.assign({}, ev[2] || {});
   if(ov.noImp || i===0) return null;
   const neg = !!ov.neg;
-  delete ov.noImp; delete ov.cls; delete ov.neg;
+  ["noImp","cls","neg","bad","rows","pl"].forEach(k=>delete ov[k]);
   const E = Object.assign(genEnVerb(v), ov);
   if(ov.b && !("be" in ov)) delete E.be;
-  const pl = i>=3;
-  const obj = ev[0].replace("{o}", pl?"i":"o").replace("{e}", pl?"i":"e");
-  const it = cap1(genImperIt(v,i,neg)) + " " + obj + (i===3 ? "!" : ", per favore!");
   const base = E.be!==undefined ? "be"+(E.be?" "+E.be:"") : E.b;
-  const en = (i===3 ? (neg ? "Let's not " : "Let's ") : (neg ? "Please don't " : "Please ")) + base + " " + ev[1] + "!"
-           + (i===2 ? " (formal)" : i===4 ? " (you all)" : i===5 ? " (formal, pl.)" : "");
-  return {it:it.replace(/\s+/g," "), en:en.replace(/\s+/g," "), note:"", curated:true};
+  return imperSentence(v, i, ev[0], base+" "+ev[1], neg);
 }
 function curatedSentence(v,t,i,fem){
   const key = CUR_T[t];
   let row = CURATED[v.inf] && key && CURATED[v.inf][key];
   const ev = !CURATED[v.inf] && EVERYDAY[v.inf];
-  if(t==="imperativo") return ev ? everydayImper(v,i,ev) : null;
+  if(t==="imperativo"){
+    const r = IMP_ROWS[v.inf];
+    if(r) return imperSentence(v, i, r[0], r[1], !!r[2]);
+    return ev ? everydayImper(v,i,ev) : null;
+  }
+  const xo = (ev && ev[2]) || {};
+  const cls = xo.cls, N = !!xo.neg && !(xo.bad && ["p","ipg","pg"].includes(key));   // on purpose: no "senza volerlo" / "oh no"
+  const obj = (i>=3 && xo.pl) ? xo.pl : [ev ? ev[0] : "", ev ? ev[1] : ""];
   let h = 0; for(const ch of v.inf) h = (h*31 + ch.charCodeAt(0)) >>> 0;
+  if(!row && ev && xo.rows && xo.rows[key]){             // a frame replaced by a hand-written row for this verb
+    const r = xo.rows[key];
+    row = [r[0], r[1], r[2] || null, Object.assign({}, xo, r[3] || {}), r[3] || null];
+  }
   if(!row && CUR_PROG_FRAMES[key] && (CUR_PROG[v.inf] || ev)){    // progressives: hand-picked activity + the tense's own frame
-    const PF = (ev && ev[2] && ev[2].cls==="S" && EV_PROG_S[key]) || CUR_PROG_FRAMES[key];   // states: "in questo periodo sto gestendo…"
-    const fr = PF[key==="fpg" && i===4 ? 0 : (h + i) % PF.length], o = CUR_PROG[v.inf] || ev;   // no "Quando arriverete, starete…"
+    const PF = (cls==="S" && !N && EV_PROG_S[key]) || (ev && N && EV_FRAMES_N[key]) || CUR_PROG_FRAMES[key];
+    const fr = PF[(h + i) % PF.length], o = CUR_PROG[v.inf] || [obj[0], obj[1], xo];
     row = [fr[0].replace("{O}", o[0] ? " "+o[0] : ""), fr[1].replace("{O}", o[1] ? " "+o[1] : ""), null, o[2]];
   }
-  if(!row && ev && key==="tr") row = [ev[0], ev[1], ev[2]];
-  else if(!row && ev){                                   // the rest of the deck: everyday complement + this tense's frame
-    const cls = ev[2] && ev[2].cls;
-    const FR = (cls==="S" && EV_FRAMES_S[key]) || (cls==="O" && EV_FRAMES_O[key]) || EV_FRAMES[key];
-    if(FR){
-      const fr = FR[(h + i) % FR.length];
-      row = [fr[0].replace("{O}", ev[0]), fr[1].replace("{O}", ev[1]), fr[2] || null, ev[2]];
-      if(ev[2] && ev[2].neg)                             // "Se Giulia fosse caduta…" was never going to be "better"
-        row = [row[0].replace("sarebbe stato meglio","sarebbe stato un guaio").replace("sarebbe meglio","sarebbe un problema")
-                     .replace("È importante che","È strano che").replace("Con più tempo,", key==="cp" ? "Con quella fretta," : "Con questa fretta,"),
-               row[1].replace("it would have been better","it would have been a mess").replace("it would be better","it would be a problem")
-                     .replace("It's important that","It's strange that").replace("With more time,", key==="cp" ? "In that rush," : "In this rush,"), row[2], row[3]];
+  if(!row && ev){                                        // the rest of the deck: everyday complement + this tense's frame
+    let FR = (N && EV_FRAMES_N[key]) || (cls==="S" && EV_FRAMES_S[key]) || (cls==="O" && EV_FRAMES_O[key]) || EV_FRAMES[key];
+    if(cls==="S" && key==="fa" && i===0) FR = EV_FRAMES_S.fa0;
+    if(key==="tr" && cls!=="S" && !N) row = [obj[0], obj[1], xo];
+    else if(FR){
+      let k = (h + i) % FR.length;
+      if((i===1 || i===4) && /^Lo sai\?/.test(FR[k][0]) && FR.length>1) k = (k+1) % FR.length;   // no "Did you know? You…"
+      const fr = FR[k];
+      row = [fr[0].replace("{O}", obj[0]), fr[1].replace("{O}", obj[1]), fr[2] || null, xo];
     }
   }
   if(!row) return null;
-  if(key==="tr"){                                        // literary: "Appena ebbi finito il lavoro, calò il silenzio."
+  if(Array.isArray(row[0])) row = row[i===5 ? 1 : 0];   // impersonal: [singular row, plural row]
+  if(key==="tr" && !/\{V\}/.test(row[0])){                                        // literary: "Appena ebbi finito il lavoro, calò il silenzio."
     const m = CUR_TR_MAIN[h % CUR_TR_MAIN.length];
     row = ["Appena {S} {V} "+row[0]+", "+m[0]+".", "As soon as {S} {V} "+row[1]+", "+m[1]+".", null, row[2]];
+  }
+  if(key==="fa" && i===0 && !/^Ormai|By now/.test(row[0]+"|"+row[1].replace(/^.*\|/,"")) && !/^(Ormai)/.test(row[0])
+     && /must have|probably|I bet|I imagine|I guess/.test(row[1]) && !/By now/.test(row[1])){
+    // guessing about your own past only works when you can't remember: "Non ricordo bene: sarò andato al mare."
+    const pick = (s, mark) => { const parts = s.split(/: /); return parts.find(p=>p.includes(mark)) || s; };
+    let it0 = pick(row[0], "{V"), en0 = pick(row[1], "{S}");
+    it0 = it0.replace(/,? ?\b(immagino|scommetto|come sempre|come al solito|spero)\b.*$/,"")
+             .replace(/^(Come sempre|Come al solito|Conoscendo il tipo|Con tutti quei viaggi[^,]*|Con tutto quel rumore|Con tutte quelle assenze|Con una proposta così|Al buio|Con questa pioggia),?\s*/,"");
+    en0 = en0.replace(/^(As usual, |Knowing the type, |With all those trips[^,]*, |With all those absences, |With an offer like that, |With all that noise, |In the dark, |With this rain, )/,"")
+             .replace(/\b(I imagine|I bet|I guess|I suppose) /,"").replace(/,? \b(I imagine|I bet|I guess|I suppose|as usual|I hope)\b.*$/,"")
+             .replace(/\{S\} probably /,"{S} must have ");
+    if(!/must have|probably/.test(en0)) en0 = en0.replace(/\{S\} /,"{S} probably ");
+    it0 = it0.replace(/^\s+/,""); it0 = it0.charAt(0).toLowerCase()+it0.slice(1);
+    row = ["Non ricordo bene: "+it0.replace(/[.\s]*$/,"."), "I don't remember exactly: "+en0.replace(/[.\s]*$/,"."), row[2], row[3], row[4]];
   }
   const S0 = (i===2 && fem) ? {it:"Giulia",en:"Giulia",g:"f",pl:false} : CUR_SUBJ[i];
   const subj = Object.assign({i:i}, S0);
   if(["cg","ci","cgp","cgt"].includes(key) && i<2) subj.it = ["io","tu"][i];   // che io / che tu: the forms are identical, so the pronoun stays
   const agree = s => s.replace(/(\S+)[oi]\/[ae](?=\s|$)/g, (m,stem)=> stem+(subj.pl?(subj.g==="f"?"e":"i"):(subj.g==="f"?"a":"o")));
-  const gia = f => { const w = f.split(" "); w.splice(v.refl ? 2 : 1, 0, "già"); return w.join(" "); };   // avevo già finito · mi ero già fidato
-  let it = row[0].replace("{VG}", ()=>gia(agree(form(v,t,i)))).replace("{V}", ()=>agree(form(v,t,i)))
-                 .replace("{o}", subj.pl?(subj.g==="f"?"e":"i"):(subj.g==="f"?"a":"o"))
-                 .replace("{e}", subj.pl?"i":"e")
+  const gia = f => { const w = f.split(" "), nt = v.tail ? v.tail.split(" ").length : 0;
+                     w.splice(w.length-1-nt, 0, "già"); return w.join(" "); };   // avevo già finito · me l'ero già bevuta · ne avevo già avuto abbastanza
+  const mai = f => { const w = f.split(" "), nt = v.tail ? v.tail.split(" ").length : 0;
+                     w.splice(w.length-1-nt, 0, "mai"); return w.join(" "); };   // non avevo mai visto
+  let it = row[0].replace("{VM}", ()=>mai(agree(form(v,t,i)))).replace("{VG}", ()=>gia(agree(form(v,t,i)))).replace("{V}", ()=>agree(form(v,t,i)))
+                 .replace(/\{o\}/g, subj.pl?(subj.g==="f"?"e":"i"):(subj.g==="f"?"a":"o"))
+                 .replace(/\{e\}/g, subj.pl?"i":"e")
                  .replace("{S}", subj.it);
   const ov = Object.assign({}, (CURATED[v.inf] && CURATED[v.inf].e) || {}, row[3] || {});
-  delete ov.noImp; delete ov.cls; delete ov.neg;
+  ["noImp","cls","neg","bad","rows","pl"].forEach(k=>delete ov[k]);
   const E = Object.assign(genEnVerb(v), ov);
-  if(ov.b && !("be" in ov)) delete E.be;           // "have a good time" replaces "be doing well"
+  const own = row[4] || row[3] || {};
+  if(own.b && !("be" in own)) delete E.be;          // "have a good time" replaces "be doing well"; "running late" replaces "late"
+  else if(ov.b && !("be" in ov)) delete E.be;
   const kind = row[2] || CUR_KIND[key];
   let en = row[1].replace("{S}", subj.en)
                  .replace("{VA}", ()=>genEnVP(E, kind, subj, false, "already"))
                  .replace("{NV}", ()=>genEnVP(E, kind, subj, true, null))
                  .replace("{V}",  ()=>genEnVP(E, kind, subj, false, null));
-  const tidy = s => cap1(s.replace(/\s+/g," ").replace(/\s([,.!?…])/g,"$1").replace(/^[ ,]+/,"").trim())
+  const tidy = s => cap1(s.replace(/\s+/g," ").replace(/\s([,.!?…])/g,"$1").replace(/^[ ,]+/,"").trim()
+                      .replace(/\b(to|for|on|at|with|about|into|of|in|up|off|out) \1\b/g,"$1"))   // "listening to" + "to the radio"
                       .replace(/([?!] )([a-zàèéìòù])/g,(m,a,b)=>a+b.toUpperCase());
   return {it:tidy(it), en:tidy(en), note:"", curated:true};
 }
+
 
 /* ---------------- AUDIO SCRIPT EXPORT ----------------
    Builds a narration script for the `say` command from the current
@@ -6953,7 +7092,9 @@ function audioSent(v,t,f,subj){
 /* audio narration slots for one tense: the full 7 (io/tu/lui/lei/noi/voi/loro) normally,
    or 5 for imperativo — no io, and "Lei" alone stands in for the formal address
    (there's no separate "lui" command — you only formally address the listener) */
-function audioSlotsFor(t){
+function audioSlotsFor(t, v){
+  if(v && IMPERS.includes(v.inf))                          // ci vuole / ci vogliono: no pronoun to announce
+    return t==="imperativo" ? [] : AUDIO_SLOTS.filter(s=>s.pn==="lui"||s.pn==="loro").map(s=>Object.assign({}, s, {pn:""}));
   if(t!=="imperativo") return AUDIO_SLOTS;
   return AUDIO_SLOTS.filter(s => s.i!==0 && s.pn!=="lui");
 }
@@ -6998,12 +7139,12 @@ function buildAudioScript(){
                  TENSES.find(x=>x.id===t).label+". [[rate +40]] [[slnc 700]] "+v.inf+". [[slnc 1000]]");
       // English meaning on its own ¶EN¶ line, voiced by the English voice
       if(m) lines.push("¶EN¶ "+m+". [[slnc 1200]]");
-      audioSlotsFor(t).forEach(s=>{
+      audioSlotsFor(t,v).forEach(s=>{
         const f  = audioAgree(form(v,t,s.i), s.fem);
         const end = t==="imperativo" ? "" : ".";       // the form already ends in "!" for a command
         // conjugated form → an everyday sentence using it → that sentence in English
         const g = genSentenceFixed(v, t, s.i, s.i===2 ? s.fem : undefined);
-        lines.push(s.pn+" "+f+end+" [[slnc 500]] "+g.it+" [[slnc 700]]");
+        lines.push((s.pn ? s.pn+" " : "")+f+end+" [[slnc 500]] "+g.it+" [[slnc 700]]");
         if(g.en) lines.push("¶EN¶ "+g.en+" [[slnc "+gap+"]]");
       });
     });
@@ -7015,7 +7156,7 @@ function audioEstimate(){
   const sel = audioSelection(), gap = (S.audioGap||2000)/1000;
   let items = 0, blocks = 0;
   sel.verbs.forEach(v=>{ const ts = audioTensesFor(v); blocks += ts.length;
-    items += ts.reduce((sum,t)=>sum+audioSlotsFor(t).length,0); });
+    items += ts.reduce((sum,t)=>sum+audioSlotsFor(t,v).length,0); });
   const secs = items*(7+gap) + blocks*8;   // each person: form + Italian sentence + English; each block: tense + infinitive + meaning
   return {verbs:sel.verbs.length, tenses:sel.tenses.length, items:items, secs:secs};
 }
@@ -7802,8 +7943,8 @@ function famClone(inf, opts){
   [CONG, REM_IRR, IMPF_IRR, CONGI_IRR].forEach(T=>{ if(T[M.inf]) T[inf] = swA(T[M.inf]); });
   if(GER_IRR[M.inf]) GER_IRR[inf] = sw(GER_IRR[M.inf]);
   if(IMP_TU_IRR[M.inf]) IMP_TU_IRR[inf] = pres[1];      // fa' / di' are the base's alone: rifai!, predici!
-  if(NO_PROG.includes(M.inf) && !NO_PROG.includes(inf)) NO_PROG.push(inf);   // dispiacere: no stare + gerundio, like piacere
-  if(NO_IMP.includes(M.inf) && !NO_IMP.includes(inf)) NO_IMP.push(inf);
+  if(NO_PROG.includes(M.inf) && M.inf===f.base && !NO_PROG.includes(inf)) NO_PROG.push(inf);   // dispiacere: no stare + gerundio, like piacere (only from a real base: "stendo" is no state just because "intendere" is)
+  if(NO_IMP.includes(M.inf) && M.inf===f.base && !NO_IMP.includes(inf)) NO_IMP.push(inf);   // only from a real base: "cadi!" is fine even if "scadi!" isn't
   ING[inf]  = ing;
   COMP[inf] = (opts.comp && opts.comp[0]) ? opts.comp : ["spesso", "often"];
   const B = VERBS.find(x=>x.inf===f.base) || M;
@@ -8000,6 +8141,7 @@ function buildRefl(inf, baseInf, E, comp, x, cl){
   COMP[inf] = comp;
   if(x.noProg) NO_PROG.push(inf);
   if(x.noImp)  NO_IMP.push(inf);
+  if(x.impers) IMPERS.push(inf);
   v.why = reflWhy(v, x);
   VERBS.push(v);
 }
@@ -8033,10 +8175,15 @@ const PRONOMINALS = [
   ["cascarci","cascare","ci","fall for it",["ogni volta","every time"],{aux:"essere",noImp:true,example:"Ci sono cascato!"}],
   ["capirci","capire","ci","understand it",["poco","very little"],{noImp:true,example:"Non ci capisco niente."}],
   ["arrivarci","arrivare","ci","get it",["subito","right away"],{noImp:true,example:"Non ci arrivo."}],
+  ["volerci","volere","ci","take",["un'ora","an hour"],{aux:"essere",impers:true,noImp:true,noProg:true,
+     enPres:["","","takes","","","take"], enPastArr:["","","took","","","took"],
+     en:"to take (time, effort) — only 3rd person: ci vuole un'ora, ci vogliono due ore",example:"Ci vuole pazienza."}],
   ["rimetterci","rimettere","ci","lose",["dei soldi","some money"],{noImp:true,example:"Ci ho rimesso 100 euro."}],
 
   ["poterne più","potere","ne","be fed up",["di aspettare","with waiting"],{head:"non",tail:"più",noImp:true,noProg:true,
      en:"to not be able to take any more (non poterne più = to be fed up)",example:"Non ne posso più!"}],
+  ["averne abbastanza","avere","ne","be fed up",["di questo caldo","with this heat"],{tail:"abbastanza",noImp:true,noProg:true,
+     en:"to have had enough / to be fed up (averne abbastanza di)",example:"Ne ho abbastanza!"}],
   ["farne a meno","fare","ne","do without it",["volentieri","happily"],{tail:"a meno",example:"Non posso farne a meno."}],
 
   ["smetterla","smettere","la","stop it",["subito","right away"],{example:"Smettila!"}],
@@ -8047,12 +8194,14 @@ const PRONOMINALS = [
   ["prenderla male","prendere","la","take it badly",["sempre","always"],{tail:"male",noImp:true,example:"L'ha presa male."}],
   ["saperla lunga","sapere","la","know a thing or two",["sul vino","about wine"],{tail:"lunga",noImp:true,noProg:true,example:"Quello la sa lunga."}],
 
+  ["farsene una ragione","fare","sene","get over it",["alla fine","in the end"],{tail:"una ragione",
+     en:"to come to terms with it / to get over it",example:"Fattene una ragione!"}],
   ["andarsene","andare","sene","leave",["presto","early"],{example:"Me ne vado."}],
-  ["fregarsene","fregare","sene","not care",["delle regole","about the rules"],{noImp:true,
+  ["fregarsene","fregare","sene",["not care","doesn't care","didn't care","not cared","not caring"],["delle regole","about the rules"],{noImp:true,
      enPres:["don't care","don't care","doesn't care","don't care","don't care","don't care"],
      enPastArr:["didn't care","didn't care","didn't care","didn't care","didn't care","didn't care"],
      en:"to not care (informal)",example:"Me ne frego."}],
-  ["infischiarsene","infischiare","sene","not care",["dei pettegolezzi","about gossip"],{noImp:true,
+  ["infischiarsene","infischiare","sene",["not care","doesn't care","didn't care","not cared","not caring"],["dei pettegolezzi","about gossip"],{noImp:true,
      enPres:["don't care","don't care","doesn't care","don't care","don't care","don't care"],
      enPastArr:["didn't care","didn't care","didn't care","didn't care","didn't care","didn't care"],
      en:"to not give a hoot",example:"Se ne infischia."}],
@@ -8066,6 +8215,7 @@ const PRONOMINALS = [
   ["avercela","avere","cela","be mad",["con il vicino","at the neighbor"],{noImp:true,noProg:true,example:"Ce l'hai con me?"}],
   ["mettercela tutta","mettere","cela","give it everything",["per vincere","to win"],{tail:"tutta",example:"Ce la metto tutta."}],
 
+  ["bersela","bere","sela","fall for it",["ogni volta","every time"],{en:"to fall for it / to swallow a story (also beversela)",example:"Se l'è bevuta!"}],
   ["cavarsela","cavare","sela","get by",["con l'italiano","in Italian"],{example:"Me la cavo con l'italiano."}],
   ["prendersela","prendere","sela","get upset",["per niente","over nothing"],{noImp:true,example:"Non te la prendere!"}],
   ["godersela","godere","sela","enjoy it",["al mare","at the beach"],{body:{fut:["godrò","godrai","godrà","godremo","godrete","godranno"]},example:"Godetevela!"}],
@@ -8080,6 +8230,11 @@ const PRONOMINALS = [
   ["tirarsela","tirare","sela","show off",["troppo","too much"],{noImp:true,example:"Se la tira."}]
 ];
 PRONOMINALS.forEach(([inf, baseInf, cl, b, comp, x])=>buildRefl(inf, baseInf, b, comp, x, cl));
+["fregarsene","infischiarsene"].forEach(k=>{ IMPF_EN[k] = ["didn't care","didn't care","didn't care","didn't care","didn't care","didn't care"]; });
+/* American English throughout: "had gotten up", not "had got up" */
+VERBS.forEach(v=>{ if(/^got\b/.test(v.enPart||"")) v.enPart = v.enPart.replace(/^got\b/,"gotten"); });
+IMPF_EN.volerci = ["","","used to take","","","used to take"];   // ci voleva un giorno = it used to take a day
+IMPF_EN["averne abbastanza"] = ["was fed up","were fed up","was fed up","were fed up","were fed up","were fed up"];   // not "was being fed up"
 
 const USER_KEY = "verbi_user_v1";
 let USER_SPECS = [];
@@ -8133,7 +8288,7 @@ function buildDeck(){
       if(S.filt && S.filt.reg==="irr" && !irregularIn(v,t)) return;   // Irregular on: only the tenses where it IS irregular
       if(S.filt && S.filt.reg==="reg" &&  irregularIn(v,t)) return;
       const cards = [];
-      for(const i of personIdxs(t)){ const id=cardId(v.inf,t,i); if(S.known[id]) continue; cards.push({v, t, i, id}); }
+      for(const i of personIdxs(t,v)){ const id=cardId(v.inf,t,i); if(S.known[id]) continue; cards.push({v, t, i, id}); }
       if(cards.length) groups.set(v.inf+"|"+t, cards);   // fully-known verb+tense drops out
     });
   });
@@ -8170,7 +8325,7 @@ function render(){
   const it = form(c.v,c.t,c.i);
   const en = english(c.v,c.t,c.i);
 
-  $("tag").textContent = tenseLabel + " · " + personLabel(c.t,c.i);
+  $("tag").textContent = tenseLabel + " · " + personLabel(c.t,c.i,c.v);
 
   const g0 = genSentenceFixed(c.v,c.t,c.i);
   curPhrase = g0.it;
@@ -8189,7 +8344,7 @@ function render(){
   if(S.mode==="recall"){
     $("front").innerHTML =
       '<div class="prompt">'+c.v.inf+(c.v.en?' — '+c.v.en:'')+'</div>'+
-      '<div class="big">'+personLabel(c.t,c.i)+' …</div>'+
+      '<div class="big">'+personLabel(c.t,c.i,c.v)+' …</div>'+
       '<div class="sub">'+tenseLabel+'</div>';
     $("back").innerHTML =
       '<div class="big" style="color:var(--accent)">'+it+'</div>'+
@@ -8201,7 +8356,7 @@ function render(){
       '<div class="big">'+it+'</div>';
     $("back").innerHTML =
       '<div class="big" style="color:var(--accent2);font-size:26px">'+en+'</div>'+
-      '<div class="sub">'+c.v.inf+(c.v.en?' — '+c.v.en:'')+' · '+personLabel(c.t,c.i)+'</div>'+ ex + spk + str +
+      '<div class="sub">'+c.v.inf+(c.v.en?' — '+c.v.en:'')+' · '+personLabel(c.t,c.i,c.v)+'</div>'+ ex + spk + str +
       auxNote(c);
   }
 
@@ -8463,10 +8618,10 @@ function drawStudy(){
     }
     html += '<div class="tbl"><h3>'+t.label+
             (PROGRESSIVE.includes(t.id) ? ' · gerundio: '+gerund(v) : '')+'</h3>';
-    for(const i of personIdxs(t.id)){
+    for(const i of personIdxs(t.id,v)){
       const f = form(v,t.id,i);
       html += '<div class="r" data-say="'+f.replace(/\/[aei]/g,"")+'">'+
-                '<div class="p">'+personLabel(t.id,i)+'</div>'+
+                '<div class="p">'+personLabel(t.id,i,v)+'</div>'+
                 '<div class="f">'+f+'<small>'+stressWord(lastWord(f))+' 🔊</small></div>'+
                 '<div class="e">'+english(v,t.id,i)+'</div>'+
               '</div>';
@@ -8712,7 +8867,7 @@ function calcIrregular(v,t){
   if(PROGRESSIVE.includes(t)) return gerund(v) !== st + (inf.endsWith("are") ? "ando" : "endo");
   const C = regCandidates(inf,t);
   if(!C.length) return !v.reg;
-  const idx = personIdxs(t);
+  const idx = personIdxs(t,v);
   const actual = idx.map(i=>String(form(v,t,i)).replace(/!$/,""));
   return !C.some(c=>idx.every((i,k)=>c[i]===actual[k]));
 }
