@@ -329,6 +329,7 @@
     </div>
     <div class="row">
       <button class="btn" id="reflV">🔁 Reflexive</button>
+      <button class="btn" id="pronV">🧩 Pronominal</button>
     </div>
     <div class="stat" id="filtStat"></div>
     <div class="legend">
@@ -338,6 +339,7 @@
       <span>✈︎ travel verb</span>
       <span>🌳 base verb</span>
       <span>🔁 reflexive (-si)</span>
+      <span>🧩 pronominal (-ci, -ne, -la, -sene, -cela, -sela)</span>
     </div>
     <div class="chips" id="verbChips" style="margin-top:10px"></div>
 
@@ -3623,6 +3625,7 @@ const ING = {
 // participle with agreement for essere-verbs: stato -> stato/a (sing), stati/e (plural)
 function participle(v,i){
   v = RB(v);                                      // reflexive entries conjugate their plain verb
+  if(v.ppFix) return v.ppFix;                     // -la / -cela / -sela: agrees with la (fatta, cavata)
   if(v.aux === "avere") return v.pp;
   const stem = v.pp.slice(0,-1);            // stat-, andat-, venut-
   return i < 3 ? stem+"o/a" : stem+"i/e";
@@ -4532,6 +4535,16 @@ function genSubject(i, allowDrop){
 /* ---- Italian verb group for this card, with agreement, clitic, negation ---- */
 function genVerbIt(v,t,i,subj,o){
   o = o || {};
+  if(v.refl){                                             // reflexive / pronominal entries: build on the plain verb
+    let f = form(v.body,t,i).replace(/!$/,"");
+    f = f.replace(/(\S+)[oi]\/[ae](?=\s|$)/g, (m,stem)=> stem + (subj.pl ? (subj.g==="f"?"e":"i") : (subj.g==="f"?"a":"o")));
+    const w = f.split(" ");
+    if(o.adv && w.length>1 && !v.head) w.splice(1,0,o.adv);   // no "già" inside non … più
+    let out = cliJoin(CLITICS[v.cl||"refl"].pro[i], w.join(" "), v.cl) + (v.tail ? " "+v.tail : "");
+    if(v.head) out = v.head+" "+out;                       // non ne posso più — already negative
+    else if(o.neg) out = "non "+out;
+    return out;
+  }
   const refl = !!GEN_REFL[v.inf] || !!v.refl;
   const pv = RB(v);
   const vv = refl ? Object.assign({}, pv, {aux:"essere"}) : pv;
@@ -4546,6 +4559,10 @@ function genVerbIt(v,t,i,subj,o){
   return w.join(" ");
 }
 function genImperIt(v,i,neg){
+  if(v.refl){
+    if(neg && i===1) return "non "+v.body.inf.slice(0,-1)+CLITICS[v.cl||"refl"].enc[1]+(v.tail?" "+v.tail:"");   // non andartene
+    return (neg ? "non " : "")+form(v,"imperativo",i).replace(/!$/,"");
+  }
   const refl = !!GEN_REFL[v.inf] || !!v.refl;
   const tail = v.tail ? " "+v.tail : "";
   const pv = RB(v);
@@ -5707,52 +5724,198 @@ const REFLEXIVES = [
   ["rendersi conto","rendere",["realize","realizes","realized","realized","realizing"],["della situazione","the situation"],
      {tail:"conto"}],
 ];
+/* ---- clitic patterns ----
+   refl  mi/ti/si…  + essere, participle agrees with the subject   (mi sono alzato/a)
+   ci    ci (fixed) + the plain verb's auxiliary                    (ci ho messo, ci sono cascato)
+   ne    ne (fixed)                                                 (ne ho fatto a meno)
+   la    la (fixed), avere, participle agrees with la               (l'ha fatta franca)
+   sene  me ne/te ne/se ne… + essere, agrees with the subject       (me ne sono andato/a)
+   cela  ce la (fixed), avere, agrees with la                       (ce l'ho fatta)
+   sela  me la/te la/se la… + essere, agrees with la                (me la sono cavata)
+   enc = the form attached to imperativo tu/noi/voi; lei = in front of Lei/Loro */
+const CLITICS = {
+  refl:{pro:["mi","ti","si","ci","vi","si"],                enc:[null,"ti",null,"ci","vi",null],       lei:"si",    aux:"essere"},
+  ci:  {pro:["ci","ci","ci","ci","ci","ci"],                enc:[null,"ci",null,"ci","ci",null],       lei:"ci"},
+  ne:  {pro:["ne","ne","ne","ne","ne","ne"],                enc:[null,"ne",null,"ne","ne",null],       lei:"ne"},
+  la:  {pro:["la","la","la","la","la","la"],                enc:[null,"la",null,"la","la",null],       lei:"la",    fem:true},
+  sene:{pro:["me ne","te ne","se ne","ce ne","ve ne","se ne"], enc:[null,"tene",null,"cene","vene",null], lei:"se ne", aux:"essere"},
+  cela:{pro:["ce la","ce la","ce la","ce la","ce la","ce la"], enc:[null,"cela",null,"cela","cela",null], lei:"ce la", fem:true},
+  sela:{pro:["me la","te la","se la","ce la","ve la","se la"], enc:[null,"tela",null,"cela","vela",null], lei:"se la", aux:"essere", fem:true}
+};
+const CLI_LABEL = {refl:"reflexive", ci:"-ci", ne:"-ne", la:"-la", sene:"-sene", cela:"-cela", sela:"-sela"};
+const CLI_NOTE = {
+  ci:  "<b>ci</b> is frozen into the idiom (it often means \"it / there\"). It goes in front of every form; the auxiliary is the plain verb's own — usually avere (<b>ci ho messo</b>), essere for verbs of motion or state (<b>ci sono cascato/a</b>). Before e- or i- it elides: <b>c'entro</b>.",
+  ne:  "<b>ne</b> (\"of it / about it\") is frozen into the expression and goes in front of every form.",
+  la:  "<b>la</b> is a vague \"it\" (the situation). It goes in front of every form, the auxiliary is avere, and the participle agrees with <b>la</b> — always feminine: <b>l'ha fatta franca</b>. Before a vowel or h it elides to <b>l'</b>.",
+  sene:"Reflexive si + ne: si becomes <b>se</b> before ne — <b>me ne, te ne, se ne, ce ne, ve ne, se ne</b>. Reflexive, so compound tenses take essere and agree with the subject: <b>me ne sono andato/a</b>, <b>se n'è andata</b>.",
+  cela:"ci + la → <b>ce la</b>, the same for every person. Compound tenses take avere and the participle agrees with la: <b>ce l'ho fatta</b>.",
+  sela:"Reflexive si + la → <b>me la, te la, se la, ce la, ve la, se la</b>. Reflexive, so compound tenses take essere — but the participle agrees with <b>la</b>, not the subject, so it is always feminine: <b>me la sono cavata</b> (said by a man too)."
+};
 function RB(v){ return v && v.refl ? v.body : v; }
+/* proclitic + verb, with the standard elisions: l'ho, ce l'ho, se l'è, c'entro, se n'è */
+function cliJoin(p, w, cl){
+  if(/(^| )la$/.test(p) && /^[aeiouàèéìòùh]/.test(w)) return p.slice(0,-1)+"'"+w;
+  if(cl==="ci" && /^[eièé]/.test(w)) return p.slice(0,-1)+"'"+w;
+  if(/(^| )ne$/.test(p) && /^è/.test(w)) return p.slice(0,-1)+"'"+w;
+  return p+" "+w;
+}
 function reflForm(v,t,i){
   const f = form(v.body,t,i);
   if(f == null) return f;
+  const C = CLITICS[v.cl||"refl"];
   const tail = v.tail ? " "+v.tail : "";
   if(t==="imperativo"){
     const bare = String(f).replace(/!$/,"");
-    if(i===2 || i===5) return "si "+bare+tail+"!";        // Lei / Loro: pronoun in front
-    return bare+REFL[i]+tail+"!";                          // tu / noi / voi: attached
+    if(i===2 || i===5) return cliJoin(C.lei, bare, v.cl)+tail+"!";   // Lei / Loro: pronoun in front
+    let st = bare, enc = C.enc[i];
+    if(/'$/.test(st)){ st = st.slice(0,-1); enc = enc[0]+enc; }      // va' + tene → vattene, fa' + cela → faccela
+    return st+enc+tail+"!";                                          // tu / noi / voi: attached
   }
-  return REFL[i]+" "+f+tail;
+  return (v.head ? v.head+" " : "") + cliJoin(C.pro[i], f, v.cl) + tail;
 }
-function reflBody(baseInf){
-  const real = VERBS.find(x=>x.inf===baseInf && !x.refl);
-  if(real) return Object.assign({}, real, {aux:"essere", travel:false});
-  const r = conjugate(baseInf);                            // not in the deck as a plain verb (lavare, sedere…)
-  if(!r || !r.ok) return null;
-  if(!CONG[baseInf]) CONG[baseInf] = r.cong;
-  const b = {inf:baseInf, pres:r.pres, fut:r.fut, pp:r.pp, aux:"essere", g:r.g, reg:r.reg};
-  if(r.latin) b.latin = r.latin;
+function reflBody(baseInf, C, x){
+  const real = VERBS.find(y=>y.inf===baseInf && !y.refl);
+  let b;
+  if(real) b = Object.assign({}, real, {travel:false});
+  else if(FAM_OF[baseInf]) b = famClone(baseInf, {b:""});            // rimettere ← mettere, with its passato remoto
+  else {
+    const r = conjugate(baseInf);                                    // not in the deck as a plain verb (lavare, cavare…)
+    if(!r || !r.ok) return null;
+    if(!CONG[baseInf]) CONG[baseInf] = r.cong;
+    b = {inf:baseInf, pres:r.pres, fut:r.fut, pp:r.pp, aux:r.aux, g:r.g, reg:r.reg};
+    if(r.latin) b.latin = r.latin;
+  }
+  if(!b) return null;
+  if(x.body) Object.assign(b, x.body);                               // e.g. godere → future godrò
+  b.aux = C.aux || x.aux || b.aux;
+  if(C.fem) b.ppFix = b.pp.slice(0,-1)+"a";                          // agrees with la: fatta, cavata
+  delete b.famClone; delete b.custom;
   return b;
 }
-REFLEXIVES.forEach(([inf, baseInf, E, comp, x])=>{
+function reflWhy(v, x){
+  const C = CLITICS[v.cl], b = v.body, base = v.base;
+  const inDeck = VERBS.some(y=>y.inf===base && !y.refl);
+  const ex = t=>"<b>"+reflForm(v,t.t,t.i)+"</b>";
+  const p2 = participle(b,0);
+  if(v.cl==="refl"){
+    return "🔁 Reflexive form of <b>"+base+"</b>"+(inDeck?" (also in the deck on its own)":"")+
+      ". The pronoun mi / ti / si / ci / vi / si goes in front — "+ex({t:"presente",i:0})+", "+ex({t:"presente",i:3})+" — "+
+      "and compound tenses always take <b>essere</b>, so the participle agrees with the subject: <b>mi sono "+p2.replace(/\/a$/,"")+"/a</b>. "+
+      "In the imperativo the pronoun attaches to tu, noi and voi"+(x.noImp ? "" : " ("+ex({t:"imperativo",i:1})+", "+ex({t:"imperativo",i:3})+", "+ex({t:"imperativo",i:4})+")")+
+      " but stays in front for Lei and Loro"+(x.noImp ? "" : " ("+ex({t:"imperativo",i:2})+")")+"."+
+      (b.reg ? "" : " The plain verb is irregular, and the reflexive inherits all of it.");
+  }
+  return "🧩 Pronominal verb built on <b>"+base+"</b>"+(inDeck?" (in the deck on its own too)":"")+". "+CLI_NOTE[v.cl]+
+    " Here: "+ex({t:"presente",i:0})+" · "+ex({t:"passato",i:2})+
+    (x.noImp ? "" : " · "+ex({t:"imperativo",i:1})+" (attached in the imperativo for tu, noi, voi)")+"."+
+    (x.example ? " Real-life: <i>"+x.example+"</i>" : "")+
+    (b.reg ? "" : " The plain verb is irregular, and every form here inherits it.");
+}
+/* English for the built entries: "be …" conjugates like to be; first words looked up in FAM_EN_IRR */
+Object.assign(FAM_EN_IRR, {
+  have:["has","had","had","having"], give:["gives","gave","given","giving"], think:["thinks","thought","thought","thinking"],
+  lose:["loses","lost","lost","losing"], cut:["cuts","cut","cut","cutting"], know:["knows","knew","known","knowing"],
+  leave:["leaves","left","left","leaving"], sneak:["sneaks","snuck","snuck","sneaking"], slip:["slips","slipped","slipped","slipping"],
+  show:["shows","showed","shown","showing"]
+});
+function reflEnglish(b){
+  if(/^be /.test(b)){
+    const r = b.slice(3);
+    return {enBase:b, en3:"is "+r, enPast:"was "+r, enPart:"been "+r, ing:"being "+r,
+            enPres:["am","are","is","are","are","are"].map(x=>x+" "+r),
+            enPastArr:["was","were","was","were","were","were"].map(x=>x+" "+r)};
+  }
+  return {enBase:b, en3:famEnAlt(b,0,_third), enPast:famEnAlt(b,1,_ed), enPart:famEnAlt(b,2,_ed), ing:famEnAlt(b,3,_ing)};
+}
+function buildRefl(inf, baseInf, E, comp, x, cl){
   x = x || {};
   if(VERBS.some(v=>v.inf===inf)) return;
-  const body = reflBody(baseInf); if(!body) return;
-  const v = {inf, refl:true, body, base:baseInf, tail:x.tail||"",
-             en: x.en || "to "+E[0], enBase:E[0], en3:E[1], enPast:E[2], enPart:E[3], enFut:"will "+E[0],
-             pres:body.pres, fut:body.fut, pp:body.pp, aux:"essere", g:body.g, reg:body.reg,
+  const C = CLITICS[cl];
+  const body = reflBody(baseInf, C, x); if(!body) return;
+  const en = Array.isArray(E) ? {enBase:E[0], en3:E[1], enPast:E[2], enPart:E[3], ing:E[4]} : reflEnglish(E);
+  const v = {inf, refl:true, cl, body, base:baseInf, tail:x.tail||"", head:x.head||"",
+             en: x.en || "to "+en.enBase, enBase:en.enBase, en3:en.en3, enPast:en.enPast, enPart:en.enPart, enFut:"will "+en.enBase,
+             pres:body.pres, fut:body.fut, pp:body.pp, aux:body.aux, g:body.g, reg:body.reg,
              travel:false, freq: FREQ_VERB[inf] || 0};
   if(body.latin) v.latin = body.latin;
-  if(x.enPres) v.enPres = x.enPres;
-  if(x.enPastArr) v.enPastArr = x.enPastArr;
-  ING[inf] = E[4];
+  if(x.enPres || en.enPres) v.enPres = x.enPres || en.enPres;
+  if(x.enPastArr || en.enPastArr) v.enPastArr = x.enPastArr || en.enPastArr;
+  ING[inf] = x.ing || en.ing;
   COMP[inf] = comp;
   if(x.noProg) NO_PROG.push(inf);
   if(x.noImp)  NO_IMP.push(inf);
-  const p0 = participle(body,0).replace(/\/a$/,"");
-  v.why = "🔁 Reflexive form of <b>"+baseInf+"</b>"+(VERBS.some(y=>y.inf===baseInf)?" (also in the deck on its own)":"")+
-    ". The pronoun mi / ti / si / ci / vi / si goes in front — <b>"+reflForm(v,"presente",0)+"</b>, <b>"+reflForm(v,"presente",3)+"</b> — "+
-    "and compound tenses always take <b>essere</b>, so the participle agrees with the subject: <b>mi sono "+p0+"/a</b>. "+
-    "In the imperativo the pronoun attaches to tu, noi and voi"+(x.noImp ? "" : " (<b>"+reflForm(v,"imperativo",1)+"</b>, <b>"+reflForm(v,"imperativo",3)+"</b>, <b>"+reflForm(v,"imperativo",4)+"</b>)")+
-    " but stays in front for Lei and Loro"+(x.noImp ? "" : " (<b>"+reflForm(v,"imperativo",2)+"</b>)")+"."+
-    (body.reg ? "" : " The plain verb is irregular, and the reflexive inherits all of it.");
+  v.why = reflWhy(v, x);
   VERBS.push(v);
-});
+}
+REFLEXIVES.forEach(([inf, baseInf, E, comp, x])=>buildRefl(inf, baseInf, E, comp, x, "refl"));
+
+/* ============ PRONOMINAL VERBS ============
+   Idioms with a frozen pronoun (ci, ne, la) or a reflexive one fused with it (-sene, -cela, -sela),
+   from the Verbi pronominali deck. Conjugated in every tense like the reflexives above.
+   Rows: [infinitive, plain verb, clitic, English base form, [complement it, en], extras]
+   Left out on purpose: volerci, valerne la pena, andarne di (impersonal — they only live in the
+   3rd person) and volerne a qualcuno (needs an indirect object: non me ne volere). */
+const PRONOMINALS = [
+  ["metterci","mettere","ci","take",["un'ora","an hour"],{example:"Ci metto un'ora."}],
+  ["entrarci","entrare","ci","be involved",["con questa storia","in this story"],{noImp:true,noProg:true,example:"Io non c'entro!"}],
+  ["sentirci","sentire","ci","be able to hear",["bene","well"],{noImp:true,noProg:true,example:"Non ci sento."}],
+  ["vederci","vedere","ci","be able to see",["senza occhiali","without glasses"],{noImp:true,noProg:true,example:"Non ci vedo senza occhiali."}],
+  ["tenerci","tenere","ci","care about it",["molto","a lot"],{noImp:true,noProg:true,example:"Ci tengo tanto."}],
+  ["crederci","credere","ci","believe it",["fino in fondo","all the way"],{noProg:true,example:"Non ci credo!"}],
+  ["pensarci","pensare","ci","think about it",["un attimo","for a moment"],{example:"Ci penso io."}],
+  ["contarci","contare","ci","count on it",["davvero","really"],{example:"Ci conto!"}],
+  ["provarci","provare","ci","give it a try",["ancora","again"],{example:"Ci provo."}],
+  ["starci","stare","ci","be up for it",["volentieri","gladly"],{noProg:true,example:"Ci stai?"}],
+  ["cascarci","cascare","ci","fall for it",["ogni volta","every time"],{aux:"essere",noImp:true,example:"Ci sono cascato!"}],
+  ["capirci","capire","ci","understand it",["poco","very little"],{noImp:true,example:"Non ci capisco niente."}],
+  ["arrivarci","arrivare","ci","get it",["subito","right away"],{noImp:true,example:"Non ci arrivo."}],
+  ["rimetterci","rimettere","ci","lose",["dei soldi","some money"],{noImp:true,example:"Ci ho rimesso 100 euro."}],
+
+  ["poterne più","potere","ne","be fed up",["di aspettare","with waiting"],{head:"non",tail:"più",noImp:true,noProg:true,
+     en:"to not be able to take any more (non poterne più = to be fed up)",example:"Non ne posso più!"}],
+  ["farne a meno","fare","ne","do without it",["volentieri","happily"],{tail:"a meno",example:"Non posso farne a meno."}],
+
+  ["smetterla","smettere","la","stop it",["subito","right away"],{example:"Smettila!"}],
+  ["finirla","finire","la","quit it",["una volta per tutte","once and for all"],{example:"Finiscila!"}],
+  ["farla finita","fare","la","be done",["con questa storia","with this business"],{tail:"finita",example:"Facciamola finita."}],
+  ["piantarla","piantare","la","cut it out",["subito","right away"],{example:"Piantala!"}],
+  ["farla franca","fare","la","get away with it",["ancora una volta","once again"],{tail:"franca",noImp:true,example:"L'ha fatta franca."}],
+  ["prenderla male","prendere","la","take it badly",["sempre","always"],{tail:"male",noImp:true,example:"L'ha presa male."}],
+  ["saperla lunga","sapere","la","know a thing or two",["sul vino","about wine"],{tail:"lunga",noImp:true,noProg:true,example:"Quello la sa lunga."}],
+
+  ["andarsene","andare","sene","leave",["presto","early"],{example:"Me ne vado."}],
+  ["fregarsene","fregare","sene","not care",["delle regole","about the rules"],{noImp:true,
+     enPres:["don't care","don't care","doesn't care","don't care","don't care","don't care"],
+     enPastArr:["didn't care","didn't care","didn't care","didn't care","didn't care","didn't care"],
+     en:"to not care (informal)",example:"Me ne frego."}],
+  ["infischiarsene","infischiare","sene","not care",["dei pettegolezzi","about gossip"],{noImp:true,
+     enPres:["don't care","don't care","doesn't care","don't care","don't care","don't care"],
+     enPastArr:["didn't care","didn't care","didn't care","didn't care","didn't care","didn't care"],
+     en:"to not give a hoot",example:"Se ne infischia."}],
+  ["intendersene","intendere","sene","know a lot",["di vino","about wine"],{noImp:true,noProg:true,example:"Te ne intendi di vino?"}],
+  ["starsene","stare","sene","stay",["a casa","at home"],{noProg:true,example:"Me ne sto a casa."}],
+  ["tornarsene","tornare","sene","head back",["a casa","home"],{example:"Me ne torno a casa."}],
+  ["approfittarsene","approfittare","sene","take advantage of it",["sempre","always"],{example:"Se ne approfitta."}],
+  ["uscirsene","uscire","sene","come out",["con una battuta","with a joke"],{noImp:true,example:"Se n'è uscito con una battuta."}],
+
+  ["farcela","fare","cela","make it",["alla fine","in the end"],{example:"Ce la faccio!"}],
+  ["avercela","avere","cela","be mad",["con il vicino","at the neighbor"],{noImp:true,noProg:true,example:"Ce l'hai con me?"}],
+  ["mettercela tutta","mettere","cela","give it everything",["per vincere","to win"],{tail:"tutta",example:"Ce la metto tutta."}],
+
+  ["cavarsela","cavare","sela","get by",["con l'italiano","in Italian"],{example:"Me la cavo con l'italiano."}],
+  ["prendersela","prendere","sela","get upset",["per niente","over nothing"],{noImp:true,example:"Non te la prendere!"}],
+  ["godersela","godere","sela","enjoy it",["al mare","at the beach"],{body:{fut:["godrò","godrai","godrà","godremo","godrete","godranno"]},example:"Godetevela!"}],
+  ["passarsela bene","passare","sela","be doing well",["in Italia","in Italy"],{tail:"bene",noImp:true,example:"Come te la passi?"}],
+  ["filarsela","filare","sela","sneak off",["in silenzio","quietly"],{example:"Se l'è filata."}],
+  ["squagliarsela","squagliare","sela","slip away",["dalla festa","from the party"],{example:"Ce la siamo squagliata."}],
+  ["spassarsela","spassare","sela","have a great time",["al mare","at the beach"],{example:"Se la spassano."}],
+  ["sbrigarsela","sbrigare","sela","handle it",["senza aiuto","without help"],{example:"Sbrigatela tu!"}],
+  ["vedersela brutta","vedere","sela","have a close call",["in mare","at sea"],{tail:"brutta",noImp:true,example:"Me la sono vista brutta."}],
+  ["cercarsela","cercare","sela","ask for it",["sempre","always"],{noImp:true,example:"Se l'è cercata."}],
+  ["legarsela al dito","legare","sela","hold a grudge",["per sempre","forever"],{tail:"al dito",example:"Me la sono legata al dito."}],
+  ["tirarsela","tirare","sela","show off",["troppo","too much"],{noImp:true,example:"Se la tira."}]
+];
+PRONOMINALS.forEach(([inf, baseInf, cl, b, comp, x])=>buildRefl(inf, baseInf, b, comp, x, cl));
 
 const USER_KEY = "verbi_user_v1";
 let USER_SPECS = [];
@@ -6276,7 +6439,7 @@ function drawChips(){
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
       '<i class="dot '+(irrInSelection(v)?'irr':'reg')+'"></i>'+v.inf+
       (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
-      (v.travel?' ✈︎':'')+(FAM[v.inf]?' 🌳':'')+(v.refl?' 🔁':'')+'</div>').join("");
+      (v.travel?' ✈︎':'')+(FAM[v.inf]?' 🌳':'')+(v.cl==="refl"?' 🔁':v.refl?' 🧩':'')+'</div>').join("");
   drawFamChips();
 
   $("tenseChips").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
@@ -6417,7 +6580,8 @@ function verbPasses(v){
   if(f.reg==="reg" && !regInSelection(v)) return false;
   if(f.reg==="irr" && !irrInSelection(v)) return false;
   if(f.aux && v.aux!==f.aux) return false;
-  if(f.refl && !v.refl) return false;                                     // reflexive (-si) verbs only
+  if(f.refl && v.cl!=="refl") return false;                               // reflexive (-si) verbs only
+  if(f.pron && !(v.cl && v.cl!=="refl")) return false;                    // pronominal: -ci, -ne, -la, -sene, -cela, -sela
   if(f.base==="base" && !FAM[v.inf]) return false;                       // base verbs only
   if(f.base==="fam" && !FAM[v.inf] && !FAM_OF[v.inf]) return false;      // bases + their families
   return true;
@@ -6434,6 +6598,7 @@ function drawFilters(){
   $("essV").classList.toggle("on", f.aux==="essere");
   $("aveV").classList.toggle("on", f.aux==="avere");
   $("reflV").classList.toggle("on", !!f.refl);
+  $("pronV").classList.toggle("on", !!f.pron);
   $("baseOnlyV").classList.toggle("on", f.base==="base");
   $("baseFamV").classList.toggle("on", f.base==="fam");
   const parts = [];
@@ -6445,6 +6610,7 @@ function drawFilters(){
   }
   if(f.aux) parts.push("takes "+f.aux);
   if(f.refl) parts.push("reflexive");
+  if(f.pron) parts.push("pronominal");
   if(f.base) parts.push(f.base==="base" ? "base verbs" : "base verbs + families");
   $("filtStat").innerHTML = "<b>"+S.verbs.length+"</b> of "+VERBS.length+" verbs selected" +
     (parts.length ? " — filter: "+parts.join(" ∩ ") : "");
@@ -6474,6 +6640,7 @@ function drawFamChips(){
 // Base-verb filters stack with Travel / Regular-Irregular / Essere-Avere as an intersection,
 // and the two are mutually exclusive like the other pairs (tap the active one to switch it off).
 $("reflV").onclick = ()=>{ S.filt.refl = !S.filt.refl; applyFilters(); };
+$("pronV").onclick = ()=>{ S.filt.pron = !S.filt.pron; applyFilters(); };
 $("baseOnlyV").onclick = ()=>{ S.filt.base = S.filt.base==="base" ? null : "base"; applyFilters(); };
 $("baseFamV").onclick  = ()=>{ S.filt.base = S.filt.base==="fam"  ? null : "fam";  applyFilters(); };
 $("allV").onclick  = ()=>{ S.filt={travel:false,reg:null,aux:null}; applyFilters(); };

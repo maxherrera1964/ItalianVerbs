@@ -72,16 +72,19 @@ mkdir -p "$OUT/per-verbo" "$WORK/parts" "$WORK/segs" "$WORK/segaiff" "$WORK/aiff
 # Pass 1 — split on verb-announcement lines. Two formats are accepted:
 #   old: "[[slnc NNNN]] <infinitive>. [[slnc 1000]]"
 #   new: "[[slnc NNNN]] [[rate -40]] <Tense>. [[rate +40]] [[slnc 700]] <infinitive>. [[slnc 1000]]"
-# The infinitive is always the last word before ". [[slnc 1000]]". In the new
+# The infinitive is everything after the last "]] " and before ". [[slnc 1000]]"
+# — it can be several words (rendersi conto, legarsela al dito). In the new
 # format every tense block repeats the announcement, so a new file is started
 # only when the infinitive changes — one file per verb, all its tenses inside.
+# Spaces become hyphens in the file name: 07_rendersi-conto.m4a.
 awk -v dir="$WORK/parts" '
   /^\[\[slnc [0-9]+\]\] .*[a-zà-ù]+\. \[\[slnc 1000\]\]$/ {
     line = $0; sub(/\. \[\[slnc 1000\]\]$/, "", line)
-    k = split(line, w, " "); verb = w[k]
+    sub(/^.*\]\] /, "", line); verb = line
     if (verb != last) {
       if (file) close(file)
-      file = sprintf("%s/%02d_%s.txt", dir, n++, verb); last = verb
+      fname = verb; gsub(/[ \/]+/, "-", fname)
+      file = sprintf("%s/%02d_%s.txt", dir, n++, fname); last = verb
     }
   }
   file && NF { print > file }
