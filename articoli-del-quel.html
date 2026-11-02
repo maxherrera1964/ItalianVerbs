@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Articoli, del, quel</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --txt:#151a21; --dim:#5b6675; --line:#d7dce3;
+  --m:#2563eb; --m-bg:rgba(37,99,235,.08); --f:#c0266d; --f-bg:rgba(192,38,109,.08);
+  --ok:#059669; --ok-bg:rgba(5,150,105,.12); --bad:#dc2626; --bad-bg:rgba(220,38,38,.10); --hi:#b45309;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#12161c; --panel:#1a2029; --txt:#eef2f6; --dim:#97a3b2; --line:#2e3744;
+  --m:#60a5fa; --m-bg:rgba(96,165,250,.10); --f:#f472b6; --f-bg:rgba(244,114,182,.10);
+  --ok:#34d399; --ok-bg:rgba(52,211,153,.14); --bad:#f87171; --bad-bg:rgba(248,113,113,.12); --hi:#fbbf24; color-scheme:dark;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;
+  padding:22px max(16px,env(safe-area-inset-left)) 48px max(16px,env(safe-area-inset-right))}
+main{max-width:900px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--dim);margin:0 0 18px}
+h2{font-size:18px;margin:30px 0 10px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+nav a{font-size:13px;font-weight:600;color:var(--txt);text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:640px){.steps{grid-template-columns:1fr}}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.step b{display:block;font-size:13px;color:var(--dim);letter-spacing:.04em}
+.step span{font-size:16px;font-weight:600}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px}
+th,td{padding:8px 7px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim)}
+tr.m td:first-child{border-left:4px solid var(--m)} tr.f td:first-child{border-left:4px solid var(--f)}
+td.when{color:var(--dim);font-size:13px;white-space:normal;min-width:150px}
+td.art{font-weight:800;font-size:17px}
+tr.m td.art{color:var(--m)} tr.f td.art{color:var(--f)}
+td.x{font-weight:600}
+td.x i{font-style:normal;color:var(--hi)}
+.trick{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.trick div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:15px}
+.trick i{font-style:normal;color:var(--hi);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:99px;padding:6px 11px;font-size:14px;cursor:pointer}
+.chip.m{border-color:var(--m)} .chip.f{border-color:var(--f)}
+.chip.sel{background:var(--txt);color:var(--bg)}
+.chip:focus-visible,button:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+.legend{font-size:13px;color:var(--dim);margin:6px 0 10px}
+.legend .dm{color:var(--m);font-weight:700}.legend .df{color:var(--f);font-weight:700}
+#exp{margin-top:12px}
+.why{font-size:15px;margin-bottom:10px}
+.why b{color:var(--hi)}
+.forms{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:640px){.forms{grid-template-columns:repeat(2,1fr)}}
+.form{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.form small{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.form span{font-size:17px;font-weight:600}
+.drill-top{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--dim);flex-wrap:wrap}
+.qtype{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--hi);margin-top:8px}
+.q{font-size:24px;font-weight:600;margin:6px 0 14px}
+.q .blank{display:inline-block;min-width:70px;border-bottom:3px solid var(--hi);text-align:center}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.opt{font-size:18px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);cursor:pointer}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)} .opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{margin-top:12px;font-size:15px;min-height:1.5em}
+.fb .ok{color:var(--ok);font-weight:700}.fb .no{color:var(--bad);font-weight:700}
+.next{margin-top:12px;padding:11px 18px;border:none;border-radius:10px;background:var(--txt);color:var(--bg);font-size:15px;font-weight:600;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.small{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--txt);cursor:pointer}
+#review{margin-top:10px;font-size:14px;color:var(--dim)}
+#review b{color:var(--txt)}
+.traps{display:grid;gap:10px}
+.trap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.trap h3{margin:0 0 4px;font-size:15px}
+.trap p{margin:0;font-size:15px}
+.trap .y{color:var(--ok);font-weight:700}.trap .n{color:var(--bad);text-decoration:line-through}
+</style>
+</head>
+<body>
+<main>
+<h1>Articoli, del, quel</h1>
+<p class="sub">One pattern for the article, di + article, the other prepositions, quel and bel.</p>
+<nav><a href="#regole">Rules</a><a href="#tabella">Table</a><a href="#esplora">Explore a word</a><a href="#esercizio">Practice</a><a href="#trappole">Traps</a></nav>
+
+<h2 id="regole">Ask 3 questions about the next word</h2>
+<div class="steps">
+  <div class="step"><b>1 · GENDER</b><span>Masculine or feminine?</span></div>
+  <div class="step"><b>2 · NUMBER</b><span>Singular or plural?</span></div>
+  <div class="step"><b>3 · FIRST SOUND</b><span>Normal consonant, s+consonant / z / gn / ps / y, or a vowel?</span></div>
+</div>
+
+<h2 id="tabella">The master table</h2>
+<div class="card scroll">
+<table>
+<tr><th>When</th><th>Article</th><th>di</th><th>a</th><th>da</th><th>in</th><th>su</th><th>quel</th><th>bel</th></tr>
+<tr class="m"><td class="when">masc. sing. + consonant<br><em>libro</em></td><td class="art">il</td><td class="x">de<i>l</i></td><td class="x">a<i>l</i></td><td class="x">da<i>l</i></td><td class="x">ne<i>l</i></td><td class="x">su<i>l</i></td><td class="x">que<i>l</i></td><td class="x">be<i>l</i></td></tr>
+<tr class="m"><td class="when">masc. sing. + s+cons., z, gn, ps, y<br><em>studente, zio</em></td><td class="art">lo</td><td class="x">del<i>lo</i></td><td class="x">al<i>lo</i></td><td class="x">dal<i>lo</i></td><td class="x">nel<i>lo</i></td><td class="x">sul<i>lo</i></td><td class="x">quel<i>lo</i></td><td class="x">bel<i>lo</i></td></tr>
+<tr class="m"><td class="when">masc. sing. + vowel<br><em>amico</em></td><td class="art">l'</td><td class="x">del<i>l'</i></td><td class="x">al<i>l'</i></td><td class="x">dal<i>l'</i></td><td class="x">nel<i>l'</i></td><td class="x">sul<i>l'</i></td><td class="x">quel<i>l'</i></td><td class="x">bel<i>l'</i></td></tr>
+<tr class="f"><td class="when">fem. sing. + consonant<br><em>casa</em></td><td class="art">la</td><td class="x">del<i>la</i></td><td class="x">al<i>la</i></td><td class="x">dal<i>la</i></td><td class="x">nel<i>la</i></td><td class="x">sul<i>la</i></td><td class="x">quel<i>la</i></td><td class="x">bel<i>la</i></td></tr>
+<tr class="f"><td class="when">fem. sing. + vowel<br><em>amica</em></td><td class="art">l'</td><td class="x">del<i>l'</i></td><td class="x">al<i>l'</i></td><td class="x">dal<i>l'</i></td><td class="x">nel<i>l'</i></td><td class="x">sul<i>l'</i></td><td class="x">quel<i>l'</i></td><td class="x">bel<i>l'</i></td></tr>
+<tr class="m"><td class="when">masc. plur. + consonant<br><em>libri</em></td><td class="art">i</td><td class="x">de<i>i</i></td><td class="x">a<i>i</i></td><td class="x">da<i>i</i></td><td class="x">ne<i>i</i></td><td class="x">su<i>i</i></td><td class="x">que<i>i</i></td><td class="x">be<i>i</i></td></tr>
+<tr class="m"><td class="when">masc. plur. + s+cons., z, vowel…<br><em>studenti, amici</em></td><td class="art">gli</td><td class="x">de<i>gli</i></td><td class="x">a<i>gli</i></td><td class="x">da<i>gli</i></td><td class="x">ne<i>gli</i></td><td class="x">su<i>gli</i></td><td class="x">que<i>gli</i></td><td class="x">be<i>gli</i></td></tr>
+<tr class="f"><td class="when">fem. plur. (always)<br><em>case, amiche</em></td><td class="art">le</td><td class="x">del<i>le</i></td><td class="x">al<i>le</i></td><td class="x">dal<i>le</i></td><td class="x">nel<i>le</i></td><td class="x">sul<i>le</i></td><td class="x">quel<i>le</i></td><td class="x">bel<i>le</i></td></tr>
+</table>
+</div>
+<div class="trick">
+  <div><b>The trick:</b> every column ends with the article.</div>
+  <div>de + <i>il</i> = del · de + <i>lo</i> = dello</div>
+  <div>que + <i>gli</i> = quegli · be + <i>i</i> = bei</div>
+</div>
+
+<h2 id="esplora">Explore a word</h2>
+<div class="card">
+  <div class="legend"><span class="dm">blue</span> = masculine · <span class="df">pink</span> = feminine. Tap a word to see all its forms.</div>
+  <div class="chips" id="chips"></div>
+  <div id="exp"></div>
+</div>
+
+<h2 id="esercizio">Practice</h2>
+<div class="card">
+  <div class="drill-top"><span id="score">Score: 0 / 0</span><span id="streak"></span></div>
+  <div class="qtype" id="qtype"></div>
+  <div class="q" id="q"></div>
+  <div class="opts" id="opts"></div>
+  <div class="fb" id="fb"></div>
+  <div class="row"><button class="next" id="next" type="button" hidden>Next →</button><button class="small" id="reset" type="button">Reset score</button></div>
+  <div id="review"></div>
+</div>
+
+<h2 id="trappole">The three traps</h2>
+<div class="traps">
+  <div class="trap"><h3>1. The next word decides, not the noun</h3><p>lo studente → <span class="y">il bravo studente</span> · gli amici → <span class="y">i vecchi amici</span> · l'amica → <span class="y">la mia amica</span></p></div>
+  <div class="trap"><h3>2. Quello with no noun after it uses the full form</h3><p>quei libri, but: Non voglio questi, voglio <span class="y">quelli</span> (<span class="n">quei</span>).</p></div>
+  <div class="trap"><h3>3. Del, della, dei can mean "some"</h3><p>Compro <span class="y">del</span> pane = some bread · Ho visto <span class="y">dei</span> ragazzi = some boys</p></div>
+</div>
+</main>
+
+<script>
+const SLOTS={
+ il:{art:"il",di:"del",a:"al",da:"dal",in:"nel",su:"sul",quel:"quel",bel:"bel",why:"masculine singular, starts with a normal consonant"},
+ lo:{art:"lo",di:"dello",a:"allo",da:"dallo",in:"nello",su:"sullo",quel:"quello",bel:"bello",why:"masculine singular, starts with s+consonant, z, gn, ps or y"},
+ lm:{art:"l'",di:"dell'",a:"all'",da:"dall'",in:"nell'",su:"sull'",quel:"quell'",bel:"bell'",why:"masculine singular, starts with a vowel"},
+ la:{art:"la",di:"della",a:"alla",da:"dalla",in:"nella",su:"sulla",quel:"quella",bel:"bella",why:"feminine singular, starts with a consonant"},
+ lf:{art:"l'",di:"dell'",a:"all'",da:"dall'",in:"nell'",su:"sull'",quel:"quell'",bel:"bell'",why:"feminine singular, starts with a vowel"},
+ i:{art:"i",di:"dei",a:"ai",da:"dai",in:"nei",su:"sui",quel:"quei",bel:"bei",why:"masculine plural, starts with a normal consonant"},
+ gli:{art:"gli",di:"degli",a:"agli",da:"dagli",in:"negli",su:"sugli",quel:"quegli",bel:"begli",why:"masculine plural, starts with a vowel, s+consonant, z, gn or ps"},
+ le:{art:"le",di:"delle",a:"alle",da:"dalle",in:"nelle",su:"sulle",quel:"quelle",bel:"belle",why:"feminine plural (always le)"}
+};
+const W=[["libro","il"],["ragazzo","il"],["tavolo","il"],["treno","il"],["giorno","il"],
+["studente","lo"],["zio","lo"],["zaino","lo"],["sport","lo"],["specchio","lo"],["psicologo","lo"],["yogurt","lo"],
+["amico","lm"],["albero","lm"],["uomo","lm"],["aereo","lm"],["ospedale","lm"],
+["casa","la"],["donna","la"],["macchina","la"],["chiave","la"],["stazione","la"],
+["amica","lf"],["isola","lf"],["acqua","lf"],["estate","lf"],["idea","lf"],
+["libri","i"],["ragazzi","i"],["bambini","i"],["treni","i"],
+["studenti","gli"],["zii","gli"],["amici","gli"],["alberi","gli"],["uomini","gli"],["occhi","gli"],["spaghetti","gli"],
+["case","le"],["donne","le"],["amiche","le"],["chiavi","le"],["isole","le"]];
+const isF=s=>s==="la"||s==="lf"||s==="le";
+const COLS=[["art","Article"],["di","di +"],["a","a +"],["da","da +"],["in","in +"],["su","su +"],["quel","quel"],["bel","bel"]];
+const join=(f,w)=>f.endsWith("'")?f+w:f+" "+w;
+
+const chips=document.getElementById("chips"),exp=document.getElementById("exp");
+W.forEach(([w,s])=>{const b=document.createElement("button");b.type="button";b.className="chip "+(isF(s)?"f":"m");b.textContent=w;
+ b.onclick=()=>{chips.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel"));b.classList.add("sel");show(w,s)};chips.appendChild(b)});
+function show(w,s){const S=SLOTS[s];
+ exp.innerHTML='<div class="why"><b>'+w+'</b>: '+S.why+' → <b>'+S.art+'</b></div><div class="forms">'+
+ COLS.map(([k,l])=>'<div class="form"><small>'+l+'</small><span>'+join(S[k],w)+'</span></div>').join("")+'</div>';}
+show("studente","lo");chips.children[5].classList.add("sel");
+
+const TYPES=[["art","Definite article"],["di","di + article"],["quel","quel / quello…"],["a","a + article"],["in","in + article"],["bel","bel / bello…"]];
+const TRAPS=[
+ {t:"Adjective in front",q:"___ vecchi amici",a:"i",o:["i","gli","lo"],e:"The word right after is <b>vecchi</b> (normal consonant) → i. The adjective decides, not amici."},
+ {t:"Adjective in front",q:"___ bravo studente",a:"il",o:["il","lo","l'"],e:"Right after comes <b>bravo</b> → il. Without the adjective it would be lo studente."},
+ {t:"Adjective in front",q:"___ grande albero",a:"il",o:["il","l'","lo"],e:"<b>grande</b> starts with a consonant → il."},
+ {t:"Adjective in front",q:"___ piccola isola",a:"la",o:["la","l'","le"],e:"<b>piccola</b> starts with a consonant → la."},
+ {t:"Quello alone",q:"Non questo libro, ___!",a:"quello",o:["quel","quello","quell'"],e:"No noun follows, so use the full form: <b>quello</b>."},
+ {t:"Quello alone",q:"Questi ragazzi o ___?",a:"quelli",o:["quei","quegli","quelli"],e:"No noun follows → <b>quelli</b>. (quei only goes before a noun.)"},
+ {t:"Quello alone",q:"Non queste case, ___!",a:"quelle",o:["quelle","quella","quei"],e:"No noun, feminine plural → <b>quelle</b>."},
+ {t:"Partitive (some)",q:"Compro ___ pane.",a:"del",o:["del","dello","il"],e:"di + il = <b>del</b> = some bread."},
+ {t:"Partitive (some)",q:"Ho visto ___ ragazzi.",a:"dei",o:["dei","degli","delle"],e:"di + i = <b>dei</b> = some boys."}
+];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let st={right:0,total:0,streak:0,miss:{}};
+try{const r=localStorage.getItem("artdrill");if(r)st=Object.assign(st,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem("artdrill",JSON.stringify(st))}catch(e){}};
+const $=id=>document.getElementById(id);
+function nextQ(){
+ let Q;
+ if(Math.random()<0.22){const T=TRAPS[Math.floor(Math.random()*TRAPS.length)];Q={t:T.t,q:T.q,a:T.a,o:shuffle(T.o.slice()),e:T.e}}
+ else{const [w,s]=W[Math.floor(Math.random()*W.length)],[k,label]=TYPES[Math.floor(Math.random()*TYPES.length)];
+  const right=SLOTS[s][k];const pool=[...new Set(Object.values(SLOTS).map(x=>x[k]))].filter(x=>x!==right);
+  Q={t:label,q:"___ "+w,a:right,o:shuffle([right,...shuffle(pool).slice(0,3)]),e:"<b>"+w+"</b>: "+SLOTS[s].why+" → "+SLOTS[s].art+", so <b>"+join(right,w)+"</b>.",w:w}}
+ $("qtype").textContent=Q.t;
+ $("q").innerHTML=Q.q.replace("___",'<span class="blank">?</span>');
+ $("fb").innerHTML="";$("next").hidden=true;
+ $("opts").innerHTML=Q.o.map(o=>'<button type="button" class="opt">'+o+'</button>').join("");
+ $("opts").querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+  const ok=b.textContent===Q.a;st.total++;
+  $("opts").querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.textContent===Q.a)x.classList.add("right")});
+  if(ok){st.right++;st.streak++}else{b.classList.add("wrong");st.streak=0;const key=Q.w?Q.t+": "+Q.w:Q.t;st.miss[key]=(st.miss[key]||0)+1}
+  $("q").innerHTML=Q.q.replace("___",'<span class="blank">'+Q.a+'</span>').replace("' ","'");
+  $("fb").innerHTML=(ok?'<span class="ok">Giusto! </span>':'<span class="no">Non proprio. </span>')+Q.e;
+  $("next").hidden=false;$("next").focus();save();stats();
+ });
+}
+function stats(){
+ $("score").textContent="Score: "+st.right+" / "+st.total+(st.total?" ("+Math.round(st.right/st.total*100)+"%)":"");
+ $("streak").textContent=st.streak>=3?"🔥 "+st.streak+" in a row":"";
+ const m=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ $("review").innerHTML=m.length?"To review: "+m.map(([k,v])=>"<b>"+k+"</b> ×"+v).join(" · "):"";
+}
+$("next").onclick=nextQ;
+$("reset").onclick=()=>{st={right:0,total:0,streak:0,miss:{}};save();stats();nextQ()};
+stats();nextQ();
+</script>
+</body>
+</html>
