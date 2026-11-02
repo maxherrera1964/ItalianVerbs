@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mappa dei tempi</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --txt:#151a21; --dim:#5b6675; --line:#d7dce3;
+  --ind:#2563eb; --ind-bg:rgba(37,99,235,.07); --ind-box:rgba(37,99,235,.13);
+  --cong:#059669; --cong-bg:rgba(5,150,105,.07); --cong-box:rgba(5,150,105,.13);
+  --accent:#c2410c;
+  --cond:#7c3aed; --cond-bg:rgba(124,58,237,.07); --cond-box:rgba(124,58,237,.13);
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#12161c; --panel:#1a2029; --txt:#eef2f6; --dim:#97a3b2; --line:#2e3744;
+  --ind:#60a5fa; --ind-bg:rgba(96,165,250,.08); --ind-box:rgba(96,165,250,.16);
+  --cong:#34d399; --cong-bg:rgba(52,211,153,.08); --cong-box:rgba(52,211,153,.16);
+  --accent:#fb923c; color-scheme:dark;
+  --cond:#a78bfa; --cond-bg:rgba(167,139,250,.08); --cond-box:rgba(167,139,250,.16);
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;
+  padding:24px max(16px,env(safe-area-inset-left)) 40px max(16px,env(safe-area-inset-right))}
+main{max-width:860px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--dim);margin:0 0 20px}
+h2{font-size:18px;margin:32px 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.scroll{overflow-x:auto}
+svg text{font-family:inherit}
+.t{fill:var(--txt);font-size:13px;font-weight:600}
+.f{fill:var(--txt);font-size:13px;font-style:italic}
+.s{fill:var(--dim);font-size:11.5px}
+.ax{fill:var(--dim);font-size:12px;font-weight:600}
+.now{fill:var(--accent)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px}
+th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+td .form{color:var(--cong);font-weight:700;font-style:italic}
+td .tense{color:var(--dim);font-size:13px}
+td .main{color:var(--dim);font-size:13px;font-style:italic}
+.ex{margin:14px 0 0;padding-left:18px;color:var(--txt)}
+.ex li{margin:4px 0}
+.ex b{color:var(--cong)}
+.note{color:var(--dim);font-size:14px;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>Mappa dei tempi</h1>
+<p class="sub">Indicativo, congiuntivo e condizionale in ordine temporale · esempio: <i>mangiare</i></p>
+
+<div class="card scroll">
+<svg viewBox="0 0 800 610" width="100%" style="min-width:640px" role="img" aria-label="Timeline of Italian indicative, subjunctive and conditional tenses">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--dim)"/></marker></defs>
+<line x1="30" y1="34" x2="778" y2="34" style="stroke:var(--dim)" stroke-width="1.5" marker-end="url(#ar)"/>
+<g text-anchor="middle">
+<text class="ax" x="105" y="22">prima del passato</text>
+<text class="ax" x="255" y="22">passato</text>
+<text class="ax now" x="405" y="22">ORA</text>
+<text class="ax" x="555" y="22">futuro (prima)</text>
+<text class="ax" x="705" y="22">futuro</text>
+</g>
+<g style="stroke:var(--dim)" stroke-width="1" stroke-dasharray="3 4" opacity=".4">
+<line x1="105" y1="38" x2="105" y2="600"/><line x1="255" y1="38" x2="255" y2="600"/><line x1="405" y1="38" x2="405" y2="600"/><line x1="555" y1="38" x2="555" y2="600"/><line x1="705" y1="38" x2="705" y2="600"/>
+</g>
+<rect x="18" y="52" width="764" height="190" rx="12" style="fill:var(--ind-bg);stroke:var(--ind)" stroke-opacity=".5"/>
+<text x="32" y="72" font-size="12" font-weight="700" letter-spacing="1" style="fill:var(--ind)">INDICATIVO · fatti, certezze</text>
+<g style="stroke:var(--ind);fill:var(--ind-box)" stroke-width="1.3">
+<rect x="40" y="122" width="130" height="58" rx="8"/><rect x="190" y="86" width="130" height="58" rx="8"/><rect x="190" y="160" width="130" height="58" rx="8"/>
+<rect x="340" y="122" width="130" height="58" rx="8"/><rect x="490" y="122" width="130" height="58" rx="8"/><rect x="640" y="122" width="130" height="58" rx="8"/>
+</g>
+<g text-anchor="middle">
+<text class="t" x="105" y="146">Trapassato pross.</text><text class="f" x="105" y="166">avevo mangiato</text>
+<text class="t" x="255" y="110">Passato prossimo</text><text class="f" x="255" y="130">ho mangiato</text>
+<text class="t" x="255" y="184">Imperfetto</text><text class="f" x="255" y="204">mangiavo</text>
+<text class="t" x="405" y="146">Presente</text><text class="f" x="405" y="166">mangio</text>
+<text class="t" x="555" y="146">Futuro anteriore</text><text class="f" x="555" y="166">avrò mangiato</text>
+<text class="t" x="705" y="146">Futuro semplice</text><text class="f" x="705" y="166">mangerò</text>
+</g>
+<rect x="18" y="258" width="764" height="190" rx="12" style="fill:var(--cong-bg);stroke:var(--cong)" stroke-opacity=".5"/>
+<text x="32" y="278" font-size="12" font-weight="700" letter-spacing="1" style="fill:var(--cong)">CONGIUNTIVO · dopo "che" + opinione, desiderio, emozione, dubbio</text>
+<g style="stroke:var(--cong);fill:var(--cong-box)" stroke-width="1.3">
+<rect x="40" y="328" width="130" height="58" rx="8"/><rect x="190" y="292" width="130" height="58" rx="8"/><rect x="190" y="366" width="130" height="58" rx="8"/>
+<rect x="340" y="328" width="430" height="58" rx="8"/>
+</g>
+<g text-anchor="middle">
+<text class="t" x="105" y="352">Cong. trapassato</text><text class="f" x="105" y="372">avessi mangiato</text>
+<text class="t" x="255" y="316">Cong. passato</text><text class="f" x="255" y="336">abbia mangiato</text>
+<text class="t" x="255" y="390">Cong. imperfetto</text><text class="f" x="255" y="410">mangiassi</text>
+<text class="t" x="555" y="352">Congiuntivo presente · <tspan font-style="italic" font-weight="400">mangi</tspan></text>
+<text class="s" x="555" y="372">copre presente e futuro (non esiste un congiuntivo futuro)</text>
+</g>
+<rect x="18" y="464" width="764" height="138" rx="12" style="fill:var(--cond-bg);stroke:var(--cond)" stroke-opacity=".5"/>
+<text x="32" y="484" font-size="12" font-weight="700" letter-spacing="1" style="fill:var(--cond)">CONDIZIONALE · ipotesi, desideri, consigli, cortesia</text>
+<g style="stroke:var(--cond);fill:var(--cond-box)" stroke-width="1.3">
+<rect x="190" y="506" width="130" height="72" rx="8"/>
+<rect x="340" y="506" width="430" height="72" rx="8"/>
+</g>
+<g text-anchor="middle">
+<text class="t" x="255" y="530">Cond. passato</text><text class="f" x="255" y="550">avrei mangiato</text><text class="s" x="255" y="568">+ futuro nel passato</text>
+<text class="t" x="555" y="536">Condizionale presente · <tspan font-style="italic" font-weight="400">mangerei</tspan></text>
+<text class="s" x="555" y="558">copre presente e futuro</text>
+</g>
+</svg>
+</div>
+
+<h2>Quale congiuntivo? Dipende dal verbo principale</h2>
+<div class="card scroll">
+<table>
+<tr><th>Verbo principale</th><th>Azione prima</th><th>Stesso momento</th><th>Azione dopo</th></tr>
+<tr>
+<td><b>Presente</b><br><span class="main">Penso che…</span></td>
+<td><span class="form">abbia mangiato</span><br><span class="tense">cong. passato</span></td>
+<td><span class="form">mangi</span><br><span class="tense">cong. presente</span></td>
+<td><span class="form">mangi</span> / mangerà<br><span class="tense">cong. presente (o futuro)</span></td>
+</tr>
+<tr>
+<td><b>Passato o condizionale</b><br><span class="main">Pensavo che… / Vorrei che…</span></td>
+<td><span class="form">avesse mangiato</span><br><span class="tense">cong. trapassato</span></td>
+<td><span class="form">mangiasse</span><br><span class="tense">cong. imperfetto</span></td>
+<td><span class="form">avrebbe mangiato</span><br><span class="tense">condizionale passato</span></td>
+</tr>
+</table>
+<ul class="ex">
+<li>Penso che Luca <b>abbia mangiato</b> / <b>mangi</b> adesso / <b>mangi</b> domani.</li>
+<li>Pensavo che Luca <b>avesse mangiato</b> / <b>mangiasse</b> / <b>avrebbe mangiato</b> dopo.</li>
+<li>Vorrei che tu <b>mangiassi</b> con noi.</li>
+</ul>
+</div>
+
+<h2>Condizionale + congiuntivo</h2>
+<div class="card">
+<ul class="ex" style="margin-top:0">
+<li><b style="color:var(--cond)">Vorrei</b> che tu <b>venissi</b>. <span class="main">condizionale come verbo principale → cong. imperfetto</span></li>
+<li>Se <b>avessi</b> fame, <b style="color:var(--cond)">mangerei</b>. <span class="main">periodo ipotetico: cong. imperfetto + cond. presente</span></li>
+<li>Se <b>avessi avuto</b> fame, <b style="color:var(--cond)">avrei mangiato</b>. <span class="main">cong. trapassato + cond. passato</span></li>
+<li>Ha detto che <b style="color:var(--cond)">sarebbe venuto</b>. <span class="main">futuro nel passato → cond. passato</span></li>
+</ul>
+</div>
+
+<p class="note">Non incluso: l'imperativo (<i>mangia! / mangi!</i>) è un modo a parte. L'imperativo formale <i>mangi!</i> prende la forma dal congiuntivo presente.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imperativo diretto e indiretto</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --txt:#151a21; --dim:#5b6675; --line:#d7dce3;
+  --dir:#d9480f; --dir-bg:rgba(217,72,15,.07); --dir-box:rgba(217,72,15,.12);
+  --ind:#2563eb; --ind-bg:rgba(37,99,235,.07); --ind-box:rgba(37,99,235,.12);
+  --grp:#059669;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#12161c; --panel:#1a2029; --txt:#eef2f6; --dim:#97a3b2; --line:#2e3744;
+  --dir:#ff8a50; --dir-bg:rgba(255,138,80,.08); --dir-box:rgba(255,138,80,.15);
+  --ind:#60a5fa; --ind-bg:rgba(96,165,250,.08); --ind-box:rgba(96,165,250,.15);
+  --grp:#34d399; color-scheme:dark;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;
+  padding:24px max(16px,env(safe-area-inset-left)) 40px max(16px,env(safe-area-inset-right))}
+main{max-width:900px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--dim);margin:0 0 22px}
+h2{font-size:18px;margin:30px 0 10px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.split{grid-template-columns:1fr}}
+.col{border-radius:14px;padding:16px;border:1.5px solid;min-width:0}
+.col.d{background:var(--dir-bg);border-color:var(--dir)}
+.col.i{background:var(--ind-bg);border-color:var(--ind)}
+.tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;padding:3px 9px;border-radius:99px;color:#fff;margin-bottom:8px}
+.d .tag{background:var(--dir)} .i .tag{background:var(--ind)}
+.col h3{margin:0 0 4px;font-size:20px}
+.who{color:var(--dim);font-size:14px;margin:0 0 12px}
+.big{font-size:26px;font-weight:700;margin:2px 0}
+.d .big,.d b.k{color:var(--dir)} .i .big,.i b.k{color:var(--ind)}
+.rule{font-size:14px;color:var(--dim)}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
+.box .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.box .ex{font-size:16px;margin-top:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 14px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:15px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}
+tr:last-child td{border-bottom:none}
+th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+th.d{color:var(--dir)} th.i{color:var(--ind)}
+td.d{color:var(--dir);font-weight:600} td.i{color:var(--ind);font-weight:600}
+td.v{color:var(--dim)}
+.scene{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.scene{grid-template-columns:1fr}}
+.bubble{border-radius:14px;padding:14px 16px;font-size:16px;line-height:1.7;min-width:0}
+.bubble.d{background:var(--dir-box)} .bubble.i{background:var(--ind-box)}
+.bubble .who{margin-bottom:6px}
+.bubble b{font-weight:700} .bubble.d b{color:var(--dir)} .bubble.i b{color:var(--ind)}
+.grp{border-left:4px solid var(--grp);background:var(--panel);border-radius:10px;padding:12px 14px;margin-top:14px}
+.grp b{color:var(--grp)}
+.test{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+@media (max-width:640px){.test{grid-template-columns:1fr}}
+.t{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.t .q{font-size:13px;color:var(--dim)}
+.t .a{font-size:20px;font-weight:700;margin-top:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Imperativo diretto e indiretto</h1>
+<p class="sub">Same command, two registers: who you're talking to decides the form.</p>
+
+<div class="split">
+  <section class="col d">
+    <span class="tag">DIRETTO</span>
+    <h3>tu · noi · voi</h3>
+    <p class="who">Friends, family, kids, groups</p>
+    <div class="big">Parla! · Prendi! · Dormi!</div>
+    <p class="rule">Its own imperative forms. -are → <b class="k">-a</b>, -ere/-ire → <b class="k">-i</b></p>
+    <div class="box"><div class="lbl">Pronouns</div><div class="ex">attached at the end → <b class="k">dimmi</b>, <b class="k">aiutami</b>, <b class="k">siediti</b></div></div>
+    <div class="box"><div class="lbl">Negative (tu)</div><div class="ex">non + infinitive → <b class="k">non parlare!</b></div></div>
+  </section>
+  <section class="col i">
+    <span class="tag">INDIRETTO</span>
+    <h3>Lei · (Loro)</h3>
+    <p class="who">Strangers, shops, doctors, older people</p>
+    <div class="big">Parli! · Prenda! · Dorma!</div>
+    <p class="rule">Borrowed from the congiuntivo presente. -are → <b class="k">-i</b>, -ere/-ire → <b class="k">-a</b></p>
+    <div class="box"><div class="lbl">Pronouns</div><div class="ex">before the verb → <b class="k">mi dica</b>, <b class="k">mi aiuti</b>, <b class="k">si sieda</b></div></div>
+    <div class="box"><div class="lbl">Negative</div><div class="ex">non + the same form → <b class="k">non parli!</b></div></div>
+  </section>
+</div>
+
+<h2>The vowels swap</h2>
+<div class="card scroll"><table>
+<tr><th>Verb</th><th class="d">Tu</th><th class="d">Non (tu)</th><th class="i">Lei</th><th class="i">Non (Lei)</th></tr>
+<tr><td class="v">parlare</td><td class="d">parla</td><td class="d">non parlare</td><td class="i">parli</td><td class="i">non parli</td></tr>
+<tr><td class="v">prendere</td><td class="d">prendi</td><td class="d">non prendere</td><td class="i">prenda</td><td class="i">non prenda</td></tr>
+<tr><td class="v">dormire</td><td class="d">dormi</td><td class="d">non dormire</td><td class="i">dorma</td><td class="i">non dorma</td></tr>
+<tr><td class="v">finire (-isc)</td><td class="d">finisci</td><td class="d">non finire</td><td class="i">finisca</td><td class="i">non finisca</td></tr>
+<tr><td class="v">pagare</td><td class="d">paga</td><td class="d">non pagare</td><td class="i">paghi</td><td class="i">non paghi</td></tr>
+</table></div>
+
+<h2>Irregulars</h2>
+<div class="card scroll"><table>
+<tr><th>Verb</th><th class="d">Tu</th><th class="i">Lei</th><th>Lei: how to remember it</th></tr>
+<tr><td class="v">andare</td><td class="d">va' / vai</td><td class="i">vada</td><td class="v">vado → vada</td></tr>
+<tr><td class="v">fare</td><td class="d">fa' / fai</td><td class="i">faccia</td><td class="v">faccio → faccia</td></tr>
+<tr><td class="v">dire</td><td class="d">di'</td><td class="i">dica</td><td class="v">dico → dica</td></tr>
+<tr><td class="v">venire</td><td class="d">vieni</td><td class="i">venga</td><td class="v">vengo → venga</td></tr>
+<tr><td class="v">uscire</td><td class="d">esci</td><td class="i">esca</td><td class="v">esco → esca</td></tr>
+<tr><td class="v">dare</td><td class="d">da' / dai</td><td class="i">dia</td><td class="v">memorize</td></tr>
+<tr><td class="v">stare</td><td class="d">sta' / stai</td><td class="i">stia</td><td class="v">memorize</td></tr>
+<tr><td class="v">essere</td><td class="d">sii</td><td class="i">sia</td><td class="v">memorize</td></tr>
+<tr><td class="v">avere</td><td class="d">abbi</td><td class="i">abbia</td><td class="v">memorize</td></tr>
+</table></div>
+
+<h2>Pronouns move</h2>
+<div class="card scroll"><table>
+<tr><th>Meaning</th><th class="d">Tu</th><th class="i">Lei</th></tr>
+<tr><td class="v">Tell me</td><td class="d">dimmi</td><td class="i">mi dica</td></tr>
+<tr><td class="v">Excuse me</td><td class="d">scusa</td><td class="i">scusi</td></tr>
+<tr><td class="v">Sit down</td><td class="d">siediti</td><td class="i">si sieda</td></tr>
+<tr><td class="v">Don't worry</td><td class="d">non ti preoccupare</td><td class="i">non si preoccupi</td></tr>
+<tr><td class="v">Tell it to me</td><td class="d">dimmelo</td><td class="i">me lo dica</td></tr>
+<tr><td class="v">Go away</td><td class="d">vattene</td><td class="i">se ne vada</td></tr>
+</table></div>
+<p class="rule" style="margin-top:8px">With short tu forms (va', fa', di', da') the pronoun doubles its consonant: <b style="color:var(--dir)">dimmi, fammi, dammi, vattene</b>.</p>
+
+<h2>The same scene, both ways</h2>
+<div class="scene">
+  <div class="bubble d"><div class="who">To a friend</div><b>Scusa</b>, <b>dimmi</b> dov'è la stazione.<br>— <b>Vai</b> dritto e <b>gira</b> a destra. <b>Non preoccuparti</b>, è vicina!</div>
+  <div class="bubble i"><div class="who">To a stranger</div><b>Scusi</b>, <b>mi dica</b> dov'è la stazione.<br>— <b>Vada</b> dritto e <b>giri</b> a destra. <b>Non si preoccupi</b>, è vicina!</div>
+</div>
+
+<div class="grp"><b>Talking to a group?</b> Use <b>voi</b>, formal or not: <i>Accomodatevi! Seguitemi! Non preoccupatevi!</i> The formal plural <i>Loro</i> (<i>Si accomodino</i>) is rare and found mostly in very elegant hotels and restaurants.</div>
+
+<h2>Quick test</h2>
+<div class="test">
+  <div class="t"><div class="q">One stranger</div><div class="a" style="color:var(--ind)">Lei → mi dica</div></div>
+  <div class="t"><div class="q">One friend</div><div class="a" style="color:var(--dir)">tu → dimmi</div></div>
+  <div class="t"><div class="q">Any group</div><div class="a" style="color:var(--grp)">voi → ditemi</div></div>
+</div>
+</main>
+</body>
+</html>
