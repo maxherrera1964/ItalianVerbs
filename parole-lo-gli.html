@@ -204,6 +204,12 @@
       <button class="btn" id="allC">All</button>
       <button class="btn" id="noneC">Clear</button>
     </div>
+    <div class="row">
+      <button class="btn" id="setS">s + consonant</button>
+      <button class="btn" id="setLA">Look-alikes</button>
+    </div>
+    <div class="addhint"><b>Look-alikes</b> are the words that take lo / gli without starting with s + consonant:
+      z, gn, ps, pn, x, y, i + vowel, and ch, pt, ts, tz.</div>
 
     <h2>Order</h2>
     <div class="chips" id="ordChips"></div>
@@ -228,17 +234,26 @@
 
 <script>
 /* =======================================================================
-   DATA — 100 masculine nouns starting with s + consonant.
-   Each takes lo in the singular and gli in the plural.
-   Row: [singular, plural, English, group, custom note, extra accepted plurals]
+   DATA — 100 masculine nouns starting with s + consonant, plus 80
+   look-alikes (z, gn, ps, pn, x, y, i + vowel, ch, pt, ts, tz).
+   Every one takes lo in the singular and gli in the plural.
+   Row: [singular, plural, English, group, custom note,
+         extra accepted plurals, extra accepted singulars]
    ======================================================================= */
 const CATS = [
   {id:"sc",   label:"SC-",               it:"SC-"},
   {id:"sp",   label:"SP-",               it:"SP-"},
   {id:"st",   label:"ST-",               it:"ST-"},
   {id:"sbfg", label:"SB- SF- SG-",       it:"SB- · SF- · SG-"},
-  {id:"altri",label:"SL- SM- SN- SQ- SV-",it:"SL- · SM- · SN- · SQ- · SV-"}
+  {id:"altri",label:"SL- SM- SN- SQ- SV-",it:"SL- · SM- · SN- · SQ- · SV-"},
+  {id:"z",    label:"Z-",                it:"Z-"},
+  {id:"gnps", label:"GN- PS- PN-",       it:"GN- · PS- · PN-"},
+  {id:"xy",   label:"X- Y- I-",          it:"X- · Y- · I + vowel"},
+  {id:"chpt", label:"CH- PT- TS- TZ-",   it:"CH- · PT- · TS- · TZ-"}
 ];
+const SET_S  = ["sc","sp","st","sbfg","altri"];
+const SET_LA = ["z","gnps","xy","chpt"];
+const RARE_PL = "Mostly used in the singular; the plural is rare.";
 const TYPES = [
   {id:"pl", label:"Plural"},
   {id:"sg", label:"Singular"},
@@ -350,21 +365,120 @@ const W = [
   ["svincolo","svincoli","highway exit","altri"],
   ["sviluppo","sviluppi","development","altri"],
   ["svizzero","svizzeri","Swiss man","altri"],
-  ["svolgimento","svolgimenti","carrying out (of a task)","altri"]
+  ["svolgimento","svolgimenti","carrying out (of a task)","altri"],
+  /* Z- */
+  ["zabaione","zabaioni","zabaglione (egg custard)","z"],
+  ["zafferano","zafferani","saffron","z",RARE_PL],
+  ["zaffiro","zaffiri","sapphire","z"],
+  ["zaino","zaini","backpack","z"],
+  ["zainetto","zainetti","small backpack","z"],
+  ["zampillo","zampilli","jet of water","z"],
+  ["zampino","zampini","little paw","z","Metterci lo zampino: to have a hand in something."],
+  ["zampone","zamponi","stuffed pig's trotter","z"],
+  ["zampognaro","zampognari","bagpipe player","z"],
+  ["zapping","zapping","channel surfing","z"],
+  ["zar","zar","tsar","z"],
+  ["zecchino","zecchini","gold coin","z"],
+  ["zeffiro","zeffiri","gentle breeze","z"],
+  ["zelo","zeli","zeal","z",RARE_PL],
+  ["zenit","zenit","zenith","z"],
+  ["zenzero","zenzeri","ginger","z"],
+  ["zeppelin","zeppelin","airship","z"],
+  ["zerbino","zerbini","doormat","z"],
+  ["zero","zeri","zero","z"],
+  ["zibaldone","zibaldoni","notebook, miscellany","z"],
+  ["zigomo","zigomi","cheekbone","z"],
+  ["zigote","zigoti","zygote","z"],
+  ["zigzag","zigzag","zigzag","z"],
+  ["zimbello","zimbelli","laughingstock","z"],
+  ["zinco","zinchi","zinc","z","-co → -chi keeps the hard sound, but zinc is a material: the plural is rare."],
+  ["zio","zii","uncle","z","Here the i of -io is stressed (zìo), so it survives: gli zii, two i's. Gli zii also means aunt and uncle together."],
+  ["zircone","zirconi","zircon","z"],
+  ["zoccolo","zoccoli","clog, hoof","z"],
+  ["zodiaco","zodiaci","zodiac","z"],
+  ["zolfanello","zolfanelli","sulfur match","z"],
+  ["zolfo","zolfi","sulfur","z",RARE_PL],
+  ["zombie","zombie","zombie","z"],
+  ["zoo","zoo","zoo","z"],
+  ["zoologo","zoologi","zoologist","z"],
+  ["zoom","zoom","zoom","z"],
+  ["zootecnico","zootecnici","livestock specialist","z"],
+  ["zotico","zotici","boor","z"],
+  ["zucchero","zuccheri","sugar","z"],
+  ["zuccherino","zuccherini","sugar cube, candy","z"],
+  ["zuccherificio","zuccherifici","sugar refinery","z"],
+  ["zucchetto","zucchetti","skullcap","z"],
+  ["zucchino","zucchini","zucchini","z"],
+  ["zuccone","zucconi","blockhead","z"],
+  ["zuccotto","zuccotti","dome-shaped dessert","z"],
+  ["zufolo","zufoli","folk whistle","z"],
+  ["zuzzurellone","zuzzurelloni","goofball","z"],
+  /* GN- PS- PN- */
+  ["gnocco","gnocchi","dumpling","gnps"],
+  ["gnocchetto","gnocchetti","small dumpling","gnps"],
+  ["gnomo","gnomi","gnome","gnps"],
+  ["gnu","gnu","gnu","gnps"],
+  ["psicologo","psicologi","psychologist","gnps"],
+  ["psichiatra","psichiatri","psychiatrist (male)","gnps","Masculine noun in -a → -i. A female psychiatrist is la psichiatra → le psichiatre."],
+  ["psicoterapeuta","psicoterapeuti","psychotherapist (male)","gnps","Masculine noun in -a → -i. Female: la psicoterapeuta → le psicoterapeute."],
+  ["psicanalista","psicanalisti","psychoanalyst (male)","gnps","Masculine noun in -a → -i. Female: la psicanalista → le psicanaliste."],
+  ["psicofarmaco","psicofarmaci","psychiatric drug","gnps"],
+  ["psicopatico","psicopatici","psychopath","gnps"],
+  ["pseudonimo","pseudonimi","pseudonym","gnps"],
+  ["pneumatico","pneumatici","tire","gnps","In speech you'll often hear il pneumatico / i pneumatici; lo / gli is the standard form."],
+  ["pneumologo","pneumologi","lung specialist","gnps"],
+  /* X- Y- I- */
+  ["xilofono","xilofoni","xylophone","xy"],
+  ["xenofobo","xenofobi","xenophobe","xy"],
+  ["xeno","xeni","xenon","xy",RARE_PL],
+  ["yogurt","yogurt","yogurt","xy","Also spelled iogurt, with the same article. You'll hear l'yogurt in speech; lo yogurt is the standard form.",[],["iogurt"]],
+  ["yacht","yacht","yacht","xy"],
+  ["yoga","yoga","yoga","xy",RARE_PL],
+  ["yeti","yeti","yeti","xy"],
+  ["yen","yen","yen","xy"],
+  ["yo-yo","yo-yo","yo-yo","xy"],
+  ["yak","yak","yak","xy"],
+  ["iato","iati","hiatus","xy"],
+  ["ione","ioni","ion","xy"],
+  ["iettatore","iettatori","jinx, bringer of bad luck","xy"],
+  ["iodio","iodi","iodine","xy","You'll also hear l'iodio; lo iodio is the textbook form. The plural is rare."],
+  /* CH- PT- TS- TZ- */
+  ["chef","chef","chef","chpt"],
+  ["champagne","champagne","champagne","chpt"],
+  ["chalet","chalet","chalet","chpt"],
+  ["chignon","chignon","hair bun","chpt"],
+  ["pterodattilo","pterodattili","pterodactyl","chpt"],
+  ["tsunami","tsunami","tsunami","chpt"],
+  ["tzatziki","tzatziki","tzatziki","chpt"]
 ];
 
 /* ---- automatic notes on how the plural is formed ---- */
+const COMPOUND = ["scolapasta","spremiagrumi","stuzzicadenti"];
 function autoNote(s,p){
   if(p===s){
+    if(COMPOUND.includes(s)) return "Compound word (verb + noun): it never changes in the plural. Only the article tells you.";
     if(/[^aeiouàèéìòù]$/.test(s)) return "Borrowed word: it never changes in the plural. Only the article tells you: lo "+s+" → gli "+s+".";
-    return "Compound word (verb + noun): it never changes in the plural. Only the article tells you.";
+    return "Invariable: it never changes in the plural. Only the article tells you: lo "+s+" → gli "+s+".";
   }
   if(/[cg]o$/.test(s) && /[cg]hi$/.test(p)) return "-co / -go → -chi / -ghi: the h keeps the hard sound.";
+  if(/logo$/.test(s)) return "-logo for a person (an expert) → -logi: "+s+" → "+p+", not "+s.slice(0,-1)+"hi.";
+  if(/co$/.test(s)) return "-co → -ci here: the stress falls early in the word, so the sound softens ("+s+" → "+p+", not "+s.slice(0,-1)+"hi).";
   if(/io$/.test(s)) return "Unstressed -io → just one -i: "+s+" → "+p+", never "+s.slice(0,-1)+"i.";
+  if(/a$/.test(s)) return "Masculine noun in -a → -i.";
   if(/e$/.test(s)) return "Masculine noun in -e → -i.";
   return "-o → -i.";
 }
-const ART = "Starts with s + consonant, so lo in the singular and gli in the plural.";
+function art(s){
+  if(/^s[^aeiou]/.test(s)) return "Starts with s + consonant, so lo in the singular and gli in the plural.";
+  if(/^z/.test(s))  return "Starts with z, which takes lo / gli exactly like s + consonant.";
+  if(/^gn/.test(s)) return "Starts with gn, which takes lo / gli.";
+  if(/^p[snt]/.test(s)) return "Starts with "+s.slice(0,2)+", a consonant cluster that takes lo / gli.";
+  if(/^x/.test(s))  return "Starts with x (a ks sound), which takes lo / gli.";
+  if(/^(y|i[aeiou])/.test(s)) return "Starts with a y sound (a semivowel), which takes lo / gli.";
+  if(/^ch/.test(s)) return "Here ch sounds like sh — the same sound as sc in sci — so it takes lo / gli.";
+  if(/^t[sz]/.test(s)) return "Starts with "+s.slice(0,2)+", the same sound as z, so lo / gli.";
+  return "";
+}
 
 /* ---- deliberately wrong plural forms, used as distractors ---- */
 function wrongPl(s,p,alt){
@@ -377,24 +491,27 @@ function wrongPl(s,p,alt){
     else w = s.slice(0,-1)+"i";
   }
   else if(/[cg]hi$/.test(p)) w = p.replace(/hi$/,"i");
+  else if(/[cg]o$/.test(s)) w = s.slice(0,-1)+"hi";
   else if(/io$/.test(s)) w = s.slice(0,-1)+"i";
   else w = s;
+  if(w===p && /io$/.test(s)) w = s.slice(0,-2)+"i";
   if((alt||[]).includes(w) || w===p) w = p.replace(/i$/,"e");
   return w;
 }
 const uniq = a => a.filter((x,i)=>a.indexOf(x)===i);
 
 const CARDS = [];
-W.forEach(([s,p,en,g,n,alt])=>{
-  const note = (n ? n+" " : autoNote(s,p)+" ") + ART;
+W.forEach(([s,p,en,g,n,alt,altS])=>{
+  const note = (n ? n+" " : autoNote(s,p)+" ") + art(s);
+  const altSg = (altS||[]).map(x=>"lo "+x);
   const base = {cat:g, s:s, p:p, en:en, note:note};
   CARDS.push(Object.assign({}, base, {type:"pl", q:"lo "+s, qs:"plurale", a:"gli "+p,
-    alt:(alt||[]).map(x=>"gli "+x),
+    alt:(alt||[]).concat(altS||[]).map(x=>"gli "+x),
     opts:uniq(["gli "+p, "i "+p, "gli "+wrongPl(s,p,alt), "le "+p]).slice(0,4)}));
-  CARDS.push(Object.assign({}, base, {type:"sg", q:"gli "+p, qs:"singolare", a:"lo "+s, alt:[],
-    opts:uniq(["lo "+s, "il "+s, "la "+s, p!==s ? "lo "+p : "l'"+s]).slice(0,4)}));
+  CARDS.push(Object.assign({}, base, {type:"sg", q:"gli "+p, qs:"singolare", a:"lo "+s, alt:altSg,
+    opts:uniq(["lo "+s, "il "+s, "la "+s, p!==s ? "lo "+p : "le "+s]).slice(0,4)}));
   CARDS.push(Object.assign({}, base, {type:"en", fam:"en-"+g, q:en, qs:"in italiano · singolare con articolo",
-    a:"lo "+s, alt:[]}));
+    a:"lo "+s, alt:altSg}));
 });
 
 /* =======================================================================
@@ -413,6 +530,7 @@ let S = {
   speak:false, voiceName:"", stats:{}, known:{}, seen:0, right:0
 };
 try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+if(!S.v2){ SET_LA.forEach(id=>{ if(!S.cats.includes(id)) S.cats.push(id); }); S.v2=true; }
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
 
 let deck=[], pos=0, flipped=false, answered=false;
@@ -705,6 +823,8 @@ $("closeBtn").onclick = ()=>{ $("sheet").classList.remove("open"); buildDeck(); 
 $("sheet").onclick    = e=>{ if(e.target===$("sheet")){ $("sheet").classList.remove("open"); buildDeck(); } };
 $("allC").onclick  = ()=>{ S.cats=CATS.map(c=>c.id); save(); drawChips(); buildDeck(); };
 $("noneC").onclick = ()=>{ S.cats=[]; save(); drawChips(); buildDeck(); };
+$("setS").onclick  = ()=>{ S.cats=SET_S.slice();  save(); drawChips(); buildDeck(); };
+$("setLA").onclick = ()=>{ S.cats=SET_LA.slice(); save(); drawChips(); buildDeck(); };
 $("resetKnownBtn").onclick = ()=>{ S.known={}; save(); drawChips(); buildDeck(); };
 $("resetBtn").onclick = ()=>{
   if(!confirm("Reset all progress — known cards, per-card stats, and the score?")) return;
@@ -719,12 +839,14 @@ $("modeBtn").onclick = ()=>{
 function drawStudy(){
   const rules =
     '<div class="tbl"><h3>The rules behind every card</h3>'+
-      '<div class="r" data-say="lo specchio. gli specchi."><div class="q">Masculine + s + consonant<span>also z, gn, ps, x, y</span></div><div class="a">lo → gli</div></div>'+
+      '<div class="r" data-say="lo specchio. gli specchi."><div class="q">Masculine + s + consonant<span>also z, gn, ps, pn, x, y, i + vowel</span></div><div class="a">lo → gli</div></div>'+
       '<div class="r" data-say="degli specchi. negli stadi. sugli scaffali."><div class="q">Some / in / on the…<span>prepositions merge with gli</span></div><div class="a">degli · negli · sugli</div></div>'+
       '<div class="r" data-say="quello specchio. quegli specchi."><div class="q">That / those</div><div class="a">quello → quegli</div></div>'+
       '<div class="r" data-say="lo spreco. gli sprechi."><div class="q">-co / -go</div><div class="a">-chi / -ghi</div></div>'+
       '<div class="r" data-say="lo specchio. gli specchi."><div class="q">Unstressed -io</div><div class="a">one -i: specchi</div></div>'+
       '<div class="r" data-say="lo sport. gli sport."><div class="q">Borrowed &amp; compound words</div><div class="a">no change: gli sport</div></div>'+
+      '<div class="r" data-say="lo zio. gli zii."><div class="q">Stressed -io (zìo)</div><div class="a">two i\'s: gli zii</div></div>'+
+      '<div class="r" data-say="lo psicologo. gli psicologi."><div class="q">-logo for a person</div><div class="a">-logi: psicologi</div></div>'+
       '<div class="note">Feminine s + consonant words just take la / le: la spiaggia → le spiagge. Tap any row to hear it.</div>'+
     '</div>';
   $("studyBody").innerHTML = rules + CATS.map(cat=>{
