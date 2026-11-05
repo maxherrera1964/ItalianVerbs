@@ -172,7 +172,9 @@ find "$WORK/parts" -name '*.txt' -print0 | xargs -0 -P 6 -n 1 "$WORK/render_one.
 # The whole-track completo.m4a: every segment aiff, across every verb, in
 # order — the "NN_verb__SSS.lang" naming sorts correctly as plain text since
 # both the verb index and the segment index are zero-padded.
-find "$WORK/segaiff" -name '*.aiff' | sort | while IFS= read -r f; do printf "file '%s'\n" "$f"; done > "$WORK/concat.txt"
+# Sort numerically on the item index (field 1) then by segment (field 4), so
+# 100_x comes after 99_y — a plain text sort would put 100_ before 10_.
+(cd "$WORK/segaiff" && ls | grep '\.aiff$' | sort -t_ -k1,1n -k4,4) | while IFS= read -r f; do printf "file '%s'\n" "$WORK/segaiff/$f"; done > "$WORK/concat.txt"
 ffmpeg -y -loglevel error -f concat -safe 0 -i "$WORK/concat.txt" $RA_FLOOR "$WORK/full.aiff"
 afconvert -f m4af -d aac -s 2 -b "$BITRATE" "$WORK/full.aiff" "$OUT/completo.m4a"
 
