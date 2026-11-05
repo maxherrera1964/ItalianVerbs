@@ -1,0 +1,142 @@
+<title>L'articolo determinativo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a single study sheet — forms first, then "sì / no" rules side by side, then the prepositions grid */
+:root{
+  --bg:#f7f8fb; --surface:#ffffff; --fg:#1b2233; --muted:#5b6478; --line:#dde2ec;
+  --ink:#1f4fa8; --ink-soft:#e7eefb; --no:#b23a3a; --no-soft:#fbecec;
+  --display:"Literata",Georgia,serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12161f; --surface:#1a2030; --fg:#e6e9f0; --muted:#9aa3b8; --line:#2c3446;
+  --ink:#8fb3ff; --ink-soft:#1f2c48; --no:#f08c8c; --no-soft:#3a2026; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161f; --surface:#1a2030; --fg:#e6e9f0; --muted:#9aa3b8; --line:#2c3446;
+  --ink:#8fb3ff; --ink-soft:#1f2c48; --no:#f08c8c; --no-soft:#3a2026; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding-block:32px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:2.2rem;color:var(--ink)}
+h2{font-size:1.4rem;margin-bottom:12px}
+.lede{color:var(--muted);margin:8px 0 0;max-width:62ch}
+em{font-style:italic}
+b.a{color:var(--ink)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+td.k{font-weight:700;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:20px}
+.col{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px}
+.col h2{display:flex;align-items:center;gap:10px}
+.tag{font-family:var(--body);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:99px}
+.si .tag{background:var(--ink-soft);color:var(--ink)}
+.no .tag{background:var(--no-soft);color:var(--no)}
+ul.rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+ul.rules li{display:flex;flex-direction:column;gap:2px}
+.r{font-weight:700}
+.ex{color:var(--muted);font-size:15px}
+.ex i{color:var(--fg)}
+.note{border-left:3px solid var(--no);background:var(--no-soft);padding:14px 18px;border-radius:0 8px 8px 0}
+.note p{margin:0}
+.note p+p{margin-top:8px}
+.prep td,.prep th{text-align:center;font-variant-numeric:tabular-nums}
+.prep td:first-child,.prep th:first-child{text-align:left}
+.foot{color:var(--muted);font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>L'articolo determinativo</h1>
+    <p class="lede">Le regole viste negli esercizi di <em>VIDEOgrammatica</em>: le forme, quando si usa, quando non si usa e le preposizioni articolate.</p>
+  </header>
+
+  <section>
+    <h2>1. Le forme</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Davanti a</th><th>Singolare</th><th>Plurale</th></tr></thead>
+      <tbody>
+        <tr><td>Maschile + consonante</td><td><b class="a">il</b> libro</td><td><b class="a">i</b> libri</td></tr>
+        <tr><td>Maschile + vocale</td><td><b class="a">l'</b>amico</td><td><b class="a">gli</b> amici</td></tr>
+        <tr><td>Maschile + s+consonante, z, gn, ps, x, y</td><td><b class="a">lo</b> studente, <b class="a">lo</b> zio, <b class="a">lo</b> chef</td><td><b class="a">gli</b> studenti, <b class="a">gli</b> zii</td></tr>
+        <tr><td>Femminile + consonante</td><td><b class="a">la</b> casa</td><td><b class="a">le</b> case</td></tr>
+        <tr><td>Femminile + vocale</td><td><b class="a">l'</b>amica</td><td><b class="a">le</b> amiche</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="grid">
+    <section class="col si">
+      <h2><span class="tag">Sì</span> Quando si usa</h2>
+      <ul class="rules">
+        <li><span class="r">Cose specifiche o già note</span><span class="ex"><i>il libro che mi hai dato, i due esercizi che mi avevi chiesto</i></span></li>
+        <li><span class="r">Concetti generali e categorie</span><span class="ex"><i>amo l'onestà, agli italiani piace parlare</i></span></li>
+        <li><span class="r">Soggetto di <i>piacere</i></span><span class="ex"><i>mi piace la storia romana</i></span></li>
+        <li><span class="r">Nazioni, regioni, continenti</span><span class="ex"><i>l'Italia è bella, dall'Italia, della Lombardia</i></span></li>
+        <li><span class="r">Fiumi, monti, laghi, mari</span><span class="ex"><i>dal Tevere, sull'Etna</i></span></li>
+        <li><span class="r">Le ore</span><span class="ex"><i>è l'una, sono le cinque</i></span></li>
+        <li><span class="r">Giorni ripetuti (abitudine)</span><span class="ex"><i>il martedì vado in palestra</i> = ogni martedì</span></li>
+        <li><span class="r">Possessivi</span><span class="ex"><i>la mia casa, il tuo libro, i miei zii</i></span></li>
+        <li><span class="r">Nome + aggettivo o specificazione</span><span class="ex"><i>la Firenze dei Medici, il Manzoni più famoso, il mio zio preferito</i></span></li>
+        <li><span class="r">Titoli che lo contengono</span><span class="ex"><i>I tre moschettieri, I promessi sposi</i></span></li>
+      </ul>
+    </section>
+
+    <section class="col no">
+      <h2><span class="tag">No</span> Quando non si usa</h2>
+      <ul class="rules">
+        <li><span class="r">Città e piccole isole</span><span class="ex"><i>Venezia, a Milano, da Cuba</i></span></li>
+        <li><span class="r"><i>in</i> + nazione, regione, continente</span><span class="ex"><i>in Italia, in Sicilia, in Europa</i></span></li>
+        <li><span class="r">Nomi propri e cognomi</span><span class="ex"><i>Mario, Ungaretti</i></span></li>
+        <li><span class="r">Parente singolare + possessivo</span><span class="ex"><i>mio padre, tua sorella, mio cognato</i></span></li>
+        <li><span class="r">Un giorno preciso</span><span class="ex"><i>venerdì parto</i> = questo venerdì</span></li>
+        <li><span class="r"><i>parlare in</i> + lingua</span><span class="ex"><i>parliamo in italiano</i> (con <i>studiare</i> è facoltativo: <i>studio (l')inglese</i>)</span></li>
+        <li><span class="r">Quantità generiche, frasi negative</span><span class="ex"><i>non metto zucchero, non voglio problemi, tre banane</i></span></li>
+        <li><span class="r">Espressioni fisse</span><span class="ex"><i>di pietra, in fretta, con pazienza, da sole, da sera, ho mal di testa</i></span></li>
+        <li><span class="r">Dopo <i>questo / quello</i></span><span class="ex"><i>in questi casi</i> (mai “nei questi”)</span></li>
+        <li><span class="r">Città d'origine</span><span class="ex"><i>sono di Milano</i></span></li>
+      </ul>
+    </section>
+  </div>
+
+  <section>
+    <h2>2. I parenti: le eccezioni</h2>
+    <div class="note">
+      <p>Senza articolo: <i>mio zio, tua nipote, suo figlio</i>.</p>
+      <p>L'articolo torna con <b>loro</b> (<i>il loro nonno</i>), al <b>plurale</b> (<i>i miei zii</i>), con un <b>aggettivo</b> (<i>il mio fratello più piccolo</i>) e con le forme <b>affettuose</b> (<i>la mia mamma, il mio fratellino</i>).</p>
+      <p><i>Fidanzato, ragazzo, amico</i> non sono parenti: <i>il mio ex fidanzato</i>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Le preposizioni articolate</h2>
+    <div class="scroll"><table class="prep">
+      <thead><tr><th></th><th>il</th><th>lo</th><th>l'</th><th>la</th><th>i</th><th>gli</th><th>le</th></tr></thead>
+      <tbody>
+        <tr><td class="k">di</td><td>del</td><td>dello</td><td>dell'</td><td>della</td><td>dei</td><td>degli</td><td>delle</td></tr>
+        <tr><td class="k">a</td><td>al</td><td>allo</td><td>all'</td><td>alla</td><td>ai</td><td>agli</td><td>alle</td></tr>
+        <tr><td class="k">da</td><td>dal</td><td>dallo</td><td>dall'</td><td>dalla</td><td>dai</td><td>dagli</td><td>dalle</td></tr>
+        <tr><td class="k">in</td><td>nel</td><td>nello</td><td>nell'</td><td>nella</td><td>nei</td><td>negli</td><td>nelle</td></tr>
+        <tr><td class="k">su</td><td>sul</td><td>sullo</td><td>sull'</td><td>sulla</td><td>sui</td><td>sugli</td><td>sulle</td></tr>
+      </tbody>
+    </table></div>
+    <p class="foot">Esempi: <i>ai Navigli, sull'Etna, dal Tevere, della Lombardia, all'ultimo piano</i>.</p>
+  </section>
+
+  <section>
+    <h2>4. Trappole da ricordare</h2>
+    <div class="scroll"><table>
+      <tbody>
+        <tr><td class="k">il problema</td><td>finisce in -a ma è maschile (anche <i>il tema, il sistema</i>)</td></tr>
+        <tr><td class="k">la radio</td><td>finisce in -o ma è femminile (anche <i>la mano, la foto</i>)</td></tr>
+        <tr><td class="k">le uova</td><td><i>l'uovo</i> è maschile, il plurale è femminile</td></tr>
+        <tr><td class="k">lo chef</td><td>si pronuncia con il suono “sc”, quindi <i>lo</i></td></tr>
+        <tr><td class="k">i caffè, le città, le crisi</td><td>non cambiano al plurale: guarda l'articolo o l'aggettivo</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
