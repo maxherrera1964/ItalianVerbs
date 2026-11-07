@@ -311,6 +311,10 @@
   <div class="sheetbox">
     <h2>Tenses</h2>
     <div class="chips" id="tenseChips"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="dobjBtn">🎯 Passato prossimo + direct object (lo / la / li / le)</button>
+    </div>
+    <div class="addhint" id="dobjStat"></div>
     <h2>Base verbs</h2>
     <div class="addhint" style="margin-top:0">Learn the base verb and you've learned its family — every member conjugates the same way, just with a prefix (venire → intervenire, prevenire…). These two buttons are filters: they combine with Travel, Regular/Irregular and Essere/Avere (and the tenses you pick) as an intersection. Tapping a single base below adds or removes its family — only the members that pass the active filters.</div>
     <div class="row">
@@ -4548,6 +4552,7 @@ function seededRng(str){
   };
 }
 function genSentenceFixed(v,t,i,fem){
+  if(dobjOn(v,t)) return dobjSentence(v,i,fem);  // passato prossimo + oggetto diretto (toggle in Deck)
   const hand = curatedSentence(v,t,i,fem);        // hand-written everyday sentence, when there is one
   if(hand) return hand;
   const saved = RNG;
@@ -4775,6 +4780,11 @@ const GEN_FRAMES = {
 /* build one sentence for card (v,t,i) → {it, en, note} */
 function genSentence(v,t,i,opt){
   opt = opt || {};
+  if(dobjOn(v,t)){                                 // 🎲 on a direct-object card: another hand-written pair
+    const n = dobjRows(v).length, cur = (opt.notK===undefined) ? -1 : opt.notK;
+    let k = Math.floor(RNG()*n); if(n>1 && k===cur) k = (k+1) % n;
+    return dobjSentence(v,i,opt.fem,k);
+  }
   const E = genEnVerb(v);
   if(t==="imperativo"){
     const neg = RNG()<0.35;
@@ -6959,6 +6969,407 @@ const CUR_SUBJ = [
   {it:"Marco",en:"Marco",g:"m",pl:false}, {it:"",en:"we",g:"m",pl:true},
   {it:"",en:"you",g:"m",pl:true}, {it:"i miei genitori",en:"my parents",g:"m",pl:true}
 ];
+/* ---------------- PASSATO PROSSIMO + OGGETTO DIRETTO (toggle: Deck → Tenses) ----------------
+   Hand-written pairs: a passato prossimo statement that names the thing or person (the
+   antecedent), then a second statement where lo / la / li / le stands in for it — and
+   the participle has to agree with that pronoun.
+     {S}  subject (dropped for io/tu/noi/voi, like the curated sentences)
+     {V}  plain passato prossimo — "ho comprato"
+     {PV} pronoun + passato prossimo with agreement — "le ho comprate", "l'ho comprata"
+     English: {S} subject, {SP} the subject again as a pronoun (I / you / he / she / we / they)
+   Last field = the antecedent: ms masc. sing. · fs fem. sing. · mp masc. pl. · fp fem. pl.
+   Each verb has one of each, so the six persons rotate through all four agreements.
+----------------------------------------------------------------------------------------------- */
+const DOBJ = {
+  aiutare:[
+    ["Sabato {S} {V} il vicino con il trasloco. {PV} a portare su il divano.","On Saturday {S} helped the neighbor with the move. {SP} helped him carry the sofa upstairs.","ms"],
+    ["Ieri {S} {V} la nonna a fare la spesa. {PV} anche a sistemare la cucina.","Yesterday {S} helped grandma with the shopping. {SP} also helped her tidy up the kitchen.","fs"],
+    ["{S} {V} i bambini con i compiti. {PV} fino all'ora di cena.","{S} helped the kids with their homework. {SP} helped them until dinnertime.","mp"],
+    ["Stamattina {S} {V} le vicine a scaricare la macchina. {PV} perché avevano troppe borse.","This morning {S} helped the neighbors unload the car. {SP} helped them because they had too many bags.","fp"]],
+  accendere:[
+    ["Ieri sera {S} {V} il riscaldamento. {PV} al massimo perché faceva freddissimo.","Last night {S} turned on the heating. {SP} turned it on full blast because it was freezing.","ms"],
+    ["Al buio {S} {V} la luce del corridoio. {PV} subito, ma la lampadina si è bruciata.","In the dark {S} turned on the hallway light. {SP} turned it on right away, but the bulb burned out.","fs"],
+    ["Alle sette {S} {V} i fornelli per la cena. {PV} tutti e quattro.","At seven {S} turned on the burners for dinner. {SP} turned on all four of them.","mp"],
+    ["Per la torta {S} {V} le candeline. {PV} con un fiammifero.","For the cake {S} lit the candles. {SP} lit them with a match.","fp"]],
+  accettare:[
+    ["{S} {V} l'invito a cena dei vicini. {PV} volentieri, anche se era tardi.","{S} accepted the neighbors' dinner invitation. {SP} accepted it gladly, even though it was late.","ms"],
+    ["{S} {V} la proposta di lavoro. {PV} dopo averci pensato una settimana.","{S} accepted the job offer. {SP} accepted it after thinking about it for a week.","fs"],
+    ["Alla fine {S} {V} i consigli del medico. {PV} senza discutere.","In the end {S} took the doctor's advice. {SP} took it without arguing.","mp"],
+    ["{S} {V} le condizioni del contratto. {PV} perché erano giuste.","{S} accepted the terms of the contract. {SP} accepted them because they were fair.","fp"]],
+  accompagnare:[
+    ["{S} {V} il nonno dal medico. {PV} in macchina alle nove.","{S} took grandpa to the doctor. {SP} drove him there at nine.","ms"],
+    ["Ieri sera {S} {V} Giulia alla stazione. {PV} fino al binario.","Last night {S} walked Giulia to the station. {SP} walked her all the way to the platform.","fs"],
+    ["Stamattina {S} {V} i bambini a scuola. {PV} a piedi perché c'era il sole.","This morning {S} took the kids to school. {SP} walked them there because it was sunny.","mp"],
+    ["{S} {V} le ragazze a casa dopo la festa. {PV} fino al portone.","{S} took the girls home after the party. {SP} walked them to the front door.","fp"]],
+  aprire:[
+    ["{S} {V} il pacco della nonna. {PV} con le forbici.","{S} opened grandma's package. {SP} opened it with scissors.","ms"],
+    ["Con questo caldo {S} {V} la finestra. {PV} per far entrare un po' d'aria.","In this heat {S} opened the window. {SP} opened it to let in some air.","fs"],
+    ["A mezzanotte {S} {V} i regali di Natale. {PV} tutti in cinque minuti.","At midnight {S} opened the Christmas presents. {SP} opened them all in five minutes.","mp"],
+    ["In albergo {S} {V} le valigie. {PV} sul letto per cercare il caricabatterie.","At the hotel {S} opened the suitcases. {SP} opened them on the bed to look for the charger.","fp"]],
+  ascoltare:[
+    ["In macchina {S} {V} il nuovo podcast. {PV} tutto, dall'inizio alla fine.","In the car {S} listened to the new podcast. {SP} listened to all of it, from start to finish.","ms"],
+    ["{S} {V} la radio per sapere il traffico. {PV} per tutto il viaggio.","{S} listened to the radio for the traffic report. {SP} listened to it the whole trip.","fs"],
+    ["{S} {V} i consigli della guida. {PV} con attenzione.","{S} listened to the guide's advice. {SP} listened to it carefully.","mp"],
+    ["{S} {V} le canzoni di Mina. {PV} mille volte.","{S} listened to Mina's songs. {SP} listened to them a thousand times.","fp"]],
+  aspettare:[
+    ["{S} {V} l'autobus per mezz'ora. {PV} sotto la pioggia.","{S} waited for the bus for half an hour. {SP} waited for it in the rain.","ms"],
+    ["{S} {V} Giulia davanti al cinema. {PV} fino alle nove, ma non è venuta.","{S} waited for Giulia in front of the movie theater. {SP} waited for her until nine, but she didn't come.","fs"],
+    ["All'aeroporto {S} {V} i nonni. {PV} agli arrivi con un cartello.","At the airport {S} waited for the grandparents. {SP} waited for them at arrivals with a sign.","mp"],
+    ["{S} {V} le amiche al bar. {PV} bevendo un caffè.","{S} waited for the friends at the café. {SP} waited for them over a coffee.","fp"]],
+  assaggiare:[
+    ["{S} {V} il sugo della nonna. {PV} con un pezzo di pane.","{S} tasted grandma's sauce. {SP} tasted it with a piece of bread.","ms"],
+    ["{S} {V} la torta di Giulia. {PV} prima di tutti.","{S} tasted Giulia's cake. {SP} tasted it before everyone else.","fs"],
+    ["Al mercato {S} {V} i formaggi locali. {PV} tutti prima di comprarne uno.","At the market {S} tasted the local cheeses. {SP} tasted them all before buying one.","mp"],
+    ["{S} {V} le olive del contadino. {PV} ed erano buonissime.","{S} tried the farmer's olives. {SP} tried them and they were delicious.","fp"]],
+  bere:[
+    ["Al bar {S} {V} il caffè in piedi. {PV} in un sorso.","At the café {S} drank the coffee standing up. {SP} drank it in one gulp.","ms"],
+    ["{S} {V} la birra che ha portato Luca. {PV} ghiacciata.","{S} drank the beer Luca brought. {SP} drank it ice-cold.","fs"],
+    ["{S} {V} i succhi di frutta del frigo. {PV} tutti.","{S} drank the fruit juices from the fridge. {SP} drank them all.","mp"],
+    ["Dopo la partita {S} {V} le bibite fresche. {PV} in un attimo.","After the game {S} drank the cold drinks. {SP} drank them in no time.","fp"]],
+  cambiare:[
+    ["{S} {V} il biglietto del treno. {PV} per partire un giorno prima.","{S} changed the train ticket. {SP} changed it to leave a day earlier.","ms"],
+    ["In albergo {S} {V} la camera. {PV} perché era troppo rumorosa.","At the hotel {S} changed the room. {SP} changed it because it was too noisy.","fs"],
+    ["All'ultimo momento {S} {V} i programmi. {PV} per colpa dello sciopero.","At the last minute {S} changed the plans. {SP} changed them because of the strike.","mp"],
+    ["{S} {V} le lenzuola del letto. {PV} stamattina, prima di uscire.","{S} changed the bed sheets. {SP} changed them this morning before going out.","fp"]],
+  capire:[
+    ["{S} {V} il problema. {PV} solo dopo la seconda spiegazione.","{S} understood the problem. {SP} understood it only after the second explanation.","ms"],
+    ["{S} {V} la domanda del professore. {PV} al volo.","{S} understood the teacher's question. {SP} got it right away.","fs"],
+    ["Finalmente {S} {V} i verbi irregolari. {PV} con gli esercizi.","Finally {S} understood the irregular verbs. {SP} understood them through the exercises.","mp"],
+    ["{S} {V} le istruzioni della lavatrice. {PV} grazie ai disegni.","{S} understood the washing machine instructions. {SP} understood them thanks to the drawings.","fp"]],
+  cercare:[
+    ["{S} {V} il portafoglio dappertutto. {PV} anche sotto il letto.","{S} looked for the wallet everywhere. {SP} looked for it even under the bed.","ms"],
+    ["{S} {V} la farmacia di turno. {PV} su Google Maps.","{S} looked for the on-duty pharmacy. {SP} looked for it on Google Maps.","fs"],
+    ["{S} {V} gli occhiali per mezz'ora. {PV} ovunque, ma erano in macchina.","{S} looked for the glasses for half an hour. {SP} looked for them everywhere, but they were in the car.","mp"],
+    ["{S} {V} le chiavi di casa. {PV} in tutte le tasche.","{S} looked for the house keys. {SP} looked for them in every pocket.","fp"]],
+  chiamare:[
+    ["{S} {V} il medico. {PV} alle otto, appena ha aperto lo studio.","{S} called the doctor. {SP} called him at eight, as soon as the office opened.","ms"],
+    ["Ieri sera {S} {V} la nonna. {PV} per farle gli auguri.","Last night {S} called grandma. {SP} called her to wish her happy birthday.","fs"],
+    ["{S} {V} i tecnici per la caldaia. {PV} tre volte.","{S} called the repairmen about the boiler. {SP} called them three times.","mp"],
+    ["{S} {V} le amiche per organizzare la cena. {PV} una per una.","{S} called the friends to plan the dinner. {SP} called them one by one.","fp"]],
+  chiedere:[
+    ["Al ristorante {S} {V} il conto. {PV} al cameriere due volte.","At the restaurant {S} asked for the check. {SP} asked the waiter for it twice.","ms"],
+    ["{S} {V} la strada a un passante. {PV} in italiano!","{S} asked a passerby for directions. {SP} asked for them in Italian!","fs"],
+    ["{S} {V} gli orari dei musei. {PV} alla reception.","{S} asked about the museum hours. {SP} asked about them at the front desk.","mp"],
+    ["{S} {V} le chiavi della camera. {PV} al portiere.","{S} asked for the room keys. {SP} asked the doorman for them.","fp"]],
+  chiudere:[
+    ["{S} {V} il negozio alle otto. {PV} prima del solito.","{S} closed the shop at eight. {SP} closed it earlier than usual.","ms"],
+    ["Prima di uscire {S} {V} la porta. {PV} a chiave.","Before going out {S} closed the door. {SP} locked it.","fs"],
+    ["Con il temporale {S} {V} i finestrini della macchina. {PV} appena in tempo.","With the storm coming {S} closed the car windows. {SP} closed them just in time.","mp"],
+    ["{S} {V} le finestre per il freddo. {PV} tutte.","{S} closed the windows because of the cold. {SP} closed all of them.","fp"]],
+  cominciare:[
+    ["A settembre {S} {V} il corso d'italiano. {PV} con molto entusiasmo.","In September {S} started the Italian course. {SP} started it with a lot of enthusiasm.","ms"],
+    ["Lunedì {S} {V} la dieta. {PV}, ma martedì c'era la pizza…","On Monday {S} started the diet. {SP} started it, but on Tuesday there was pizza…","fs"],
+    ["{S} {V} i lavori in cucina. {PV} a marzo.","{S} started the kitchen renovations. {SP} started them in March.","mp"],
+    ["{S} {V} le lezioni di tango. {PV} per divertimento.","{S} started the tango lessons. {SP} started them for fun.","fp"]],
+  comprare:[
+    ["Stamattina {S} {V} il pane. {PV} dal fornaio sotto casa.","This morning {S} bought the bread. {SP} bought it at the bakery downstairs.","ms"],
+    ["{S} {V} la frutta al mercato. {PV} a metà prezzo.","{S} bought the fruit at the market. {SP} bought it at half price.","fs"],
+    ["{S} {V} i biglietti per gli Uffizi. {PV} online la settimana scorsa.","{S} bought the tickets for the Uffizi. {SP} bought them online last week.","mp"],
+    ["Sabato {S} {V} le scarpe nuove. {PV} in centro perché erano in saldo.","On Saturday {S} bought the new shoes. {SP} bought them downtown because they were on sale.","fp"]],
+  conoscere:[
+    ["In vacanza {S} {V} un ragazzo simpaticissimo. {PV} in spiaggia.","On vacation {S} met a really nice guy. {SP} met him at the beach.","ms"],
+    ["{S} {V} la sorella di Luca. {PV} alla festa di sabato.","{S} met Luca's sister. {SP} met her at Saturday's party.","fs"],
+    ["Finalmente {S} {V} i genitori di Giulia. {PV} a cena domenica.","Finally {S} met Giulia's parents. {SP} met them at dinner on Sunday.","mp"],
+    ["{S} {V} le nuove colleghe. {PV} il primo giorno di lavoro.","{S} met the new coworkers. {SP} met them on the first day of work.","fp"]],
+  controllare:[
+    ["Prima di partire {S} {V} il passaporto. {PV} due volte.","Before leaving {S} checked the passport. {SP} checked it twice.","ms"],
+    ["{S} {V} la posta. {PV} prima di cena.","{S} checked the mail. {SP} checked it before dinner.","fs"],
+    ["All'aeroporto {S} {V} gli orari dei voli. {PV} sul tabellone.","At the airport {S} checked the flight times. {SP} checked them on the board.","mp"],
+    ["{S} {V} le gomme della macchina. {PV} dal benzinaio.","{S} checked the car's tires. {SP} checked them at the gas station.","fp"]],
+  cucinare:[
+    ["Per cena {S} {V} il pesce. {PV} al forno con le patate.","For dinner {S} cooked the fish. {SP} baked it with potatoes.","ms"],
+    ["{S} {V} la pasta per tutti. {PV} al dente, come piace a Luca.","{S} cooked the pasta for everyone. {SP} cooked it al dente, the way Luca likes it.","fs"],
+    ["{S} {V} i funghi raccolti nel bosco. {PV} con aglio e prezzemolo.","{S} cooked the mushrooms picked in the woods. {SP} cooked them with garlic and parsley.","mp"],
+    ["{S} {V} le melanzane alla parmigiana. {PV} seguendo la ricetta della nonna.","{S} made the eggplant parmesan. {SP} made it following grandma's recipe.","fp"]],
+  dare:[
+    ["{S} {V} il regalo a Giulia. {PV} a cena, davanti a tutti.","{S} gave Giulia the present. {SP} gave it to her at dinner, in front of everyone.","ms"],
+    ["{S} {V} la mancia al cameriere. {PV} perché è stato gentilissimo.","{S} gave the waiter a tip. {SP} gave it to him because he was very kind.","fs"],
+    ["{S} {V} i biscotti ai bambini. {PV} solo dopo cena.","{S} gave the kids the cookies. {SP} gave them out only after dinner.","mp"],
+    ["{S} {V} le chiavi di casa alla vicina. {PV} prima di partire.","{S} gave the neighbor the house keys. {SP} gave them to her before leaving.","fp"]],
+  decidere:[
+    ["{S} {V} il menù della festa. {PV} in dieci minuti.","{S} decided on the party menu. {SP} decided on it in ten minutes.","ms"],
+    ["{S} {V} la data del matrimonio. {PV} insieme a Giulia.","{S} decided on the wedding date. {SP} set it together with Giulia.","fs"],
+    ["{S} {V} i dettagli del viaggio. {PV} ieri sera a cena.","{S} decided on the details of the trip. {SP} decided on them last night over dinner.","mp"],
+    ["{S} {V} le regole della casa. {PV} con i bambini.","{S} decided on the house rules. {SP} decided on them with the kids.","fp"]],
+  dimenticare:[
+    ["{S} {V} l'ombrello sul treno. {PV} proprio quando pioveva.","{S} forgot the umbrella on the train. {SP} forgot it right when it was raining.","ms"],
+    ["{S} {V} la giacca al ristorante. {PV} sulla sedia.","{S} left the jacket at the restaurant. {SP} left it on the chair.","fs"],
+    ["{S} {V} gli occhiali a casa. {PV} sul tavolo della cucina.","{S} left the glasses at home. {SP} left them on the kitchen table.","mp"],
+    ["{S} {V} le chiavi in macchina. {PV} nel cruscotto.","{S} left the keys in the car. {SP} left them in the glove compartment.","fp"]],
+  dire:[
+    ["{S} {V} il segreto a Luca. {PV} solo a lui.","{S} told Luca the secret. {SP} told it only to him.","ms"],
+    ["Alla fine {S} {V} la verità. {PV} a tutti, senza paura.","In the end {S} told the truth. {SP} told it to everyone, without fear.","fs"],
+    ["{S} {V} i nomi dei vincitori. {PV} al microfono.","{S} announced the winners' names. {SP} said them over the microphone.","mp"],
+    ["{S} {V} le parole giuste. {PV} al momento giusto.","{S} said the right words. {SP} said them at the right moment.","fp"]],
+  fare:[
+    ["Stamattina {S} {V} il letto. {PV} prima di colazione.","This morning {S} made the bed. {SP} made it before breakfast.","ms"],
+    ["Sabato {S} {V} la spesa. {PV} al mercato di Sant'Ambrogio.","On Saturday {S} did the grocery shopping. {SP} did it at the Sant'Ambrogio market.","fs"],
+    ["{S} {V} i compiti. {PV} in un'ora.","{S} did the homework. {SP} did it in an hour.","mp"],
+    ["Ieri sera {S} {V} le valigie. {PV} in fretta e furia.","Last night {S} packed the suitcases. {SP} packed them in a rush.","fp"]],
+  finire:[
+    ["{S} {V} il libro di Camilleri. {PV} in tre giorni.","{S} finished the Camilleri book. {SP} finished it in three days.","ms"],
+    ["{S} {V} la pizza. {PV} fino all'ultimo pezzo.","{S} finished the pizza. {SP} finished it down to the last slice.","fs"],
+    ["{S} {V} i lavori in giardino. {PV} prima della pioggia.","{S} finished the yard work. {SP} finished it before the rain.","mp"],
+    ["{S} {V} le patatine. {PV} tutte in cinque minuti.","{S} finished the fries. {SP} finished them all in five minutes.","fp"]],
+  guardare:[
+    ["Ieri sera {S} {V} il film di Sorrentino. {PV} in lingua originale.","Last night {S} watched the Sorrentino film. {SP} watched it in the original language.","ms"],
+    ["{S} {V} la partita al bar. {PV} con gli amici.","{S} watched the game at the bar. {SP} watched it with friends.","fs"],
+    ["{S} {V} i fuochi d'artificio. {PV} dal ponte.","{S} watched the fireworks. {SP} watched them from the bridge.","mp"],
+    ["{S} {V} le foto del viaggio. {PV} sul computer.","{S} looked at the trip photos. {SP} looked at them on the computer.","fp"]],
+  imparare:[
+    ["{S} {V} il congiuntivo. {PV} con tanta pazienza.","{S} learned the subjunctive. {SP} learned it with a lot of patience.","ms"],
+    ["{S} {V} la poesia a memoria. {PV} in un giorno.","{S} learned the poem by heart. {SP} learned it in one day.","fs"],
+    ["{S} {V} i numeri in italiano. {PV} con una canzone.","{S} learned the numbers in Italian. {SP} learned them with a song.","mp"],
+    ["{S} {V} le parole nuove. {PV} con le flashcard.","{S} learned the new words. {SP} learned them with flashcards.","fp"]],
+  incontrare:[
+    ["{S} {V} il professore in centro. {PV} davanti al Duomo.","{S} ran into the teacher downtown. {SP} ran into him in front of the Duomo.","ms"],
+    ["{S} {V} la vicina al supermercato. {PV} alla cassa.","{S} ran into the neighbor at the supermarket. {SP} ran into her at the checkout.","fs"],
+    ["{S} {V} i vecchi compagni di scuola. {PV} a una festa.","{S} ran into the old schoolmates. {SP} ran into them at a party.","mp"],
+    ["{S} {V} le cugine di Giulia. {PV} per caso in spiaggia.","{S} ran into Giulia's cousins. {SP} ran into them by chance at the beach.","fp"]],
+  invitare:[
+    ["{S} {V} il nuovo collega a cena. {PV} per sabato sera.","{S} invited the new coworker to dinner. {SP} invited him for Saturday night.","ms"],
+    ["{S} {V} la vicina al compleanno di Luca. {PV} all'ultimo momento.","{S} invited the neighbor to Luca's birthday party. {SP} invited her at the last minute.","fs"],
+    ["{S} {V} i nonni per il pranzo di Natale. {PV} con un mese di anticipo.","{S} invited the grandparents to Christmas lunch. {SP} invited them a month ahead.","mp"],
+    ["{S} {V} le amiche di Giulia. {PV} tutte.","{S} invited Giulia's friends. {SP} invited all of them.","fp"]],
+  lasciare:[
+    ["{S} {V} il cane dalla nonna. {PV} da lei per tutto il weekend.","{S} left the dog at grandma's. {SP} left it with her for the whole weekend.","ms"],
+    ["{S} {V} la mancia sul tavolo. {PV} sotto il piatto.","{S} left the tip on the table. {SP} left it under the plate.","fs"],
+    ["In albergo {S} {V} i bagagli alla reception. {PV} lì fino alle sei.","At the hotel {S} left the bags at the front desk. {SP} left them there until six.","mp"],
+    ["{S} {V} le chiavi alla portinaia. {PV} prima di partire.","{S} left the keys with the concierge. {SP} left them there before leaving.","fp"]],
+  lavare:[
+    ["{S} {V} il maglione di lana. {PV} a mano, con acqua fredda.","{S} washed the wool sweater. {SP} washed it by hand, in cold water.","ms"],
+    ["Domenica {S} {V} la macchina. {PV} sotto il sole.","On Sunday {S} washed the car. {SP} washed it in the sun.","fs"],
+    ["Dopo cena {S} {V} i piatti. {PV} subito.","After dinner {S} washed the dishes. {SP} washed them right away.","mp"],
+    ["{S} {V} le tende del salotto. {PV} in lavatrice.","{S} washed the living room curtains. {SP} washed them in the washing machine.","fp"]],
+  leggere:[
+    ["{S} {V} il giornale al bar. {PV} con un cappuccino.","{S} read the paper at the café. {SP} read it over a cappuccino.","ms"],
+    ["{S} {V} la lettera della nonna. {PV} ad alta voce.","{S} read grandma's letter. {SP} read it aloud.","fs"],
+    ["{S} {V} i messaggi di Luca. {PV} solo stamattina.","{S} read Luca's messages. {SP} read them only this morning.","mp"],
+    ["{S} {V} le recensioni del ristorante. {PV} prima di prenotare.","{S} read the restaurant reviews. {SP} read them before booking.","fp"]],
+  mandare:[
+    ["{S} {V} il pacco alla nonna. {PV} per posta prioritaria.","{S} sent the package to grandma. {SP} sent it priority mail.","ms"],
+    ["{S} {V} la cartolina da Sorrento. {PV} ai colleghi.","{S} sent the postcard from Sorrento. {SP} sent it to the coworkers.","fs"],
+    ["{S} {V} i documenti all'avvocato. {PV} via email.","{S} sent the documents to the lawyer. {SP} sent them by email.","mp"],
+    ["{S} {V} le foto della festa. {PV} su WhatsApp.","{S} sent the party photos. {SP} sent them on WhatsApp.","fp"]],
+  mangiare:[
+    ["{S} {V} il gelato al pistacchio. {PV} passeggiando sul lungarno.","{S} ate the pistachio gelato. {SP} ate it while strolling along the Arno.","ms"],
+    ["{S} {V} la bistecca alla fiorentina. {PV} al sangue, come si deve.","{S} ate the Florentine steak. {SP} ate it rare, the proper way.","fs"],
+    ["{S} {V} gli spaghetti alle vongole. {PV} in riva al mare.","{S} ate the spaghetti with clams. {SP} ate it by the sea.","mp"],
+    ["{S} {V} le fragole con la panna. {PV} tutte.","{S} ate the strawberries with cream. {SP} ate all of them.","fp"]],
+  mettere:[
+    ["Con il freddo {S} {V} il cappotto pesante. {PV} per la prima volta quest'anno.","With the cold {S} put on the heavy coat. {SP} put it on for the first time this year.","ms"],
+    ["{S} {V} la torta in frigo. {PV} sul ripiano più alto.","{S} put the cake in the fridge. {SP} put it on the top shelf.","fs"],
+    ["{S} {V} i bicchieri in tavola. {PV} accanto ai piatti.","{S} put the glasses on the table. {SP} put them next to the plates.","mp"],
+    ["{S} {V} le valigie in macchina. {PV} nel bagagliaio.","{S} put the suitcases in the car. {SP} put them in the trunk.","fp"]],
+  mostrare:[
+    ["{S} {V} il passaporto alla polizia. {PV} al controllo.","{S} showed the passport to the police. {SP} showed it at the checkpoint.","ms"],
+    ["{S} {V} la casa nuova agli amici. {PV} con orgoglio.","{S} showed the new house to friends. {SP} showed it off proudly.","fs"],
+    ["{S} {V} i biglietti al controllore. {PV} sul telefono.","{S} showed the tickets to the conductor. {SP} showed them on the phone.","mp"],
+    ["{S} {V} le foto del matrimonio. {PV} a tutti.","{S} showed the wedding photos. {SP} showed them to everyone.","fp"]],
+  ordinare:[
+    ["{S} {V} il vino della casa. {PV} perché costava poco.","{S} ordered the house wine. {SP} ordered it because it was cheap.","ms"],
+    ["{S} {V} la pizza margherita. {PV} con la mozzarella di bufala.","{S} ordered the margherita pizza. {SP} ordered it with buffalo mozzarella.","fs"],
+    ["{S} {V} gli antipasti per tutti. {PV} prima ancora di vedere il menù.","{S} ordered the appetizers for everyone. {SP} ordered them before even seeing the menu.","mp"],
+    ["{S} {V} le lasagne. {PV} senza esitare.","{S} ordered the lasagna. {SP} ordered it without hesitating.","fp"]],
+  pagare:[
+    ["{S} {V} il conto. {PV} con la carta.","{S} paid the bill. {SP} paid it by card.","ms"],
+    ["{S} {V} la cena per tutti. {PV} di nascosto.","{S} paid for dinner for everyone. {SP} paid for it secretly.","fs"],
+    ["{S} {V} i biglietti del museo. {PV} in contanti.","{S} paid for the museum tickets. {SP} paid for them in cash.","mp"],
+    ["{S} {V} le bollette della luce. {PV} online.","{S} paid the electric bills. {SP} paid them online.","fp"]],
+  perdere:[
+    ["{S} {V} il treno delle otto. {PV} per due minuti.","{S} missed the eight o'clock train. {SP} missed it by two minutes.","ms"],
+    ["{S} {V} la borsa in metro. {PV} nell'ora di punta.","{S} lost the bag on the subway. {SP} lost it at rush hour.","fs"],
+    ["{S} {V} i guanti nuovi. {PV} al cinema.","{S} lost the new gloves. {SP} lost them at the movies.","mp"],
+    ["{S} {V} le chiavi della macchina. {PV} in spiaggia.","{S} lost the car keys. {SP} lost them at the beach.","fp"]],
+  portare:[
+    ["{S} {V} il vino alla cena di Luca. {PV} dalla Toscana.","{S} brought the wine to Luca's dinner. {SP} brought it from Tuscany.","ms"],
+    ["{S} {V} la torta per il compleanno. {PV} dalla pasticceria.","{S} brought the cake for the birthday. {SP} brought it from the pastry shop.","fs"],
+    ["{S} {V} i bambini al parco. {PV} dopo la scuola.","{S} took the kids to the park. {SP} took them after school.","mp"],
+    ["{S} {V} le valigie in camera. {PV} su per le scale.","{S} carried the suitcases to the room. {SP} carried them up the stairs.","fp"]],
+  prendere:[
+    ["{S} {V} l'autobus per Fiesole. {PV} in piazza San Marco.","{S} took the bus to Fiesole. {SP} caught it at Piazza San Marco.","ms"],
+    ["{S} {V} la metro per andare al lavoro. {PV} alle sette e mezza.","{S} took the subway to work. {SP} took it at seven-thirty.","fs"],
+    ["{S} {V} i biglietti all'edicola. {PV} prima di salire sul tram.","{S} got the tickets at the newsstand. {SP} got them before getting on the tram.","mp"],
+    ["{S} {V} le medicine. {PV} dopo pranzo.","{S} took the medicine. {SP} took it after lunch.","fp"]],
+  prenotare:[
+    ["{S} {V} il tavolo per stasera. {PV} per le otto e mezza.","{S} booked the table for tonight. {SP} booked it for eight-thirty.","ms"],
+    ["{S} {V} la camera a Sorrento. {PV} con vista mare.","{S} booked the room in Sorrento. {SP} booked it with a sea view.","fs"],
+    ["{S} {V} i biglietti per il traghetto. {PV} un mese fa.","{S} booked the ferry tickets. {SP} booked them a month ago.","mp"],
+    ["{S} {V} le visite guidate. {PV} sul sito del museo.","{S} booked the guided tours. {SP} booked them on the museum's website.","fp"]],
+  preparare:[
+    ["{S} {V} il pranzo per tutti. {PV} in mezz'ora.","{S} made lunch for everyone. {SP} made it in half an hour.","ms"],
+    ["{S} {V} la cena. {PV} con le verdure dell'orto.","{S} made dinner. {SP} made it with vegetables from the garden.","fs"],
+    ["{S} {V} i panini per la gita. {PV} la sera prima.","{S} made the sandwiches for the outing. {SP} made them the night before.","mp"],
+    ["{S} {V} le valigie per Sorrento. {PV} con calma.","{S} packed the suitcases for Sorrento. {SP} packed them without rushing.","fp"]],
+  presentare:[
+    ["{S} {V} il nuovo collega a tutti. {PV} durante la riunione.","{S} introduced the new coworker to everyone. {SP} introduced him during the meeting.","ms"],
+    ["{S} {V} la fidanzata alla famiglia. {PV} a cena.","{S} introduced the girlfriend to the family. {SP} introduced her at dinner.","fs"],
+    ["{S} {V} i vicini a Luca. {PV} alla festa del quartiere.","{S} introduced the neighbors to Luca. {SP} introduced them at the neighborhood party.","mp"],
+    ["{S} {V} le nuove studentesse alla classe. {PV} il primo giorno.","{S} introduced the new students to the class. {SP} introduced them on the first day.","fp"]],
+  provare:[
+    ["{S} {V} il vestito blu. {PV} in camerino.","{S} tried on the blue suit. {SP} tried it on in the fitting room.","ms"],
+    ["{S} {V} la nuova pizzeria. {PV} ieri sera.","{S} tried the new pizzeria. {SP} tried it last night.","fs"],
+    ["{S} {V} i pantaloni nuovi. {PV}, ma erano troppo lunghi.","{S} tried on the new pants. {SP} tried them on, but they were too long.","mp"],
+    ["{S} {V} le scarpe da trekking. {PV} nel negozio.","{S} tried on the hiking boots. {SP} tried them on in the store.","fp"]],
+  pulire:[
+    ["{S} {V} il bagno. {PV} da cima a fondo.","{S} cleaned the bathroom. {SP} cleaned it from top to bottom.","ms"],
+    ["{S} {V} la cucina dopo la festa. {PV} fino a mezzanotte.","{S} cleaned the kitchen after the party. {SP} cleaned it until midnight.","fs"],
+    ["{S} {V} i vetri delle finestre. {PV} con l'aceto.","{S} cleaned the windowpanes. {SP} cleaned them with vinegar.","mp"],
+    ["{S} {V} le scarpe da ginnastica. {PV} con uno spazzolino.","{S} cleaned the sneakers. {SP} cleaned them with a toothbrush.","fp"]],
+  raccontare:[
+    ["{S} {V} il viaggio in Italia. {PV} a tutti i colleghi.","{S} talked about the trip to Italy. {SP} told all the coworkers about it.","ms"],
+    ["{S} {V} la storia della famiglia. {PV} ai nipoti.","{S} told the family story. {SP} told it to the grandchildren.","fs"],
+    ["{S} {V} i dettagli della serata. {PV} il giorno dopo.","{S} told the details of the evening. {SP} told them the next day.","mp"],
+    ["{S} {V} le barzellette del nonno. {PV} a cena.","{S} told grandpa's jokes. {SP} told them at dinner.","fp"]],
+  ricevere:[
+    ["{S} {V} il pacco da Amazon. {PV} con due giorni di ritardo.","{S} received the Amazon package. {SP} got it two days late.","ms"],
+    ["{S} {V} la lettera dell'università. {PV} stamattina.","{S} received the letter from the university. {SP} got it this morning.","fs"],
+    ["{S} {V} i fiori per l'anniversario. {PV} in ufficio.","{S} received the anniversary flowers. {SP} got them at the office.","mp"],
+    ["{S} {V} le foto del matrimonio. {PV} per email.","{S} received the wedding photos. {SP} got them by email.","fp"]],
+  ringraziare:[
+    ["{S} {V} il cameriere. {PV} per la pazienza.","{S} thanked the waiter. {SP} thanked him for his patience.","ms"],
+    ["{S} {V} la guida alla fine del tour. {PV} con una bella mancia.","{S} thanked the guide at the end of the tour. {SP} thanked her with a nice tip.","fs"],
+    ["{S} {V} i vicini per l'aiuto. {PV} con una bottiglia di vino.","{S} thanked the neighbors for their help. {SP} thanked them with a bottle of wine.","mp"],
+    ["{S} {V} le infermiere dell'ospedale. {PV} una per una.","{S} thanked the hospital nurses. {SP} thanked them one by one.","fp"]],
+  ripetere:[
+    ["{S} {V} il numero di telefono. {PV} lentamente.","{S} repeated the phone number. {SP} repeated it slowly.","ms"],
+    ["{S} {V} la domanda. {PV} perché nessuno aveva capito.","{S} repeated the question. {SP} repeated it because nobody had understood.","fs"],
+    ["{S} {V} i verbi irregolari. {PV} ad alta voce.","{S} repeated the irregular verbs. {SP} repeated them out loud.","mp"],
+    ["{S} {V} le parole nuove. {PV} dieci volte.","{S} repeated the new words. {SP} repeated them ten times.","fp"]],
+  rompere:[
+    ["{S} {V} il vaso della nonna. {PV} giocando a pallone.","{S} broke grandma's vase. {SP} broke it playing ball.","ms"],
+    ["{S} {V} la tazza preferita di Giulia. {PV} lavando i piatti.","{S} broke Giulia's favorite mug. {SP} broke it washing the dishes.","fs"],
+    ["{S} {V} gli occhiali da sole. {PV} in spiaggia.","{S} broke the sunglasses. {SP} broke them at the beach.","mp"],
+    ["{S} {V} le uova per la frittata. {PV} in una ciotola.","{S} cracked the eggs for the frittata. {SP} cracked them into a bowl.","fp"]],
+  salutare:[
+    ["{S} {V} il portiere. {PV} con un sorriso.","{S} said hello to the doorman. {SP} greeted him with a smile.","ms"],
+    ["{S} {V} la nonna prima di partire. {PV} alla stazione.","{S} said goodbye to grandma before leaving. {SP} said goodbye to her at the station.","fs"],
+    ["{S} {V} gli ospiti alla porta. {PV} uno per uno.","{S} greeted the guests at the door. {SP} greeted them one by one.","mp"],
+    ["{S} {V} le vicine dal balcone. {PV} con la mano.","{S} greeted the neighbors from the balcony. {SP} waved to them.","fp"]],
+  salvare:[
+    ["{S} {V} il file. {PV} sulla chiavetta.","{S} saved the file. {SP} saved it on the flash drive.","ms"],
+    ["{S} {V} la ricetta della nonna. {PV} nel telefono.","{S} saved grandma's recipe. {SP} saved it on the phone.","fs"],
+    ["{S} {V} i documenti importanti. {PV} nel cloud.","{S} saved the important documents. {SP} saved them in the cloud.","mp"],
+    ["{S} {V} le foto del viaggio. {PV} su un disco esterno.","{S} saved the trip photos. {SP} saved them on an external drive.","fp"]],
+  scegliere:[
+    ["{S} {V} il vino per la cena. {PV} con l'aiuto del sommelier.","{S} chose the wine for dinner. {SP} chose it with the sommelier's help.","ms"],
+    ["{S} {V} la meta delle vacanze. {PV} guardando le foto.","{S} chose the vacation destination. {SP} chose it by looking at photos.","fs"],
+    ["{S} {V} i regali per i bambini. {PV} con cura.","{S} chose the presents for the kids. {SP} chose them carefully.","mp"],
+    ["{S} {V} le piastrelle per il bagno. {PV} in un negozio di Sorrento.","{S} chose the bathroom tiles. {SP} chose them at a shop in Sorrento.","fp"]],
+  scrivere:[
+    ["{S} {V} il discorso per il matrimonio. {PV} in una notte.","{S} wrote the wedding speech. {SP} wrote it in one night.","ms"],
+    ["{S} {V} la lettera di presentazione. {PV} in italiano.","{S} wrote the cover letter. {SP} wrote it in Italian.","fs"],
+    ["{S} {V} i biglietti di auguri. {PV} a mano.","{S} wrote the greeting cards. {SP} wrote them by hand.","mp"],
+    ["{S} {V} le cartoline da Firenze. {PV} al bar, con un caffè.","{S} wrote the postcards from Florence. {SP} wrote them at the café over a coffee.","fp"]],
+  sentire:[
+    ["{S} {V} il rumore in cucina. {PV} verso le tre di notte.","{S} heard the noise in the kitchen. {SP} heard it around three in the morning.","ms"],
+    ["{S} {V} la notizia alla radio. {PV} in macchina.","{S} heard the news on the radio. {SP} heard it in the car.","fs"],
+    ["{S} {V} i tuoni del temporale. {PV} tutta la notte.","{S} heard the thunder from the storm. {SP} heard it all night.","mp"],
+    ["{S} {V} le campane della chiesa. {PV} dalla finestra.","{S} heard the church bells. {SP} heard them from the window.","fp"]],
+  spedire:[
+    ["{S} {V} il pacco in America. {PV} con il corriere.","{S} shipped the package to America. {SP} shipped it by courier.","ms"],
+    ["{S} {V} la domanda di iscrizione. {PV} l'ultimo giorno.","{S} sent in the application. {SP} sent it on the last day.","fs"],
+    ["{S} {V} i regali di Natale. {PV} in anticipo.","{S} mailed the Christmas presents. {SP} mailed them early.","mp"],
+    ["{S} {V} le cartoline dall'ufficio postale. {PV} tutte insieme.","{S} mailed the postcards from the post office. {SP} mailed them all together.","fp"]],
+  spegnere:[
+    ["{S} {V} il computer. {PV} alle sei in punto.","{S} turned off the computer. {SP} turned it off at six on the dot.","ms"],
+    ["{S} {V} la luce. {PV} prima di dormire.","{S} turned off the light. {SP} turned it off before going to sleep.","fs"],
+    ["{S} {V} i telefoni durante il concerto. {PV} all'inizio.","{S} turned off the phones during the concert. {SP} turned them off at the start.","mp"],
+    ["{S} {V} le candeline della torta. {PV} con un soffio.","{S} blew out the candles on the cake. {SP} blew them out in one breath.","fp"]],
+  spiegare:[
+    ["{S} {V} il problema al meccanico. {PV} in italiano.","{S} explained the problem to the mechanic. {SP} explained it in Italian.","ms"],
+    ["{S} {V} la regola del congiuntivo. {PV} con tanti esempi.","{S} explained the subjunctive rule. {SP} explained it with lots of examples.","fs"],
+    ["{S} {V} i motivi del ritardo. {PV} al capo.","{S} explained the reasons for the delay. {SP} explained them to the boss.","mp"],
+    ["{S} {V} le regole del gioco. {PV} ai bambini.","{S} explained the rules of the game. {SP} explained them to the kids.","fp"]],
+  studiare:[
+    ["{S} {V} il passato prossimo. {PV} con le flashcard.","{S} studied the passato prossimo. {SP} studied it with flashcards.","ms"],
+    ["{S} {V} la storia di Firenze. {PV} prima del viaggio.","{S} studied the history of Florence. {SP} studied it before the trip.","fs"],
+    ["{S} {V} i pronomi diretti. {PV} tutto il pomeriggio.","{S} studied the direct object pronouns. {SP} studied them all afternoon.","mp"],
+    ["{S} {V} le preposizioni articolate. {PV} per l'esame.","{S} studied the articulated prepositions. {SP} studied them for the exam.","fp"]],
+  svegliare:[
+    ["{S} {V} il nonno dal riposino. {PV} piano piano.","{S} woke grandpa from his nap. {SP} woke him gently.","ms"],
+    ["{S} {V} la bambina. {PV} con un bacio.","{S} woke the little girl. {SP} woke her with a kiss.","fs"],
+    ["{S} {V} i bambini per la scuola. {PV} alle sette.","{S} woke the kids for school. {SP} woke them at seven.","mp"],
+    ["{S} {V} le ragazze all'alba. {PV} per vedere il sorgere del sole.","{S} woke the girls at dawn. {SP} woke them to see the sunrise.","fp"]],
+  tagliare:[
+    ["{S} {V} il pane per la bruschetta. {PV} a fette sottili.","{S} cut the bread for the bruschetta. {SP} cut it into thin slices.","ms"],
+    ["{S} {V} la torta. {PV} in otto pezzi.","{S} cut the cake. {SP} cut it into eight pieces.","fs"],
+    ["{S} {V} i rami secchi. {PV} con la sega.","{S} cut the dead branches. {SP} cut them with the saw.","mp"],
+    ["{S} {V} le cipolle per il soffritto. {PV} piangendo.","{S} chopped the onions for the soffritto. {SP} chopped them in tears.","fp"]],
+  togliere:[
+    ["In casa {S} {V} il cappotto. {PV} subito.","Inside {S} took off the coat. {SP} took it off right away.","ms"],
+    ["{S} {V} la neve dalla macchina. {PV} con una spazzola.","{S} cleared the snow off the car. {SP} cleared it with a brush.","fs"],
+    ["{S} {V} i piatti dalla tavola. {PV} dopo il dolce.","{S} cleared the plates from the table. {SP} cleared them after dessert.","mp"],
+    ["{S} {V} le scarpe all'ingresso. {PV} per non sporcare.","{S} took off the shoes at the door. {SP} took them off so as not to track in dirt.","fp"]],
+  trovare:[
+    ["{S} {V} il portafoglio. {PV} sotto il divano.","{S} found the wallet. {SP} found it under the sofa.","ms"],
+    ["{S} {V} la soluzione. {PV} per caso.","{S} found the solution. {SP} found it by chance.","fs"],
+    ["{S} {V} gli occhiali. {PV} nel frigorifero!","{S} found the glasses. {SP} found them in the fridge!","mp"],
+    ["{S} {V} le chiavi. {PV} nella tasca della giacca.","{S} found the keys. {SP} found them in the jacket pocket.","fp"]],
+  usare:[
+    ["{S} {V} il navigatore per arrivare a Siena. {PV} per tutto il viaggio.","{S} used the GPS to get to Siena. {SP} used it the whole way.","ms"],
+    ["{S} {V} la macchina di Luca. {PV} per andare al mare.","{S} used Luca's car. {SP} used it to go to the beach.","fs"],
+    ["{S} {V} i bicchieri buoni. {PV} per la cena di Natale.","{S} used the good glasses. {SP} used them for Christmas dinner.","mp"],
+    ["{S} {V} le forbici della cucina. {PV} per aprire il pacco.","{S} used the kitchen scissors. {SP} used them to open the package.","fp"]],
+  vedere:[
+    ["{S} {V} il Colosseo. {PV} di notte, tutto illuminato.","{S} saw the Colosseum. {SP} saw it at night, all lit up.","ms"],
+    ["{S} {V} la Cappella Sistina. {PV} con una guida.","{S} saw the Sistine Chapel. {SP} saw it with a guide.","fs"],
+    ["{S} {V} i nonni domenica. {PV} a pranzo.","{S} saw the grandparents on Sunday. {SP} saw them at lunch.","mp"],
+    ["{S} {V} le foto della vacanza. {PV} sul telefono di Giulia.","{S} saw the vacation photos. {SP} saw them on Giulia's phone.","fp"]],
+  vendere:[
+    ["{S} {V} il motorino. {PV} a un ragazzo del quartiere.","{S} sold the scooter. {SP} sold it to a kid from the neighborhood.","ms"],
+    ["{S} {V} la vecchia macchina. {PV} online.","{S} sold the old car. {SP} sold it online.","fs"],
+    ["{S} {V} i mobili del salotto. {PV} prima del trasloco.","{S} sold the living room furniture. {SP} sold it before the move.","mp"],
+    ["{S} {V} le biciclette. {PV} al mercatino dell'usato.","{S} sold the bikes. {SP} sold them at the flea market.","fp"]],
+  visitare:[
+    ["{S} {V} il museo degli Uffizi. {PV} in quattro ore.","{S} visited the Uffizi museum. {SP} visited it in four hours.","ms"],
+    ["{S} {V} la mostra di Leonardo. {PV} di mattina, senza fila.","{S} visited the Leonardo exhibit. {SP} visited it in the morning, with no line.","fs"],
+    ["{S} {V} i giardini di Boboli. {PV} al tramonto.","{S} visited the Boboli Gardens. {SP} visited them at sunset.","mp"],
+    ["{S} {V} le chiese di Roma. {PV} quasi tutte.","{S} visited the churches of Rome. {SP} visited almost all of them.","fp"]]
+};
+const DOBJ_PRO  = {ms:"lo", fs:"la", mp:"li", fp:"le"};
+const DOBJ_END  = {ms:"o",  fs:"a",  mp:"i",  fp:"e"};
+const DOBJ_DESC = {ms:"masculine singular", fs:"feminine singular", mp:"masculine plural", fp:"feminine plural"};
+const DOBJ_SP   = ["I","you","he","we","you","they"];
+const DOBJ_SUBJ_F = {it:"Chiara", en:"Chiara", g:"f", pl:false};   // the audio "lei" slot
+/* the verb's hand-written pairs, when the toggle is on and the verb takes avere */
+function dobjRows(v){
+  if(!S.dobj || !v || v.refl || v.aux!=="avere" || GEN_REFL[v.inf]) return null;
+  const r = DOBJ[v.inf];
+  return r && r.length ? r : null;
+}
+function dobjOn(v,t){ return t==="passato" && !!dobjRows(v); }
+/* "ho comprato" + fp → {full:"le ho comprate", …}; lo/la elide before avere: l'ho comprata */
+function dobjVerb(v,i,code){
+  const w = form(v,"passato",i).replace(/!$/,"").split(" ");
+  const pp = w.pop(), aux = w.join(" ");
+  const ppA = pp.replace(/o$/, DOBJ_END[code]);
+  const pro = DOBJ_PRO[code];
+  const head = (code==="ms" || code==="fs") ? "l'"+aux : pro+" "+aux;
+  return {full:head+" "+ppA, pro:pro, aux:aux, pp:pp, ppA:ppA, code:code};
+}
+/* the pair for card (v,i); k picks the row (fixed per card, or random for 🎲) */
+function dobjSentence(v,i,fem,k){
+  const rows = dobjRows(v);
+  if(!rows) return null;
+  let h = 0; for(const ch of v.inf) h = (h*31 + ch.charCodeAt(0)) >>> 0;
+  if(k===undefined) k = (h + i) % rows.length;
+  const row = rows[k % rows.length], code = row[2];
+  const subj = (i===2 && fem) ? DOBJ_SUBJ_F : CUR_SUBJ[i];
+  const V  = form(v,"passato",i).replace(/!$/,"");
+  const D  = dobjVerb(v,i,code);
+  const sp = (i===2 && fem) ? "she" : DOBJ_SP[i];
+  const caps = s => s.replace(/\s+/g," ").replace(/\s([,.!?…])/g,"$1").trim()
+                     .replace(/^(\S)/, c=>c.toUpperCase())
+                     .replace(/([.!?…]\s+)(\S)/g, (m,a,b)=>a+b.toUpperCase());
+  const fill = pv => caps(row[0].replace("{S}", subj.it).replace("{V}", V).replace("{PV}", pv));
+  const it  = fill(D.full);
+  const q   = fill("_____");
+  const en  = caps(row[1].replace("{S}", subj.en).replace("{SP}", sp));
+  const elide = (code==="ms" || code==="fs") ? " · "+D.pro+" + "+D.aux.split(" ")[0]+" → l'"+D.aux.split(" ")[0] : "";
+  const note = "oggetto diretto: "+D.pro+" = "+DOBJ_DESC[code]+" → "+D.full+elide;
+  return {it:it, en:en, note:note, curated:true, q:q, k:k % rows.length, dobj:D};
+}
 /* imperativo built from a hand-written ending: "Apri la finestra, per favore!" / "Please open the window!" */
 function imperSentence(v,i,tail,enPhrase,neg){
   if(i===0) return null;
@@ -8279,7 +8690,7 @@ if(S.ver !== VER){                                // migrate: switch on the new 
 if(!S.filt || typeof S.filt!=="object") S.filt = {travel:false, reg:null, aux:null};
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
 
-let deck=[], pos=0, flipped=false, curPhrase="";
+let deck=[], pos=0, flipped=false, curPhrase="", curDobj;
 
 function cardId(vi,t,i){ return vi+"|"+t+"|"+i; }
 
@@ -8337,6 +8748,7 @@ function render(){
 
   const g0 = genSentenceFixed(c.v,c.t,c.i);
   curPhrase = g0.it;
+  curDobj = g0.dobj ? g0.k : undefined;
   const ex  = '<div class="ex">'+
                 '<div class="exit" id="exIt">'+esc(g0.it)+'</div>'+
                 '<div class="exen" id="exEn">'+esc(g0.en)+'</div>'+
@@ -8349,7 +8761,29 @@ function render(){
               '</div>';
   const str = '<div class="stress">'+stressWord(lastWord(it))+' — '+stress(c.v,c.t,c.i)+'</div>';
 
-  if(S.mode==="recall"){
+  if(g0.dobj){                                   // passato prossimo + oggetto diretto
+    $("tag").textContent = tenseLabel + " · " + personLabel(c.t,c.i,c.v) + " · oggetto diretto";
+    const dNote = '<div class="pron">auxiliary <b>avere</b> — but the participle agrees with a direct-object pronoun '+
+                  '(<b>lo / la / li / le</b>) placed before it. <b>lo</b> and <b>la</b> become <b>l\'</b> before avere; '+
+                  '<b>li</b> and <b>le</b> never do.</div>';
+    if(S.mode==="recall"){
+      $("front").innerHTML =
+        '<div class="prompt">'+c.v.inf+(c.v.en?' — '+c.v.en:'')+'</div>'+
+        '<div class="sub">'+tenseLabel+' · '+personLabel(c.t,c.i,c.v)+' · pronome diretto</div>'+
+        '<div class="ex"><div class="exit" id="dqIt">'+esc(g0.q)+'</div>'+
+        '<div class="exnote">fill the blank: lo / la / li / le + passato prossimo, with agreement</div></div>';
+      $("back").innerHTML =
+        '<div class="big" style="color:var(--accent)" id="dobjBig">'+esc(g0.dobj.full)+'</div>'+
+        ex + spk + str + dNote;
+    }else{
+      $("front").innerHTML =
+        '<div class="prompt">'+tenseLabel+' · oggetto diretto</div>'+
+        '<div class="ex"><div class="exit" id="dqIt">'+esc(g0.it)+'</div></div>';
+      $("back").innerHTML =
+        '<div class="sub" style="color:var(--accent2)">'+c.v.inf+(c.v.en?' — '+c.v.en:'')+' · '+personLabel(c.t,c.i,c.v)+'</div>'+
+        ex + spk + str + dNote;
+    }
+  }else if(S.mode==="recall"){
     $("front").innerHTML =
       '<div class="prompt">'+c.v.inf+(c.v.en?' — '+c.v.en:'')+'</div>'+
       '<div class="big">'+personLabel(c.t,c.i,c.v)+' …</div>'+
@@ -8456,13 +8890,18 @@ function flip(){
   if(b) b.onclick = e =>{ e.stopPropagation(); speak(curPhrase); };
   if(gb) gb.onclick = e =>{                       // fresh sentence around this exact conjugation
     e.stopPropagation();
-    const g = genSentence(c.v,c.t,c.i);
+    const g = genSentence(c.v,c.t,c.i,{notK:curDobj});
     curPhrase = g.it;
     $("exIt").textContent = g.it;
     $("exEn").textContent = g.en;
     $("exNote").textContent = g.note;
+    if(g.dobj){                                   // keep the answer and the hidden front in step
+      curDobj = g.k;
+      if($("dobjBig")) $("dobjBig").textContent = g.dobj.full;
+      if($("dqIt")) $("dqIt").textContent = S.mode==="recall" ? g.q : g.it;
+    }
   };
-  if(w) w.onclick = e =>{ e.stopPropagation(); speak(word); };
+  if(w) w.onclick = e =>{ e.stopPropagation(); speak($("dobjBig") ? $("dobjBig").textContent : word); };
   if(S.speak) speak(phrase, true);      // auto-speak reads the whole sentence
   $("controls").innerHTML =
     '<div class="rate">'+
@@ -8784,6 +9223,16 @@ function drawChips(){
 
   drawFilters();
   $("autoSpk").classList.toggle("on", !!S.speak);
+  $("dobjBtn").classList.toggle("on", !!S.dobj);
+  {
+    const sel = VERBS.filter(v=>S.verbs.includes(v.inf) && !v.refl && v.aux==="avere" && DOBJ[v.inf]).length;
+    $("dobjStat").innerHTML = S.dobj
+      ? "<b>On</b> — passato prossimo cards for avere verbs with hand-written pairs become two-sentence drills: "+
+        "a statement naming something, then a blank where <b>lo / la / li / le</b> + the agreeing participle goes "+
+        "(Ho comprato le scarpe. <b>Le ho comprate</b> ieri.). <b>"+sel+"</b> of your selected verbs have pairs; "+
+        "the rest keep their normal cards. Also used in the audio script export."
+      : "Off — tap to practice participle agreement with direct-object pronouns in the passato prossimo.";
+  }
   drawVoices();
   drawAudio();
 
@@ -9179,6 +9628,11 @@ $("voiceSel").onchange = e =>{
   speak("Vorrei un caffè, per favore."); drawVoices();
 };
 $("autoSpk").onclick = ()=>{ S.speak = !S.speak; save(); drawChips(); };
+$("dobjBtn").onclick = ()=>{
+  S.dobj = !S.dobj;
+  if(S.dobj && !S.tenses.includes("passato")) S.tenses = S.tenses.concat("passato");   // the drill lives in the passato prossimo
+  save(); drawChips();
+};
 $("testSpk").onclick = ()=>{ speak("Stasera andiamo a mangiare fuori: vorrei assaggiare il vino della casa."); drawVoices(); };
 /* two-tap confirm: first tap arms the button, a second tap within 4 s runs it */
 function armConfirm(btn, prompt, action){
