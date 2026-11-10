@@ -5,15 +5,15 @@
 /* Layout: a single study sheet — forms first, then "sì / no" rules side by side, then the prepositions grid */
 :root{
   --bg:#f7f8fb; --surface:#ffffff; --fg:#1b2233; --muted:#5b6478; --line:#dde2ec;
-  --ink:#1f4fa8; --ink-soft:#e7eefb; --no:#b23a3a; --no-soft:#fbecec;
+  --ink:#1f4fa8; --ink-soft:#e7eefb; --no:#b23a3a; --no-soft:#fbecec; --pink:#c2366f;
   --display:"Literata",Georgia,serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12161f; --surface:#1a2030; --fg:#e6e9f0; --muted:#9aa3b8; --line:#2c3446;
-  --ink:#8fb3ff; --ink-soft:#1f2c48; --no:#f08c8c; --no-soft:#3a2026; color-scheme:dark}}
+  --ink:#8fb3ff; --ink-soft:#1f2c48; --no:#f08c8c; --no-soft:#3a2026; --pink:#f59ac0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12161f; --surface:#1a2030; --fg:#e6e9f0; --muted:#9aa3b8; --line:#2c3446;
-  --ink:#8fb3ff; --ink-soft:#1f2c48; --no:#f08c8c; --no-soft:#3a2026; color-scheme:dark}
+  --ink:#8fb3ff; --ink-soft:#1f2c48; --no:#f08c8c; --no-soft:#3a2026; --pink:#f59ac0; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6}
 .wrap{max-width:860px;margin:0 auto;padding-block:32px 56px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
@@ -46,6 +46,10 @@ ul.rules li{display:flex;flex-direction:column;gap:2px}
 .note p+p{margin-top:8px}
 .prep td,.prep th{text-align:center;font-variant-numeric:tabular-nums}
 .prep td:first-child,.prep th:first-child{text-align:left}
+.prep td:nth-child(n+2):nth-child(-n+6),.prep tr:last-child th:nth-child(n+2):nth-child(-n+6),.prep th.m{color:var(--ink);font-weight:700}
+.prep tr.num th{font-size:11px;padding-block:4px;border-bottom:1px solid var(--line)}
+.prep tr.num th.pl{background:var(--ink-soft);color:var(--fg)}
+.prep td:nth-child(n+7),.prep tr:last-child th:nth-child(n+7),.prep th.f{color:var(--pink);font-weight:700}
 .foot{color:var(--muted);font-size:14px}
 </style>
 
@@ -115,15 +119,20 @@ ul.rules li{display:flex;flex-direction:column;gap:2px}
   <section>
     <h2>3. Le preposizioni articolate</h2>
     <div class="scroll"><table class="prep">
-      <thead><tr><th></th><th>il</th><th>lo</th><th>l'</th><th>la</th><th>i</th><th>gli</th><th>le</th></tr></thead>
+      <thead>
+        <tr><th></th><th class="m" colspan="5">Maschile</th><th class="f" colspan="2">Femminile</th></tr>
+        <tr class="num"><th></th><th>sing.</th><th class="pl">plur.</th><th colspan="2">sing.</th><th class="pl">plur.</th><th>sing.</th><th class="pl">plur.</th></tr>
+        <tr><th></th><th>il</th><th>i</th><th>lo</th><th>l'</th><th>gli</th><th>la</th><th>le</th></tr>
+      </thead>
       <tbody>
-        <tr><td class="k">di</td><td>del</td><td>dello</td><td>dell'</td><td>della</td><td>dei</td><td>degli</td><td>delle</td></tr>
-        <tr><td class="k">a</td><td>al</td><td>allo</td><td>all'</td><td>alla</td><td>ai</td><td>agli</td><td>alle</td></tr>
-        <tr><td class="k">da</td><td>dal</td><td>dallo</td><td>dall'</td><td>dalla</td><td>dai</td><td>dagli</td><td>dalle</td></tr>
-        <tr><td class="k">in</td><td>nel</td><td>nello</td><td>nell'</td><td>nella</td><td>nei</td><td>negli</td><td>nelle</td></tr>
-        <tr><td class="k">su</td><td>sul</td><td>sullo</td><td>sull'</td><td>sulla</td><td>sui</td><td>sugli</td><td>sulle</td></tr>
+        <tr><td class="k">di</td><td>del</td><td>dei</td><td>dello</td><td>dell'</td><td>degli</td><td>della</td><td>delle</td></tr>
+        <tr><td class="k">a</td><td>al</td><td>ai</td><td>allo</td><td>all'</td><td>agli</td><td>alla</td><td>alle</td></tr>
+        <tr><td class="k">da</td><td>dal</td><td>dai</td><td>dallo</td><td>dall'</td><td>dagli</td><td>dalla</td><td>dalle</td></tr>
+        <tr><td class="k">in</td><td>nel</td><td>nei</td><td>nello</td><td>nell'</td><td>negli</td><td>nella</td><td>nelle</td></tr>
+        <tr><td class="k">su</td><td>sul</td><td>sui</td><td>sullo</td><td>sull'</td><td>sugli</td><td>sulla</td><td>sulle</td></tr>
       </tbody>
     </table></div>
+    <p class="foot">Ogni singolare è seguito dal suo plurale: <i>il → i</i>, <i>lo / l' → gli</i>, <i>la → le</i>. Attenzione: <i>l'</i> davanti a un nome femminile fa <i>le</i> al plurale (<i>l'amica → le amiche, dell'amica → delle amiche</i>).</p>
     <p class="foot">Esempi: <i>ai Navigli, sull'Etna, dal Tevere, della Lombardia, all'ultimo piano</i>.</p>
   </section>
 
