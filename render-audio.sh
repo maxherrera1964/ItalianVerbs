@@ -17,7 +17,10 @@
 #
 # Produces, next to this script (and so next to italianverbs.html too):
 #   <name>/completo.m4a     one track, all verbs
-#   <name>/per-verbo/*.m4a  one file per verb, numbered in selection order
+#   <name>/per-verbo/essere/*.m4a  verbs whose compound tenses use essere
+#   <name>/per-verbo/avere/*.m4a   verbs whose compound tenses use avere
+#                                  (numbered in selection order; a verb whose
+#                                  auxiliary can't be told stays in per-verbo/)
 #
 # Requires: say, afconvert (both ship with macOS), ffmpeg (brew install ffmpeg).
 
@@ -87,10 +90,14 @@ awk -v dir="$WORK/parts" '
       file = sprintf("%s/%02d_%s.txt", dir, n++, fname); last = verb
     }
   }
+  # "¶AUX¶ essere" / "¶AUX¶ avere" (written by the export) is never spoken:
+  # it goes into a side file next to the verb'"'"'s part so the verb can be filed
+  # under per-verbo/essere or per-verbo/avere.
+  /^¶AUX¶ / { if (file) { af = file ".aux"; print $2 > af; close(af) } next }
   file && NF { print > file }
 ' "$SCRIPT_FILE"
 
-COUNT=$(ls "$WORK/parts" | wc -l | tr -d ' ')
+COUNT=$(ls "$WORK/parts" | grep -c '\.txt$' || true)
 [ "$COUNT" -gt 0 ] || { echo "error: no verbs found — is this an exported script?" >&2; exit 1; }
 echo "Rendering $COUNT verb(s) with '$VOICE' (English lines: '$EN_VOICE')…"
 
@@ -104,6 +111,37 @@ cat > "$WORK/render_one.sh" << 'HELPER'
 set -euo pipefail
 f="$1"
 b="$(basename "$f" .txt)"
+
+# Which auxiliary? The export's ¶AUX¶ tag if there is one; otherwise (older
+# scripts) read it off the conjugation lines themselves — the first auxiliary
+# form that is followed by another word (the participle): "io sarò andato",
+# "me la sono presa", "ce l'avrò fatta". A bare "io sono." / "io ho." is the
+# verb itself in a simple tense and doesn't count.
+aux=""
+[ -f "$f.aux" ] && aux="$(head -1 "$f.aux")"
+if [ -z "$aux" ]; then
+  aux="$(awk -v q="'" '
+    BEGIN {
+      split("sono sei è siamo siete ero eri era eravamo eravate erano fui fosti fu fummo foste furono sarò sarai sarà saremo sarete saranno sia siate siano fossi fosse fossimo fossero sarei saresti sarebbe saremmo sareste sarebbero", E, " ")
+      for (k in E) ess[E[k]] = 1
+      split("ho hai ha abbiamo avete hanno avevo avevi aveva avevamo avevate avevano ebbi avesti ebbe avemmo aveste ebbero avrò avrai avrà avremo avrete avranno abbia abbiate abbiano avessi avesse avessimo avessero avrei avresti avrebbe avremmo avreste avrebbero", A, " ")
+      for (k in A) av[A[k]] = 1
+    }
+    /^¶EN¶ / { next }
+    /\[\[slnc 500\]\]/ {
+      s = $0; sub(/ \[\[slnc 500\]\].*/, "", s)
+      gsub(/[.!?,]/, "", s); gsub(q, " ", s); gsub("’", " ", s)
+      n = split(s, w, " ")
+      for (i = 1; i < n; i++) {
+        if (w[i] in ess) { ne++; break }
+        if (w[i] in av)  { na++; break }
+      }
+    }
+    END { if (ne > na) print "essere"; else if (na > ne) print "avere" }
+  ' "$f")"
+fi
+case "$aux" in essere|avere) dest="$RA_OUT/per-verbo/$aux" ;; *) dest="$RA_OUT/per-verbo"; aux="?" ;; esac
+mkdir -p "$dest"
 
 # Pass 2 — split this verb into alternating language segments. Every line
 # starting with "¶EN¶ " is a standalone English sentence; everything else
@@ -151,8 +189,8 @@ for a in "$RA_WORK/segaiff/${b}__"*.aiff; do
   printf "file '%s'\n" "$a" >> "$concat"
 done
 ffmpeg -y -loglevel error -f concat -safe 0 -i "$concat" $RA_FLOOR "$RA_WORK/aiff/$b.aiff"
-afconvert -f m4af -d aac -s 2 -b "$RA_BITRATE" "$RA_WORK/aiff/$b.aiff" "$RA_OUT/per-verbo/$b.m4a"
-echo "  $b"
+afconvert -f m4af -d aac -s 2 -b "$RA_BITRATE" "$RA_WORK/aiff/$b.aiff" "$dest/$b.m4a"
+echo "  $b  ($aux)"
 HELPER
 chmod +x "$WORK/render_one.sh"
 
@@ -181,4 +219,10 @@ afconvert -f m4af -d aac -s 2 -b "$BITRATE" "$WORK/full.aiff" "$OUT/completo.m4a
 DUR=$(afinfo "$OUT/completo.m4a" | awk -F': ' '/estimated duration/{printf "%d", $2}')
 printf '\nDone — %dh %02dm across %s verb(s)\n' $((DUR/3600)) $(((DUR%3600)/60)) "$COUNT"
 echo "  $OUT/completo.m4a"
-echo "  $OUT/per-verbo/  ($COUNT files)"
+NE=$(ls "$OUT/per-verbo/essere" 2>/dev/null | grep -c '\.m4a$' || true)
+NA=$(ls "$OUT/per-verbo/avere"  2>/dev/null | grep -c '\.m4a$' || true)
+NU=$(ls "$OUT/per-verbo"        2>/dev/null | grep -c '\.m4a$' || true)
+echo "  $OUT/per-verbo/essere/  ($NE files)"
+echo "  $OUT/per-verbo/avere/   ($NA files)"
+[ "$NU" -gt 0 ] && echo "  $OUT/per-verbo/  ($NU files — auxiliary not shown in this script)"
+true

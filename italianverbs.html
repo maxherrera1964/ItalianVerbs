@@ -7554,6 +7554,9 @@ function buildAudioScript(){
       // "<infinitive>. [[slnc 1000]]" — render-audio.sh splits per verb on that.
       lines.push("[[slnc "+(Math.round(gap*1.25)+500)+"]] [[rate -40]] "+
                  TENSES.find(x=>x.id===t).label+". [[rate +40]] [[slnc 700]] "+v.inf+". [[slnc 1000]]");
+      // auxiliary tag — never spoken: render-audio.sh reads it to file this verb
+      // under per-verbo/essere or per-verbo/avere, then drops the line
+      if(v.aux==="essere" || v.aux==="avere") lines.push("¶AUX¶ "+v.aux);
       // English meaning on its own ¶EN¶ line, voiced by the English voice
       if(m) lines.push("¶EN¶ "+m+". [[slnc 1200]]");
       audioSlotsFor(t,v).forEach(s=>{
