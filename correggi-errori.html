@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Correggi i tuoi errori</title>
+<style>
+  :root {
+    --bg: #f6f3ee; --card: #ffffff; --ink: #1f2328; --muted: #6b6f76;
+    --ok: #2e7d4f; --ok-bg: #e6f3eb; --bad: #b8432f; --bad-bg: #fbeae6; --accent: #2f6db8; --line: #e3ded6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181a; --card: #222427; --ink: #ececec; --muted: #9aa0a6;
+            --ok: #6cc28f; --ok-bg: #1e3327; --bad: #e0735f; --bad-bg: #3a2420; --accent: #6ea3e6; --line: #33363a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; text-align: center; }
+  .sub { color: var(--muted); margin: 0 0 14px; font-size: .95rem; text-align: center; max-width: 460px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; max-width: 480px; }
+  .chip { font-size: .82rem; padding: 6px 11px; border-radius: 999px; }
+  .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .panel { width: 100%; max-width: 460px; background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+           padding: 22px 20px; box-shadow: 0 4px 18px rgba(0,0,0,.06); }
+  .tag { font-size: .75rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
+  .q { font-size: 1.25rem; line-height: 1.45; font-weight: 500; margin-bottom: 18px; }
+  .q .blank { display: inline-block; min-width: 3em; border-bottom: 2px solid var(--muted); text-align: center; }
+  .opts { display: grid; gap: 8px; }
+  .opt { text-align: left; font-size: 1.05rem; padding: 12px 14px; }
+  .opt.ok { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); font-weight: 600; }
+  .opt.bad { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); text-decoration: line-through; }
+  .opt:disabled { cursor: default; }
+  .fb { margin-top: 16px; display: none; }
+  .fb.show { display: block; }
+  .verdict { font-weight: 700; margin-bottom: 6px; }
+  .verdict.ok { color: var(--ok); } .verdict.bad { color: var(--bad); }
+  .full { font-size: 1.08rem; font-style: italic; line-height: 1.45; }
+  .en { color: var(--muted); font-size: .92rem; margin-top: 3px; }
+  .why { margin-top: 10px; font-size: .95rem; line-height: 1.45; border-left: 3px solid var(--accent); padding-left: 10px; }
+  .controls { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
+  button { font: inherit; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line);
+           background: var(--card); color: var(--ink); cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--muted); }
+  .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .count { margin-top: 14px; color: var(--muted); font-size: .9rem; text-align: center; }
+  .done { text-align: center; }
+  .done .big { font-size: 2rem; font-weight: 700; margin: 6px 0; }
+</style>
+</head>
+<body>
+  <h1>Correggi i tuoi errori</h1>
+  <p class="sub">Esercizi sui tuoi errori ricorrenti, con frasi vere di Love is Blind (📺). Dopo ogni risposta, <b>ripeti la frase ad alta voce</b>.</p>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="panel" id="panel">
+    <div class="tag"><span id="cat"></span><span id="src"></span></div>
+    <div class="q" id="q"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb">
+      <div class="verdict" id="verdict"></div>
+      <div class="full" id="full"></div>
+      <div class="en" id="en"></div>
+      <div class="why" id="why"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="speak">🔊 Ascolta e ripeti</button>
+    <button id="next" class="primary">Avanti →</button>
+    <button id="retry">Ripassa gli sbagliati</button>
+  </div>
+  <div class="count" id="count"></div>
+
+<script>
+// {c: category, q: sentence with ___, o: options (correct one FIRST — shuffled on screen),
+//  x: why, en: English, s: true = line from the show, full: whole sentence when q is a question}
+const Q = [
+  // ---- Preposizioni ----
+  {c:"Preposizioni", s:true, q:"Penso che in queste capsule ci possa essere la persona che fa ___ me.", o:["per","a","da","di"],
+   en:"I think in these capsules there could be the right person for me.", x:"<b>fare per qualcuno</b> = to be right for someone. <i>Non fa per me</i> = it's not for me."},
+  {c:"Preposizioni", s:true, q:"Io sono stato molto amato ___ mia vita.", o:["nella","en la","in la","nel"],
+   en:"I've been very loved in my life.", x:"<b>in + la = nella</b>. In Italian the article always merges with <i>in</i> (nel, nella, nei…). And it's never <i>en</i>."},
+  {c:"Preposizioni", s:true, q:"Ludo, che fai ___ vita?", o:["nella","en la","in","a la"],
+   en:"Ludo, what do you do for a living?", x:"<b>Che fai nella vita?</b> = what do you do (for work)? A fixed phrase — learn it as a block."},
+  {c:"Preposizioni", s:true, q:"No, ___ realtà no, zero.", o:["in","en","a","nella"],
+   en:"No, actually no, not at all.", x:"<b>in realtà</b> = actually. No article."},
+  {c:"Preposizioni", s:true, q:"Benvenuti ___ casa!", o:["in","en","nella","di"],
+   en:"Welcome to the house!", x:"<b>in casa</b> = in / into the house (indoors). Compare <i>a casa</i> = (at) home."},
+  {c:"Preposizioni", s:true, q:"Giovanni mi ha fatto sentire ___ casa.", o:["a","in","alla","en"],
+   en:"Giovanni made me feel at home.", x:"<b>a casa</b> = at home / home. <i>Torno a casa, sono a casa, mi sento a casa.</i>"},
+  {c:"Preposizioni", s:true, q:"Il tempo è volato, cioè ___ me almeno il tempo è volato.", o:["per","para","a","da"],
+   en:"Time flew — for me at least, time flew.", x:"<b>per</b>, never <i>para</i> (that's Spanish). <i>Per me</i> is the show's most common phrase: 132 times."},
+  {c:"Preposizioni", s:true, q:"Cioè, ___ fine siamo stati tutti liberi di scegliere.", o:["alla","a la","en la","al"],
+   en:"I mean, in the end we were all free to choose.", x:"<b>a + la = alla</b>. <i>Alla fine</i> = in the end."},
+  {c:"Preposizioni", s:true, q:"Sei l'unica persona ___ cui farei questo primo passo.", o:["con","di","a","que"],
+   en:"You're the only person I'd take this first step with.", x:"Preposition + <b>cui</b>: <i>con cui</i> (with whom), <i>in cui</i> (in which), <i>di cui</i> (of which). Never <i>que</i>."},
+  {c:"Preposizioni", s:true, q:"Nel momento ___ cui sono entrata, ho sentito la sua voce.", o:["in","en","a","di"],
+   en:"The moment I walked in, I heard his voice.", x:"<b>nel momento in cui</b> = the moment when."},
+  {c:"Preposizioni", s:true, q:"Non mi devo spiegare nulla, lui capisce ___ solo.", o:["da","per","a","di"],
+   en:"I don't have to explain anything, he understands on his own.", x:"<b>da solo / da sola</b> = alone, by oneself."},
+  {c:"Preposizioni", s:true, q:"So quanto sia valida la persona ___ parte.", o:["dall'altra","de l'altra","all'altra","in l'altra"],
+   en:"I know how worthy the person on the other side is.", x:"<b>da + l'altra = dall'altra</b>. <i>Dall'altra parte</i> = on the other side."},
+  {c:"Preposizioni", s:true, q:"Io ho bisogno ___ farti una domanda.", o:["di","de","a","per"],
+   en:"I need to ask you a question.", x:"<b>avere bisogno di</b> + noun or infinitive. <i>De</i> is Spanish."},
+  {c:"Preposizioni", s:true, q:"Voglio continuare ___ vivere con gli occhi a cuore.", o:["a","di","per","—"],
+   en:"I want to keep living with hearts in my eyes.", x:"<b>continuare a</b> + infinitive."},
+  {c:"Preposizioni", s:true, q:"È stato bellissimo dare un volto ___ tutte le parole che ci siamo detti!", o:["a","per","di","da"],
+   en:"It was wonderful to put a face to all the words we said to each other!", x:"<b>dare qualcosa a qualcuno</b> — the receiver takes <i>a</i>."},
+  {c:"Preposizioni", s:true, q:"Ho incontrato lei, l'amore ___ mia vita.", o:["della","de la","di la","dalla"],
+   en:"I met her, the love of my life.", x:"<b>di + la = della</b>. Italian always merges di + article: del, della, dei, delle."},
+  {c:"Preposizioni", s:true, q:"Mi porta a vedere tutto ___ un altro punto di vista.", o:["da","di","en","per"],
+   en:"He makes me see everything from another point of view.", x:"<b>da un altro punto di vista</b> = from another point of view (<i>da</i> = from)."},
+  {c:"Preposizioni", s:true, q:"Io ___ tavola ho bisogno di un certo contegno.", o:["a","in","en","alla"],
+   en:"At the table I need a certain decorum.", x:"<b>a tavola</b> = at the table (eating). Fixed, no article."},
+
+  // ---- Spagnolo → italiano ----
+  {c:"Spagnolo", q:"Studio l'italiano ___ parlare con Vale.", o:["per","para","a","di"],
+   en:"I study Italian to speak with Vale.", x:"In order to = <b>per</b> + infinitive. <i>Para</i> doesn't exist in Italian."},
+  {c:"Spagnolo", q:"Salva le correzioni ___ questa sessione.", o:["di","en","in","de"],
+   en:"Save the corrections from this session.", x:"Belonging to = <b>di</b>. <i>En</i> and <i>de</i> are Spanish."},
+  {c:"Spagnolo", q:"___ questa frase c'è un errore.", o:["In","En","Nella","A"],
+   en:"There's a mistake in this sentence.", x:"<b>in</b> — Italian never uses <i>en</i>. (With an article it becomes <i>nella frase</i>.)"},
+  {c:"Spagnolo", s:true, q:"Tutù tutù, che ora ___ capisco più niente.", o:["non","no","né","ne"],
+   en:"Oh my, now I don't understand anything anymore.", x:"Before a verb it's <b>non</b>: <i>non capisco</i>. <i>No</i> is only the answer \"no\"."},
+  {c:"Spagnolo", q:"Come si dice \"Let's keep practicing\"?", o:["Continuiamo a praticare.","Seguiamo praticando.","Continuiamo praticando.","Seguiamo a praticare."],
+   full:"Continuiamo a praticare.", en:"Let's keep practicing.", x:"<b>continuare a + infinitive</b>. <i>Seguir + gerundio</i> is Spanish; in Italian it doesn't work."},
+  {c:"Spagnolo", q:"Mi interessano ___ relazioni a distanza.", o:["le","las","i","gli"],
+   en:"I'm interested in long-distance relationships.", x:"Feminine plural article = <b>le</b> (le relazioni, le cose). <i>Las</i> is Spanish."},
+  {c:"Spagnolo", q:"Non ___ problema, ci penso io.", o:["c'è","hay","è","ha"],
+   en:"No problem, I'll take care of it.", x:"There is = <b>c'è</b> (Spanish <i>hay</i>)."},
+
+  // ---- Apostrofo ----
+  {c:"Apostrofo", s:true, q:"Per me ___amore è condivisione, è sacrificio.", o:["l'","lo ","la ","il "],
+   en:"For me love is sharing, it's sacrifice.", x:"Before a vowel: <b>l'</b> — <i>l'amore, l'idea, l'uomo</i>."},
+  {c:"Apostrofo", s:true, q:"Le dita sono pronte, ___anello ci sarà.", o:["l'","lo ","il ","la "],
+   en:"The fingers are ready, the ring will be there.", x:"<i>Anello</i> starts with a vowel → <b>l'anello</b>."},
+  {c:"Apostrofo", q:"___uso del congiuntivo è difficile.", o:["L'","Lo ","Il ","La "],
+   en:"Using the subjunctive is hard.", x:"<b>l'uso</b>, not <i>lo uso</i> (which means \"I use it\"!)."},
+  {c:"Apostrofo", q:"Ripasso ___infinito dei verbi irregolari.", o:["l'","il ","lo ","la "],
+   en:"I'm reviewing the infinitive of irregular verbs.", x:"<b>l'infinito</b> — vowel → l'."},
+  {c:"Apostrofo", q:"Mi interessa ___ontologia.", o:["l'","la ","lo ","il "],
+   en:"Ontology interests me.", x:"Feminine noun starting with a vowel → <b>l'</b> too: <i>l'ontologia, l'idea, l'altra</i>."},
+  {c:"Apostrofo", s:true, q:"Ma l'amore fuori dalle capsule è tutta ___altra storia.", o:["un'","un ","una ","uno "],
+   en:"But love outside the capsules is a whole other story.", x:"<b>un'</b> (with apostrophe) only before a FEMININE word starting with a vowel: <i>un'altra, un'idea</i>. Masculine: <i>un amico</i> (no apostrophe)."},
+  {c:"Apostrofo", s:true, q:"Hai visto ___altra?", o:["l'","la ","lo ","le "],
+   en:"Did you see the other one?", x:"<b>l'altra</b>."},
+  {c:"Apostrofo", q:"Ho conosciuto ___uomo della mia vita.", o:["l'","lo ","il ","un' "],
+   en:"I met the man of my life.", x:"<b>l'uomo</b>. And never <i>un'uomo</i> — uomo is masculine: <i>un uomo</i>."},
+
+  // ---- Metterci / volerci / in tempo ----
+  {c:"Tempo", s:true, q:"___ tempo per capire se siamo perfettamente sovrapponibili.", o:["Ci vuole","Ci vogliono","Mi metto","Si vuole"],
+   en:"It takes time to understand whether we're a perfect match.", x:"<b>ci vuole</b> + singular (ci vuole tempo), <b>ci vogliono</b> + plural (ci vogliono due ore). The subject is the time itself."},
+  {c:"Tempo", q:"Per arrivare a Sorrento ___ tre ore.", o:["ci vogliono","ci vuole","mi metto","metto"],
+   en:"It takes three hours to get to Sorrento.", x:"<i>Tre ore</i> is plural → <b>ci vogliono</b>."},
+  {c:"Tempo", q:"Io ___ mezz'ora per prepararmi.", o:["ci metto","mi metto","metto","ci vuole"],
+   en:"It takes me half an hour to get ready.", x:"When a PERSON spends the time: <b>metterci</b> — <i>io ci metto, tu ci metti</i>. <i>Mi metto</i> means \"I put myself / I start\"."},
+  {c:"Tempo", q:"Ieri ___ due ore a finire il lavoro.", o:["ci ho messo","mi sono messo","ho messo","ci è voluto"],
+   en:"Yesterday it took me two hours to finish the job.", x:"<b>ci ho messo</b> (avere). With volerci it would be <i>ci sono volute due ore</i> (essere, agrees with <i>ore</i>)."},
+  {c:"Tempo", q:"Ci abbiamo ___ un po', ma ce l'abbiamo fatta.", o:["messo","voluto","mettuto","messi"],
+   en:"It took us a while, but we made it.", x:"<b>ci abbiamo messo un po'</b> = it took us a while. Participle of mettere = <i>messo</i>."},
+  {c:"Tempo", q:"Ho consegnato il progetto ___ tempo.", o:["in","a","al","en"],
+   en:"I delivered the project on time.", x:"On time = <b>in tempo</b>. (<i>A tempo</i> = in rhythm / part-time.)"},
+
+  // ---- Congiuntivo ----
+  {c:"Congiuntivo", s:true, q:"Credo che Ludovica ___ la persona che ama il contatto fisico.", o:["sia","è","sarà","fosse"],
+   en:"I think Ludovica is the person who loves physical contact.", x:"<b>credo che / penso che</b> + congiuntivo: <i>sia</i>. (The show uses penso che 48 times!)"},
+  {c:"Congiuntivo", s:true, q:"E spero che ___ così ancora.", o:["sia","è","sarà","siano"],
+   en:"And I hope it stays like this.", x:"<b>spero che</b> + congiuntivo."},
+  {c:"Congiuntivo", s:true, q:"Karen è arrivata come un fulmine e spero che ___ rimanere a lungo.", o:["possa","può","potrà","puoi"],
+   en:"Karen arrived like a bolt of lightning and I hope she can stay a long time.", x:"potere → congiuntivo <b>possa</b> (io, tu, lui/lei)."},
+  {c:"Congiuntivo", s:true, q:"Mi sono sentita a casa e voglio che tu ___ a casa.", o:["sia","sei","essere","stai"],
+   en:"I felt at home and I want you to be at home.", x:"<b>voglio che tu</b> + congiuntivo. Different subjects → <i>che</i> + congiuntivo."},
+  {c:"Congiuntivo", s:true, q:"Io l'ho scelta, e penso che anche lei mi ___ scelto.", o:["abbia","ha","avrà","avesse"],
+   en:"I chose her, and I think she chose me too.", x:"Congiuntivo passato: <b>abbia</b> + participle."},
+  {c:"Congiuntivo", s:true, q:"Penso che non ci ___ persona migliore che possa capirti.", o:["sia","è","c'è","fosse"],
+   en:"I think there's no better person who can understand you.", x:"<b>c'è → ci sia</b> after penso che."},
+  {c:"Congiuntivo", q:"Ho paura che tu ___ già scelto un altro.", o:["abbia","hai","avrai","ha"],
+   en:"I'm afraid you've already chosen someone else.", x:"<b>ho paura che</b> + congiuntivo."},
+  {c:"Congiuntivo", q:"Ho bisogno ___ tu mi aiuti.", o:["che","di che","di","que"],
+   en:"I need you to help me.", x:"<b>ho bisogno che</b> + congiuntivo — no <i>di</i> before <i>che</i>."},
+  {c:"Congiuntivo", q:"Ho bisogno che tu mi ___. (salvare)", o:["salvi","salva","salvare","salvassi"],
+   en:"I need you to save me.", x:"Verbs in <b>-are</b> → congiuntivo ends in <b>-i</b>: <i>che tu salvi, parli, trovi</i>."},
+  {c:"Congiuntivo", q:"È importante che tu ___ italiano ogni giorno. (parlare)", o:["parli","parla","parlerai","parlare"],
+   en:"It's important that you speak Italian every day.", x:"-are verb → <b>-i</b>: <i>che tu parli</i>."},
+  {c:"Congiuntivo", q:"Spero che Vale ___ il ristorante. (trovare)", o:["trovi","trova","troverà","trovare"],
+   en:"I hope Vale finds the restaurant.", x:"-are verb → <b>-i</b> for io, tu, lui/lei: <i>che lei trovi</i>."},
+
+  // ---- Altri errori ----
+  {c:"Altro", s:true, q:"Non sto capendo ___ è il problema.", o:["qual","quale","qual'","cual"],
+   en:"I don't understand what the problem is.", x:"<b>qual è</b> — no apostrophe, and never leave out <i>è</i> (<i>Quale la differenza?</i> ✗ → <i>Qual è la differenza?</i>)."},
+  {c:"Altro", q:"___ è la differenza tra ci e ne?", o:["Qual","Quale","Qual'","Cosa"],
+   en:"What's the difference between ci and ne?", x:"<b>Qual è…?</b> = What is…? (when choosing / identifying)."},
+  {c:"Altro", q:"— ___ dici così? — Perché è giusto.", o:["Perché","Come","Cosa","Por qué"],
+   en:"— Why do you say that? — Because it's right.", x:"Why = <b>perché</b> (also \"because\"). <i>Come</i> = how."},
+  {c:"Altro", s:true, q:"Rimettere in discussione ___ le loro scelte.", o:["tutte","tutti","tutto","tutta"],
+   en:"To call all their choices into question again.", x:"<i>Scelte</i> is feminine plural → <b>tutte le</b>. Same with <i>tutte le correzioni</i>."},
+  {c:"Altro", q:"Ti ricordi quella frase? Sì, me ___ ricordo.", o:["la","lo","le","ne"],
+   en:"Do you remember that sentence? Yes, I remember it.", x:"<i>La frase</i> is feminine → <b>me la ricordo</b>."},
+  {c:"Altro", q:"Queste parole ___ conosco già.", o:["le","me le","li","ne"],
+   en:"I already know these words.", x:"<b>le conosco</b> — conoscere isn't reflexive, so no <i>me</i>."},
+  {c:"Altro", q:"Mi sono ___ dell'errore solo dopo. (accorgersi)", o:["accorto","accorgiuto","accorso","accorgito"],
+   en:"I only noticed the mistake afterwards.", x:"accorgersi → participle <b>accorto</b>, with essere: <i>mi sono accorto/a</i>."}
+];
+
+const CATS = ["Tutti","Preposizioni","Spagnolo","Apostrofo","Tempo","Congiuntivo","Altro"];
+const CAT_LABEL = {Preposizioni:"Preposizioni", Spagnolo:"Spagnolo → italiano", Apostrofo:"Apostrofo", Tempo:"Metterci / volerci", Congiuntivo:"Congiuntivo", Altro:"Altri errori"};
+let cat = "Tutti", order = [], pos = 0, answered = false, right = 0, done = 0, wrong = new Set(), shownOpts = [];
+const $ = id => document.getElementById(id);
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fullOf = it => it.full || it.q.replace("___", it.o[0]).replace(/ \(([a-z]+)\)$/, "").replace(/'\s/, "'");
+
+function start(list) {
+  order = shuffle(list.slice()); pos = 0; right = 0; done = 0; render();
+}
+function build() {
+  start(Q.map((_, i) => i).filter(i => cat === "Tutti" || Q[i].c === cat));
+}
+function render() {
+  answered = false;
+  $("fb").classList.remove("show");
+  if (pos >= order.length) return finish();
+  const it = Q[order[pos]];
+  $("cat").textContent = CAT_LABEL[it.c];
+  $("src").textContent = it.s ? "📺 dal programma" : "";
+  $("q").innerHTML = it.q.replace("___", '<span class="blank">&nbsp;</span>');
+  shownOpts = shuffle(it.o.slice());
+  $("opts").innerHTML = "";
+  shownOpts.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "opt"; b.textContent = o;
+    b.onclick = () => answer(o, b);
+    $("opts").appendChild(b);
+  });
+  $("count").textContent = (pos + 1) + " / " + order.length + "  ·  giuste: " + right + "/" + done;
+  $("next").textContent = "Avanti →";
+}
+function answer(o, btn) {
+  if (answered) return;
+  answered = true; done++;
+  const it = Q[order[pos]], ok = o === it.o[0];
+  [...$("opts").children].forEach(b => { b.disabled = true; if (b.textContent === it.o[0]) b.classList.add("ok"); });
+  if (ok) { right++; wrong.delete(order[pos]); } else { btn.classList.add("bad"); wrong.add(order[pos]); }
+  $("verdict").textContent = ok ? "Giusto! Ora ripetila ad alta voce." : "Non proprio — la forma giusta è \"" + it.o[0].trim() + "\".";
+  $("verdict").className = "verdict " + (ok ? "ok" : "bad");
+  $("full").textContent = fullOf(it);
+  $("en").textContent = it.en;
+  $("why").innerHTML = it.x;
+  $("fb").classList.add("show");
+  $("count").textContent = (pos + 1) + " / " + order.length + "  ·  giuste: " + right + "/" + done;
+  speak();
+}
+function finish() {
+  $("cat").textContent = ""; $("src").textContent = "";
+  const pct = done ? Math.round(100 * right / done) : 0;
+  $("q").innerHTML = '<div class="done"><div>Finito!</div><div class="big">' + right + " / " + done + '</div><div>' +
+    (pct >= 90 ? "Bravissimo!" : pct >= 70 ? "Molto bene — ripassa gli sbagliati." : "Ripassa gli sbagliati e riprova.") + "</div></div>";
+  $("opts").innerHTML = "";
+  $("count").textContent = wrong.size ? "Da ripassare: " + wrong.size : "Nessun errore da ripassare.";
+  $("next").textContent = "Ricomincia";
+}
+
+let itVoice = null;
+function pickVoice() {
+  if (!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices().filter(v => /^it[-_]/i.test(v.lang));
+  itVoice = vs.find(v => /enhanced|premium/i.test(v.name)) || vs[0] || null;
+}
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak() {
+  if (!("speechSynthesis" in window) || pos >= order.length) return;
+  const it = Q[order[pos]];
+  const text = answered ? fullOf(it) : it.q.replace("___", "…");
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/[—]/g, ""));
+  u.lang = "it-IT"; if (itVoice) u.voice = itVoice; u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+CATS.forEach(c => {
+  const b = document.createElement("button");
+  b.className = "chip" + (c === cat ? " on" : "");
+  b.textContent = c === "Tutti" ? "Tutti" : CAT_LABEL[c];
+  b.onclick = () => { cat = c; document.querySelectorAll(".chip").forEach(x => x.classList.toggle("on", x === b)); build(); };
+  $("chips").appendChild(b);
+});
+$("next").onclick = () => { if (pos >= order.length) { build(); return; } pos++; render(); };
+$("speak").onclick = speak;
+$("retry").onclick = () => { if (!wrong.size) { $("count").textContent = "Nessun errore da ripassare. 👏"; return; } start([...wrong]); };
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === "ArrowRight") $("next").click();
+  if (!answered && /^[1-4]$/.test(e.key)) { const b = $("opts").children[+e.key - 1]; if (b) b.click(); }
+});
+build();
+</script>
+</body>
+</html>

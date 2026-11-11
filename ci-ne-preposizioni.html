@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preposizioni, ci e ne</title>
+<style>
+  :root {
+    --bg: #f6f3ee; --card: #ffffff; --ink: #1f2328; --muted: #6b6f76;
+    --accent: #b8432f; --lit: #2f6db8; --line: #e3ded6; --warn: #9a6a00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181a; --card: #222427; --ink: #ececec; --muted: #9aa0a6;
+            --accent: #e0735f; --lit: #6ea3e6; --line: #33363a; --warn: #e2b04a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; text-align: center; }
+  .sub { color: var(--muted); margin: 0 0 14px; font-size: .95rem; text-align: center; max-width: 440px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; max-width: 460px; }
+  .chip { font-size: .85rem; padding: 6px 12px; border-radius: 999px; }
+  .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .scene { width: 100%; max-width: 440px; height: 320px; perspective: 1000px; cursor: pointer; }
+  .card { position: relative; width: 100%; height: 100%; transition: transform .5s; transform-style: preserve-3d; }
+  .card.flipped { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+          background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          padding: 24px; text-align: center; box-shadow: 0 4px 18px rgba(0,0,0,.06); overflow: auto; }
+  .back { transform: rotateY(180deg); }
+  .tag { position: absolute; top: 12px; font-size: .75rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+  .tag.vulg { color: var(--warn); }
+  .expr { font-size: 1.6rem; font-weight: 600; line-height: 1.3; }
+  .hint { position: absolute; bottom: 12px; font-size: .8rem; color: var(--muted); }
+  .meaning { font-size: 1.35rem; font-weight: 700; color: var(--accent); line-height: 1.3; }
+  .literal { margin-top: 8px; font-size: .95rem; color: var(--lit); }
+  .ex { margin-top: 14px; font-size: 1.02rem; line-height: 1.5; font-style: italic; }
+  .exen { margin-top: 4px; font-size: .9rem; color: var(--muted); }
+  .note { margin-top: 10px; font-size: .85rem; color: var(--muted); }
+  .controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  button { font: inherit; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line);
+           background: var(--card); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  .count { margin-top: 14px; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+  <h1>Preposizioni, ci e ne: Love is Blind</h1>
+  <p class="sub">Le frasi più frequenti nel programma. 📺 = frase del programma. Tocca la carta per girarla.</p>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="scene" id="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="tag" id="tagF"></div>
+        <div class="expr" id="expr"></div>
+        <div class="hint" id="hint">cosa vuol dire?</div>
+      </div>
+      <div class="face back">
+        <div class="tag" id="tagB"></div>
+        <div class="meaning" id="meaning"></div>
+        <div class="literal" id="literal"></div>
+        <div class="ex" id="ex"></div>
+        <div class="exen" id="exen"></div>
+        <div class="note" id="note"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prev">← Indietro</button>
+    <button id="flip">Gira</button>
+    <button id="next">Avanti →</button>
+    <button id="shuffle">Mescola</button>
+    <button id="speak">🔊 Ascolta</button>
+    <button id="dir">IT → EN</button>
+  </div>
+  <div class="count" id="count"></div>
+
+<script>
+// [category, phrase, meaning, how it works, example (it), example (en), note]   📺 = line from the show
+const cards = [
+  ["Preposizioni", "per me", "for me / in my opinion", "per + pronoun",
+   "📺 Per me è stato tanto pesante da accettare.", "For me it was really hard to accept.", "The show's #1 phrase with a preposition (132 times). Per me… = the way I see it…"],
+  ["Preposizioni", "a me", "to me / as for me", "a + pronoun (stressed)",
+   "A me piace stare con te.", "I like being with you.", "Puts the stress on \"me\": a me piace = mi piace, but emphatic."],
+  ["Preposizioni", "alla fine", "in the end / at the end", "a + la",
+   "Alla fine ho scelto te.", "In the end I chose you.", "47 times on the show."],
+  ["Preposizioni", "a tutti", "to everyone", "a + tutti",
+   "📺 Ciao a tutti!", "Hi everyone!", ""],
+  ["Preposizioni", "a casa / in casa", "home, at home / inside the house", "a casa = (at) home · in casa = indoors",
+   "📺 Mi ha fatto sentire a casa.", "He made me feel at home.", "Torno a casa (I'm going home) · siamo in casa (we're indoors)."],
+  ["Preposizioni", "di più", "more", "di + più",
+   "Voglio conoscerti di più.", "I want to get to know you more.", ""],
+  ["Preposizioni", "del genere", "like that / of that kind", "di + il genere",
+   "📺 È tutto un bel casino del genere.", "It's that kind of big mess.", "Una cosa del genere = something like that."],
+  ["Preposizioni", "nella vita", "in life", "in + la",
+   "📺 Nella mia vita ho sempre preso scelte di pancia.", "In my life I've always made gut decisions.", ""],
+  ["Preposizioni", "nel senso (che)", "I mean… / in the sense that", "in + il senso",
+   "📺 Ho paura… nel senso, la persona che ti corteggia…", "I'm scared… I mean, the person who courts you…", "A filler, like \"I mean\"."],
+  ["Preposizioni", "in realtà", "actually / in reality", "in + noun, no article",
+   "📺 No, in realtà no, zero.", "No, actually no, not at all.", ""],
+  ["Preposizioni", "essere in grado di", "to be able to", "in grado + di + infinitive",
+   "Non sono in grado di mentire.", "I'm not able to lie.", ""],
+  ["Preposizioni", "con te / con me", "with you / with me", "con + pronoun",
+   "📺 Mi piace stare con te.", "I like being with you.", ""],
+  ["Preposizioni", "con cui", "with whom / with which", "con + cui (after a preposition, che → cui)",
+   "La persona con cui voglio stare sei tu.", "The person I want to be with is you.", "In cui (in which) is just as common: il giorno in cui…"],
+  ["Preposizioni", "dall'altra parte", "on the other side", "da + l'altra",
+   "📺 Dall'altra parte ci sei te.", "You're on the other side.", "The wall between the capsules."],
+  ["Preposizioni", "da solo / da sola", "alone, by myself", "da + solo",
+   "📺 Non sarei da sola, grazie a Dio.", "I wouldn't be alone, thank God.", ""],
+  ["Preposizioni", "da me / da te", "at my place / at your place", "da + person = at someone's place",
+   "Stasera ceniamo da me?", "Shall we have dinner at my place tonight?", "Vado da Luca = I'm going to Luca's."],
+  ["Preposizioni", "sul fatto che", "about the fact that", "su + il fatto",
+   "📺 Sul fatto che ci possiamo vedere poche volte…", "About the fact that we can only see each other a few times…", ""],
+  ["Preposizioni", "sul serio", "seriously / for real", "su + il serio",
+   "Dici sul serio?", "Are you serious?", ""],
+  ["Preposizioni", "tra di noi", "between us", "tra + di + pronoun",
+   "Tra di noi c'è una chimica pazzesca.", "There's amazing chemistry between us.", "Tra noi also works; tra di noi is a bit more emphatic."],
+  ["Preposizioni", "tra poco", "soon, in a little while", "tra / fra + time = in (future)",
+   "Tra poco ci incontriamo.", "We'll meet in a little while.", "Fra un anno = in a year's time."],
+  ["Preposizioni", "per sempre", "forever", "per + sempre",
+   "📺 Ci tengo tantissimo a che duri per sempre.", "I really want it to last forever.", ""],
+
+  ["Ci", "c'è / ci sono", "there is / there are", "esserci",
+   "📺 C'è una chimica pazzesca tra me e lui.", "There's amazing chemistry between him and me.", "By far the most common use of ci on the show."],
+  ["Ci", "c'era / ci sarà", "there was / there will be", "esserci in other tenses",
+   "📺 Ci sarà sempre una parete a dividervi.", "There will always be a wall between you.", ""],
+  ["Ci", "ci siamo conosciuti", "we met (each other)", "ci = each other (reciprocal noi) · essere",
+   "Ci siamo conosciuti al buio.", "We met in the dark.", "The participle agrees: ci siamo conosciute (two women)."],
+  ["Ci", "ci vediamo (presto)", "see you (soon)", "ci = each other",
+   "📺 Ciao ciao, ci vediamo domani.", "Bye bye, see you tomorrow.", ""],
+  ["Ci", "ci stiamo sentendo", "we're in touch / we're talking", "ci = each other + stare + gerund",
+   "📺 Ci stiamo sentendo, ma non troppo.", "We're in touch, but not that much.", "Sentirsi = to talk on the phone / stay in touch."],
+  ["Ci", "ci siamo!", "here we are! / this is it!", "esserci with noi",
+   "📺 Ci siamo, ci siamo!", "This is it, this is it!", ""],
+  ["Ci", "c'ho / c'hai / c'ha", "I've got / you've got / he's got", "colloquial ci + avere (spoken only)",
+   "📺 Che occhi c'ha!", "What eyes he's got!", "Just means ho / hai / ha. Don't write it."],
+  ["Ci", "i valori che ci uniscono", "the values that unite us", "ci = us",
+   "📺 Ricordati i valori che ci uniscono.", "Remember the values that unite us.", "Ci ha detto = he told us."],
+  ["Ci", "ce l'ho", "I've got it", "ci + lo + avere",
+   "📺 Ce l'ho anch'io.", "I've got one too.", "Ce l'ho con te = I'm mad at you."],
+  ["Ci", "ci tengo (a te)", "I care (about you)", "tenerci a",
+   "📺 Ci tengo a te, non ti voglio perdere.", "I care about you, I don't want to lose you.", ""],
+  ["Ci", "ci sta", "that's fair / that makes sense", "starci",
+   "📺 Però ci sta, perché adesso c'è l'ombra.", "But that makes sense, it's in the shade now.", "Ci stai? = Are you in?"],
+  ["Ci", "non ci sto capendo niente", "I can't make sense of any of this", "ci = about this",
+   "📺 Io non ci sto capendo più niente.", "I can't make sense of anything anymore.", ""],
+  ["Ci", "ci credo", "I believe in it", "crederci",
+   "📺 Io ci credo tanto al matrimonio.", "I really believe in marriage.", "Non ci credo! = I can't believe it!"],
+  ["Ci", "ci si può lavorare", "we can work on it / it can be worked on", "ci si = impersonal \"one\"",
+   "📺 È una cosa sormontabile, ci si può lavorare.", "It's something we can get past, we can work on it.", ""],
+  ["Ci", "non ce la faccio", "I can't take it / I can't do it", "farcela",
+   "📺 Non ce la faccio, pensaci tu.", "I can't do it, you handle it.", "Ce l'ho fatta! = I made it!"],
+  ["Ci", "ci penso (io) / pensaci tu", "I'll think about it / you deal with it", "pensarci",
+   "📺 Pensaci tu.", "You take care of it.", "Ci penso io = leave it to me."],
+  ["Ci", "ci vuole tempo", "it takes time", "volerci (only 3rd person)",
+   "📺 Ci vuole tempo per capire.", "It takes time to understand.", "Plural: ci vogliono due ore."],
+  ["Ci", "c'arrivo", "I get it / I can manage it", "arrivarci",
+   "📺 Dove non c'arrivo io, c'arrivi tu.", "Where I fall short, you step in.", "Ci sei arrivato? = Did you figure it out?"],
+  ["Ci", "che c'entra?", "what does that have to do with it?", "entrarci",
+   "📺 Che c'entra? Che c'entra?", "What does that have to do with anything?", "Io non c'entro = it's nothing to do with me."],
+  ["Ci", "ci rifletterò", "I'll think it over", "rifletterci",
+   "📺 Stanotte ci rifletterò tanto.", "I'll think it over a lot tonight.", ""],
+  ["Ci", "ci sa fare", "he/she is smooth, good with people", "saperci fare",
+   "📺 La persona che ti corteggia, che ci sa fare…", "The person who courts you, who's smooth…", ""],
+  ["Ci", "ci mancava!", "that's all we needed!", "mancarci",
+   "Piove pure? Ci mancava!", "It's raining too? That's all we needed!", "Ironic. Also: ci mancherebbe! = of course! / don't mention it."],
+  ["Ci", "ci vado coi piedi di piombo", "I'm going into it very carefully", "ci = there / into it",
+   "📺 Ci vado coi piedi di piombo.", "I'm taking it very slowly.", "Lit. \"with feet of lead\"."],
+  ["Ci", "c'ho creduto", "I believed in it", "ci + compound tense (crederci)",
+   "📺 C'ho creduto tante volte di aver trovato l'amore.", "So many times I believed I'd found love.", ""],
+  ["Ci", "ci hai pensato?", "have you thought about it?", "ci + compound tense (pensarci)",
+   "📺 Ci hai pensato a come mi immagini?", "Have you thought about how you picture me?", ""],
+
+  ["Ne", "che ne pensi?", "what do you think (of it)?", "ne = of it / about it",
+   "Che ne pensi di lui?", "What do you think of him?", "Che ne pensate? (plural) · non so che pensarne."],
+  ["Ne", "ne sai qualcosa?", "do you know anything about it?", "ne = about it",
+   "Ne sai qualcosa?", "Do you know anything about it?", "Non ne so niente = I know nothing about it."],
+  ["Ne", "te ne parlo", "I'm telling you about it", "ne = about it · te ne = ti + ne",
+   "📺 Te ne parlo proprio con il cuore in mano.", "I'm telling you this straight from the heart.", "Ne parliamo dopo = let's talk about it later."],
+  ["Ne", "ne ho / non ne ho", "I have some / I don't have any", "ne = some of it (quantity)",
+   "Vuoi un caffè? — No grazie, ne ho già preso uno.", "Want a coffee? — No thanks, I've already had one.", "Ne ho due = I have two (of them)."],
+  ["Ne", "ce ne sono un sacco", "there are loads (of them)", "ci + ne + essere",
+   "📺 Guarda, ce ne sono un sacco.", "Look, there are loads of them.", "C'è → ce n'è (there's some)."],
+  ["Ne", "me ne prendo uno", "I'll take one (of them)", "me ne = mi + ne",
+   "Me ne prendo uno anch'io.", "I'll take one too.", ""],
+  ["Ne", "me ne vado", "I'm leaving / I'm out of here", "andarsene",
+   "📺 No, sto qua, non me ne vado.", "No, I'm staying here, I'm not leaving.", "Te ne vai? · se n'è andato · ce ne andiamo."],
+  ["Ne", "ce ne andiamo", "we're leaving", "andarsene (noi)",
+   "Dai, ce ne andiamo.", "Come on, let's go.", ""],
+  ["Ne", "non me ne frega (niente)", "I don't care (at all)", "fregarsene (slangy)",
+   "📺 Non me ne frega.", "I don't care.", "Se ne frega = he doesn't care. Casual, not for formal settings."],
+  ["Ne", "ne vale la pena", "it's worth it", "valerne la pena",
+   "📺 Lì poi ne è valsa la pena.", "In the end it was worth it.", ""],
+  ["Ne", "non ne posso più", "I can't take it anymore", "poterne",
+   "Non ne posso più di questa attesa.", "I can't stand this waiting anymore.", ""],
+  ["Ne", "farne a meno", "to do without (it)", "farne",
+   "Non posso farne a meno.", "I can't do without it.", ""],
+  ["Ne", "se ne intende", "he/she knows a lot about it", "intendersene",
+   "📺 Meno male che c'è un mio amico che se ne intende.", "Luckily I have a friend who knows about this stuff.", ""],
+  ["Ne", "me ne accorgo", "I notice (it)", "accorgersene",
+   "📺 Se tu non me lo dici, io non me ne accorgo.", "If you don't tell me, I won't notice.", "Me ne sono accorto/a = I noticed."],
+  ["Ne", "né… né", "neither… nor", "NOT the pronoun ne — note the accent",
+   "Non è né carne né pesce.", "It's neither fish nor fowl.", "Don't confuse né (neither) with ne (of it)."]
+];
+
+const CATS = ["Tutte", "Preposizioni", "Ci", "Ne"];
+let cat = "Tutte", order = [], pos = 0, enFirst = false;
+const $ = id => document.getElementById(id);
+
+function build() {
+  order = cards.map((_, i) => i).filter(i => cat === "Tutte" || cards[i][0] === cat);
+  pos = 0; render();
+}
+function render() {
+  const [c, expr, meaning, literal, ex, exen, note] = cards[order[pos]];
+  $("card").classList.remove("flipped");
+  $("tagF").textContent = $("tagB").textContent = c;
+  $("tagF").className = $("tagB").className = "tag" + "";
+  if (enFirst) {
+    $("expr").textContent = meaning;
+    $("hint").textContent = "come si dice in italiano?";
+    $("meaning").textContent = expr;
+  } else {
+    $("expr").textContent = expr;
+    $("hint").textContent = "cosa vuol dire?";
+    $("meaning").textContent = meaning;
+  }
+  $("literal").textContent = literal;
+  $("ex").textContent = ex;
+  $("exen").textContent = exen;
+  $("note").textContent = note || "";
+  $("count").textContent = (pos + 1) + " / " + order.length;
+}
+
+CATS.forEach(c => {
+  const b = document.createElement("button");
+  b.className = "chip" + (c === cat ? " on" : "");
+  b.textContent = c;
+  b.onclick = () => {
+    cat = c;
+    document.querySelectorAll(".chip").forEach(x => x.classList.toggle("on", x === b));
+    build();
+  };
+  $("chips").appendChild(b);
+});
+
+let itVoice = null;
+function pickVoice() {
+  if (!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices().filter(v => /^it[-_]/i.test(v.lang));
+  itVoice = vs.find(v => /enhanced|premium/i.test(v.name)) || vs[0] || null;
+}
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(e) {
+  if (e) e.stopPropagation();
+  if (!("speechSynthesis" in window)) return;
+  const [, expr, , , ex0] = cards[order[pos]]; const ex = ex0.replace("📺 ", "");
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(expr.replace(/[(/…)!?]/g, " ") + ". " + ex.replace(/[—]/g, ""));
+  u.lang = "it-IT"; if (itVoice) u.voice = itVoice; u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+$("scene").onclick = () => $("card").classList.toggle("flipped");
+$("flip").onclick = () => $("card").classList.toggle("flipped");
+$("next").onclick = () => { pos = (pos + 1) % order.length; render(); };
+$("prev").onclick = () => { pos = (pos - 1 + order.length) % order.length; render(); };
+$("shuffle").onclick = () => {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  pos = 0; render();
+};
+$("speak").onclick = speak;
+$("dir").onclick = () => { enFirst = !enFirst; $("dir").textContent = enFirst ? "EN → IT" : "IT → EN"; render(); };
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") $("next").click();
+  if (e.key === "ArrowLeft") $("prev").click();
+  if (e.key === " ") { e.preventDefault(); $("flip").click(); }
+});
+build();
+</script>
+</body>
+</html>
