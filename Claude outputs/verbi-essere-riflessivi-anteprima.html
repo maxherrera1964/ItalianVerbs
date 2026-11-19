@@ -195,22 +195,22 @@ const GROUPS = [
   subs:[
    {t:"Andare e venire", e:"go and come", g:"lr", v:[
      ["andare","andato","to go",1],["venire","venuto","to come",1],
-     ["provenire","provenuto","to come from",1],["pervenire","pervenuto","to arrive / to reach",0]]},
+     ["provenire","provenuto","to come from",1],["pervenire","pervenuto","to arrive / to reach",1]]},
    {t:"Arrivare e partire", e:"arrive and leave", g:"arr", v:[
      ["arrivare","arrivato","to arrive",1],["giungere","giunto","to arrive / to reach",1],
-     ["sopraggiungere","sopraggiunto","to turn up",0],["partire","partito","to leave / to depart",1],
+     ["sopraggiungere","sopraggiunto","to turn up",1],["partire","partito","to leave / to depart",1],
      ["ripartire","ripartito","to leave again",1],
      ["atterrare","atterrato","to land",1,"<i>ho atterrato</i> is also accepted"],
      ["sbarcare","sbarcato","to get off (a boat)",1,"<i>hanno sbarcato le merci</i> = unloaded the goods"]]},
    {t:"Entrare e uscire", e:"in and out", g:"box", v:[
      ["entrare","entrato","to enter / to go in",1],["rientrare","rientrato","to come back in / home",1],
      ["uscire","uscito","to go out",1],["emergere","emerso","to emerge / to come out",1],
-     ["riemergere","riemerso","to resurface",0]]},
+     ["riemergere","riemerso","to resurface",1]]},
    {t:"Salire e scendere", e:"up and down", g:"ud", v:[
      ["salire","salito","to go up / to get on",1,"<i>ho salito le scale</i> (with an object)"],
      ["risalire","risalito","to go back up / to date back",1,"<i>ho risalito il fiume</i> (with an object)"],
      ["scendere","sceso","to go down / to get off",1,"<i>ho sceso le scale</i> (with an object)"],
-     ["ascendere","asceso","to ascend",0],["discendere","disceso","to descend",0],
+     ["ascendere","asceso","to ascend",1],["discendere","disceso","to descend",1],
      ["cadere","caduto","to fall",1],
      ["precipitare","precipitato","to fall / to crash",1,"<i>non precipitiamo le cose</i> = let's not rush things"],
      ["affondare","affondato","to sink",1,"<i>hanno affondato la nave</i> = sank the ship"]]},
@@ -233,15 +233,15 @@ const GROUPS = [
   icon:"cam",
   subs:[
    {t:"Diventare", e:"becoming", g:"ab", v:[
-     ["diventare","diventato","to become",1],["divenire","divenuto","to become (formal)",0]]},
+     ["diventare","diventato","to become",1],["divenire","divenuto","to become (formal)",1]]},
    {t:"Vita e morte", e:"life and death", g:"life", v:[
-     ["nascere","nato","to be born",1],["rinascere","rinato","to be reborn",0],
+     ["nascere","nato","to be born",1],["rinascere","rinato","to be reborn",1],
      ["morire","morto","to die",1],["svenire","svenuto","to faint",1],
      ["annegare","annegato","to drown",1,"<i>annegare i dispiaceri</i> = to drown your sorrows"],
      ["affogare","affogato","to drown / to be swamped",1]]},
    {t:"Il corpo e l'età", e:"growing, weight, age", g:"size", v:[
      ["crescere","cresciuto","to grow / to grow up",1,"<i>ha cresciuto due figli</i> = raised two kids"],
-     ["decrescere","decresciuto","to decrease",0],
+     ["decrescere","decresciuto","to decrease",1],
      ["ingrassare","ingrassato","to put on weight",1],["dimagrire","dimagrito","to lose weight",1],
      ["invecchiare","invecchiato","to age / to get old",1,"<i>quel taglio ti ha invecchiato</i> = made you look older"],
      ["ringiovanire","ringiovanito","to look younger",1,"<i>la vacanza ti ha ringiovanito</i> = made you look younger"]]},
@@ -260,7 +260,7 @@ const GROUPS = [
      ["apparire","apparso","to appear",1],["comparire","comparso","to appear / to show up",1],
      ["sparire","sparito","to disappear",1],["scomparire","scomparso","to disappear / to pass away",1]]},
    {t:"Scadere", e:"running out", g:"clock", v:[
-     ["scadere","scaduto","to expire",1],["decadere","decaduto","to decline / to lapse",0]]},
+     ["scadere","scaduto","to expire",1],["decadere","decaduto","to decline / to lapse",1]]},
   ]},
  {id:"alt", title:"Altri verbi con essere", en:"Neither motion nor change",
   why:"Being and staying, things that happen, seeming, the \"flipped\" piacere-type verbs, cost and duration, belonging, weather. In all of them the subject isn't doing anything to anything.",
@@ -269,12 +269,12 @@ const GROUPS = [
    {t:"Essere e restare", e:"being and staying", g:"stay", v:[
      ["essere","stato","to be",1],["stare","stato","to stay / to be",1],
      ["restare","restato","to stay / to remain",1],["rimanere","rimasto","to stay / to remain",1],
-     ["esistere","esistito","to exist",1],["sussistere","sussistito","to exist / to hold true",0],
+     ["esistere","esistito","to exist",1],["sussistere","sussistito","to exist / to hold true",1],
      ["sopravvivere","sopravvissuto","to survive",1]]},
    {t:"Succedere", e:"things that happen", g:"spark", v:[
      ["succedere","successo","to happen",1,null,1],["capitare","capitato","to happen / to come up",1,null,1],
-     ["accadere","accaduto","to happen",1,null,1],["avvenire","avvenuto","to happen",0,null,1],
-     ["sopravvenire","sopravvenuto","to arise",0,null,1]]},
+     ["accadere","accaduto","to happen",1,null,1],["avvenire","avvenuto","to happen",1,null,1],
+     ["sopravvenire","sopravvenuto","to arise",1,null,1]]},
    {t:"Sembrare", e:"seeming", g:"eye", v:[
      ["sembrare","sembrato","to seem",1],["parere","parso","to seem",1],
      ["risultare","risultato","to turn out",1]]},
@@ -282,21 +282,21 @@ const GROUPS = [
      ["piacere","piaciuto","to please (= to like)",1,null,1],["dispiacere","dispiaciuto","to be sorry",1,null,1],
      ["mancare","mancato","to be missing (= to miss)",1,"<i>ha mancato il bersaglio</i> = missed the target",1],
      ["bastare","bastato","to be enough",1,null,1],["occorrere","occorso","to be needed",1,null,1],
-     ["rincrescere","rincresciuto","to be sorry",0,null,1],
+     ["rincrescere","rincresciuto","to be sorry",1,null,1],
      ["convenire","convenuto","to be worth it / to gather",1,"<i>abbiamo convenuto</i> = we agreed",1]]},
    {t:"Costo, valore, durata", e:"cost, worth, duration", g:"coin", v:[
      ["costare","costato","to cost",1,null,1],["valere","valso","to be worth",1,null,1],
-     ["equivalere","equivalso","to be equivalent",0,null,1],["durare","durato","to last",1,null,1]]},
+     ["equivalere","equivalso","to be equivalent",1,null,1],["durare","durato","to last",1,null,1]]},
    {t:"Dipendere e appartenere", e:"relations", g:"link", v:[
      ["dipendere","dipeso","to depend",1,null,1],
      ["appartenere","appartenuto","to belong",1,"<i>ha appartenuto</i> is also accepted",1],
-     ["consistere","consistito","to consist",0,null,1]]},
+     ["consistere","consistito","to consist",1,null,1]]},
    {t:"Il tempo", e:"weather (impersonal)", g:"cloud", v:[
      ["piovere","piovuto","to rain",1,"<i>ha piovuto</i> is also correct",2],
      ["nevicare","nevicato","to snow",1,"<i>ha nevicato</i> is also correct",2]]},
    {t:"Riuscire e altri", e:"managing, stepping in", g:"check", v:[
      ["riuscire","riuscito","to manage / to succeed",1],["intervenire","intervenuto","to step in",1],
-     ["ricorrere","ricorso","to turn to / to resort to",0]]},
+     ["ricorrere","ricorso","to turn to / to resort to",1]]},
   ]},
   {"id": "rif", "title": "Riflessivi e pronominali", "en": "Always essere, whatever they mean", "why": "Every verb with <i>si</i> takes essere, even when its meaning has nothing to do with motion or change: <i>si è alzata · ci siamo divertiti · me ne sono andato</i>. The participle agrees with the subject — except in the <i>se la</i> idioms, where it agrees with <i>la</i>: <i>se l'è cavata</i>.", "icon": "rif", "subs": [{"t": "La giornata", "e": "daily routine", "g": "sunrise", "v": [["svegliarsi", "si è svegliato/a", "to wake up", 1, null, 3], ["alzarsi", "si è alzato/a", "to get up", 1, null, 3], ["lavarsi", "si è lavato/a", "to wash", 1, null, 3], ["vestirsi", "si è vestito/a", "to get dressed", 1, null, 3], ["allenarsi", "si è allenato/a", "to work out / to train", 1, null, 3], ["sedersi", "si è seduto/a", "to sit down", 1, null, 3], ["sdraiarsi", "si è sdraiato/a", "to lie down", 1, null, 3], ["riposarsi", "si è riposato/a", "to rest", 1, null, 3], ["rilassarsi", "si è rilassato/a", "to relax", 1, null, 3], ["addormentarsi", "si è addormentato/a", "to fall asleep", 1, null, 3]]}, {"t": "Muoversi", "e": "moving around", "g": "walk", "v": [["spostarsi", "si è spostato/a", "to move", 1, null, 3], ["avvicinarsi", "si è avvicinato/a", "to come closer / to approach", 1, null, 3], ["fermarsi", "si è fermato/a", "to stop", 1, null, 3], ["affrettarsi", "si è affrettato/a", "to hurry", 1, null, 3], ["sbrigarsi", "si è sbrigato/a", "to hurry up", 1, null, 3], ["trasferirsi", "si è trasferito/a", "to move", 1, null, 3], ["andarsene", "se n'è andato/a", "to leave", 1, null, 3], ["tornarsene", "se n'è tornato/a", "to head back", 1, null, 3]]}, {"t": "Le emozioni", "e": "feelings", "g": "heart", "v": [["arrabbiarsi", "si è arrabbiato/a", "to get angry", 1, null, 3], ["incazzarsi", "si è incazzato/a", "to get pissed off", 1, null, 3], ["annoiarsi", "si è annoiato/a", "to get bored", 1, null, 3], ["divertirsi", "si è divertito/a", "to have fun", 1, null, 3], ["emozionarsi", "si è emozionato/a", "to get emotional / to get excited", 1, null, 3], ["agitarsi", "si è agitato/a", "to get nervous / to get worked up", 1, null, 3], ["preoccuparsi", "si è preoccupato/a", "to worry", 1, null, 3], ["stressarsi", "si è stressato/a", "to get stressed", 1, null, 3], ["calmarsi", "si è calmato/a", "to calm down", 1, null, 3], ["tranquillizzarsi", "si è tranquillizzato/a", "to calm down / to stop worrying", 1, null, 3], ["innamorarsi", "si è innamorato/a", "to fall in love", 1, null, 3], ["vergognarsi", "si è vergognato/a", "to be ashamed / to be embarrassed", 1, null, 3], ["lamentarsi", "si è lamentato/a", "to complain", 1, null, 3], ["pentirsi", "si è pentito/a", "to regret / to repent", 1, null, 3]]}, {"t": "I cambiamenti", "e": "getting used to, getting sick, getting married", "g": "ab", "v": [["abituarsi", "si è abituato/a", "to get used to", 1, null, 3], ["adattarsi", "si è adattato/a", "to adapt / to adjust", 1, null, 3], ["ammalarsi", "si è ammalato/a", "to get sick", 1, null, 3], ["sposarsi", "si è sposato/a", "to get married", 1, null, 3]]}, {"t": "La mente e gli altri", "e": "thinking, noticing, dealing with people", "g": "brain", "v": [["ricordarsi", "si è ricordato/a", "to remember", 1, null, 3], ["accorgersi", "si è accorto/a", "to notice", 1, null, 3], ["rendersi conto", "si è reso/a conto", "to realize", 1, null, 3], ["sbagliarsi", "si è sbagliato/a", "to be wrong", 1, null, 3], ["fidarsi", "si è fidato/a", "to trust", 1, null, 3], ["chiamarsi", "si è chiamato/a", "to be called", 1, null, 3], ["sentirsi", "si è sentito/a", "to feel", 1, null, 3], ["trovarsi", "si è trovato/a", "to find oneself / to be somewhere", 1, null, 3], ["comportarsi", "si è comportato/a", "to behave", 1, null, 3], ["occuparsi", "si è occupato/a", "to take care of / to deal with", 1, null, 3], ["dedicarsi", "si è dedicato/a", "to devote oneself to", 1, null, 3], ["impegnarsi", "si è impegnato/a", "to commit oneself / to make an effort", 1, null, 3], ["attenersi", "si è attenuto/a", "to stick to / to abide by", 1, null, 3]]}, {"t": "Con ci", "e": "no si: essere because the base verb takes it (arrivare, cascare…) — volerci is the odd one: ci è voluto", "g": "ci", "v": [["arrivarci", "c'è arrivato/a", "to get it", 1, null, 3], ["cascarci", "c'è cascato/a", "to fall for it", 1, null, 3], ["entrarci", "c'è entrato/a", "to be involved", 1, null, 3], ["starci", "c'è stato/a", "to be up for it", 1, null, 3], ["volerci", "c'è voluto/a", "to take", 1, null, 3]]}, {"t": "Con se ne", "e": "idioms with se ne", "g": "sene", "v": [["approfittarsene", "se n'è approfittato/a", "to take advantage of it", 1, null, 3], ["farsene una ragione", "se n'è fatto/a una ragione", "to come to terms with it / to get over it", 1, null, 3], ["fregarsene", "se n'è fregato/a", "to not care", 1, null, 3], ["infischiarsene", "se n'è infischiato/a", "to not give a hoot", 1, null, 3], ["intendersene", "se n'è inteso/a", "to know a lot", 1, null, 3], ["starsene", "se n'è stato/a", "to stay", 1, null, 3], ["uscirsene", "se n'è uscito/a", "to come out", 1, null, 3]]}, {"t": "Con se la", "e": "idioms with se la — the participle agrees with la", "g": "sela", "v": [["bersela", "se l'è bevuta", "to fall for it / to swallow a story", 1, null, 3], ["cavarsela", "se l'è cavata", "to get by", 1, null, 3], ["cercarsela", "se l'è cercata", "to ask for it", 1, null, 3], ["filarsela", "se l'è filata", "to sneak off", 1, null, 3], ["godersela", "se l'è goduta", "to enjoy it", 1, null, 3], ["legarsela al dito", "se l'è legata al dito", "to hold a grudge", 1, null, 3], ["passarsela bene", "se l'è passata bene", "to be doing well", 1, null, 3], ["prendersela", "se l'è presa", "to get upset", 1, null, 3], ["sbrigarsela", "se l'è sbrigata", "to handle it", 1, null, 3], ["sentirsela", "se l'è sentita", "to feel up to it", 1, null, 3], ["spassarsela", "se l'è spassata", "to have a great time", 1, null, 3], ["squagliarsela", "se l'è squagliata", "to slip away", 1, null, 3], ["tirarsela", "se l'è tirata", "to show off", 1, null, 3], ["vedersela brutta", "se l'è vista brutta", "to have a close call", 1, null, 3]]}]},
 ];
@@ -378,6 +378,10 @@ document.querySelector(".sub").firstChild.textContent = `The ${total} verbs in y
 
 document.getElementById("avChips").innerHTML = AVERE_LOOKALIKES.map(([inf,f,en])=>
   `<span class="chip"><span class="row"><span class="inf">${inf}</span></span><span class="pp">${f}</span><span class="en">${esc(en)}</span></span>`).join("");
+if(!document.querySelector(".chip.fam")){                     // every verb is in the deck: no family switch needed
+  document.getElementById("showFam").closest("label").style.display="none";
+  document.querySelector(".sw.fam").parentElement.style.display="none";
+}
 root.addEventListener("click", e=>{ const c=e.target.closest(".chip"); if(c) c.classList.toggle("open"); });
 document.getElementById("showPP").addEventListener("change", e=>document.body.classList.toggle("nopp", !e.target.checked));
 document.getElementById("showFam").addEventListener("change", e=>document.body.classList.toggle("nofam", !e.target.checked));
