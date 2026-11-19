@@ -3657,7 +3657,7 @@ const META = {
   concedere: {g:"ere", reg:false, why:"Present and future are regular; the participle is irregular: concesso."},
   procedere: {g:"ere", reg:true},
   emergere: {g:"ere", reg:false, why:"Regular present/future, but an irregular participle emerso — and it takes essere: sono emerso/a."},
-  esistere: {g:"ere", reg:true, why:"Regular endings and participle (esistito), but it takes essere: è esistito."},
+  esistere: {g:"ere", reg:false, why:"Regular endings, but an -ere verb with an -ito participle (esistito, like insistere/resistere) — and it takes essere: è esistito."},
   commettere: {g:"ere", reg:false, why:"Same family as mettere: regular present/future, irregular participle commesso."},
   ammettere: {g:"ere", reg:false, why:"Same family as mettere: irregular participle ammesso."},
   permettere: {g:"ere", reg:false, why:"Same family as mettere: irregular participle permesso."},
@@ -3676,7 +3676,7 @@ const META = {
   trattenere: {g:"ere", reg:false, why:"Like tenere: stressed stem tratteng-/trattien-, assimilated future tratten+r → tratterr-, participle trattenuto."},
   sostenere: {g:"ere", reg:false, why:"Like tenere: stressed stem sosteng-/sostien-, assimilated future sosten+r → sosterr-. Also means to claim / to argue (in court)."},
   contraddire: {g:"ire", reg:false, why:"Like dire: dic- stem (contraddico, contraddiciamo) but voi contraddite; participle contraddetto."},
-  conoscere: {g:"ere", reg:true, why:"Regular endings — the -sc- is only spelling. Conoscere = to know a person or place (be acquainted with); sapere = to know a fact."},
+  conoscere: {g:"ere", reg:false, why:"Regular present and future — the -sc- is only spelling (conosco, conosci). The passato remoto is irregular: conobbi, conobbe, conobbero. Conoscere = to know a person or place (be acquainted with); sapere = to know a fact."},
   risalire: {g:"ire", reg:false, why:"Like salire: stressed stem risalg- (risalgo, risalgono; noi/voi stay regular). 'Risalire a' = to date back to; takes essere."},
   appartenere: {g:"ere", reg:false, why:"Like tenere: stressed stem apparteng-/appartien-, assimilated future apparten+r → apparterr-; usually takes essere."},
 
@@ -3746,7 +3746,7 @@ const META = {
   rimandare: {g:"are", reg:true},
   opporre: {g:"orre", reg:false, why:"Contracted -orre infinitive (from Latin opponere): stem oppon- (oppongo, opponi, oppone), future opporr-, participle opposto. Reflexive opporsi a = to object to."},
   temere: {g:"ere", reg:true},
-  esprimere: {g:"ere", reg:false, why:"Same family as premere/comprimere: regular present/future, irregular participle espresso."},
+  esprimere: {g:"ere", reg:false, why:"Same family as comprimere/imprimere/reprimere (not premere, which is fully regular): regular present/future, irregular participle espresso."},
   investire: {g:"ire", reg:true, why:"Plain -ire (no -isc-). Means to invest, and — as in this trial — to run someone over."},
   riprendere: {g:"ere", reg:false, why:"Same family as prendere: regular present/future, irregular participle ripreso. Reflexive riprendersi = to recover."},
   compiere: {g:"ere", reg:false, why:"Irregular participle compiuto (and a twin form compire). 'Compiere gli anni' = to have a birthday; 'compiere un gesto' = to carry out an act."},
@@ -9308,7 +9308,7 @@ function stressWord(w){
   function regPP(inf) {
     const stem = inf.slice(0, -3);
     if (inf.endsWith("are")) return stem + "ato";
-    if (inf.endsWith("ere")) return stem + "uto";
+    if (inf.endsWith("ere")) return stem + (/c$/.test(stem) ? "iuto" : "uto");   // -cere keeps the soft c: piaciuto, taciuto, giaciuto
     return stem + "ito";
   }
 
@@ -9327,9 +9327,44 @@ function stressWord(w){
     nascondere: "nascosto", fondere: "fuso", tendere: "teso", spegnere: "spento",
     porgere: "porto", accorgere: "accorto", assumere: "assunto", esprimere: "espresso",
     dividere: "diviso", ridere: "riso", persuadere: "persuaso", invadere: "invaso",
+    redigere: "redatto", cuocere: "cotto", nuocere: "nuociuto", giacere: "giaciuto",
+    godere: "goduto", esigere: "esatto", espellere: "espulso", ardere: "arso", mordere: "morso",
+    affiggere: "affisso", infiggere: "infisso", crocifiggere: "crocifisso", prefiggere: "prefisso", udire: "udito",
+    radere: "raso", ledere: "leso", rodere: "roso", scindere: "scisso", espandere: "espanso",
   };
   // suffix → participle-suffix (reliable, morphologically regular families)
   const PP_SUFFIX = [
+    // specific families first (the loop takes the first match, so longer suffixes go on top)
+    ["stringere", "stretto"],      // stringere, costringere, restringere
+    ["vendere", "venduto"],        // rivendere, svendere (regular, despite -endere below)
+    ["splendere", "splenduto"],    // risplendere (regular)
+    ["stridere", "striduto"],      // regular, despite -idere below
+    ["figgere", "fitto"],          // trafiggere, sconfiggere (affiggere, crocifiggere → -fisso: exact)
+    ["eggere", "etto"],            // leggere, eleggere, reggere, correggere, proteggere
+    ["iggere", "itto"],            // friggere, sconfiggere
+    ["uggere", "utto"],            // distruggere
+    ["ngere", "nto"],              // piangere, pungere, mungere, tingere, cingere, spingere, giungere
+    ["ergere", "erso"],            // emergere, immergere, aspergere
+    ["orgere", "orto"],            // accorgere, porgere, sorgere
+    ["olgere", "olto"],            // volgere, svolgere, coinvolgere
+    ["ogliere", "olto"],           // cogliere, togliere, sciogliere
+    ["egliere", "elto"],           // scegliere, prescegliere
+    ["rrere", "rso"],              // correre, concorrere, ricorrere, scorrere
+    ["sistere", "sistito"],        // assistere, consistere, persistere, sussistere
+    ["primere", "presso"],         // esprimere, imprimere, comprimere, reprimere, opprimere
+    ["cutere", "cusso"],           // discutere, escutere
+    ["cuotere", "cosso"],          // scuotere, percuotere
+    ["solvere", "solto"],          // risolvere, assolvere, dissolvere
+    ["sumere", "sunto"],           // assumere, presumere, riassumere
+    ["fondere", "fuso"],           // confondere, diffondere, infondere
+    ["spondere", "sposto"],        // rispondere, corrispondere
+    ["scondere", "scosto"],        // nascondere
+    ["ncere", "nto"],              // vincere, convincere
+    ["vadere", "vaso"],            // invadere, evadere, pervadere
+    ["suadere", "suaso"],          // persuadere, dissuadere
+    ["nettere", "nesso"],          // connettere, annettere
+    ["argere", "arso"],            // spargere, cospargere
+    ["orcere", "orto"],            // torcere, contorcere
     ["scrivere", "scritto"],       // scrivere→scritto, descrivere, iscrivere
     ["prendere", "preso"],         // prendere, riprendere, comprendere, sorprendere
     ["mettere", "messo"],          // mettere, permettere, promettere, smettere, ammettere
@@ -9340,7 +9375,6 @@ function stressWord(w){
     ["udere", "uso"],              // chiudere→chiuso, deludere→deluso, alludere
     ["idere", "iso"],              // decidere→deciso, uccidere→ucciso, incidere
     ["endere", "eso"],             // rendere→reso, scendere→sceso, offendere→offeso, spendere→speso
-    ["ondere", "oso"],             // rispondere handled exact (risposto); nascondere exact; but fondere→fuso exact — keep conservative
     ["fliggere", "flitto"],        // infliggere, affliggere
     ["urgere", "urto"],
     ["prire", "perto"],            // aprire→aperto, coprire→coperto, scoprire→scoperto
@@ -9351,7 +9385,7 @@ function stressWord(w){
     "vendere", "rendere?", "credere", "temere", "battere", "ripetere", "premere",
     "sapere", "dovere", "potere", "volere", "tenere", "godere", "cadere", "sedere",
     "ricevere", "vedere", "provvedere", "possedere", "premere", "spremere",
-    "pretendere",  // pretende→preteso actually irregular; keep simple: leave in regular? no
+    "pendere",
   ]);
 
   function participleOf(inf) {
@@ -9428,6 +9462,16 @@ function stressWord(w){
       cong:["tolga","tolga","tolga","togliamo","togliate","tolgano"] },
     dovere: { pres:["devo","devi","deve","dobbiamo","dovete","devono"], fut:"dovrò", pp:"dovuto", aux:"avere",
       cong:["debba","debba","debba","dobbiamo","dobbiate","debbano"] },
+    godere: { pres:["godo","godi","gode","godiamo","godete","godono"], fut:"godrò", pp:"goduto", aux:"avere",
+      cong:["goda","goda","goda","godiamo","godiate","godano"] },
+    giacere: { pres:["giaccio","giaci","giace","giacciamo","giacete","giacciono"], fut:"giacerò", pp:"giaciuto", aux:"essere",
+      cong:["giaccia","giaccia","giaccia","giacciamo","giacciate","giacciano"] },
+    cuocere: { pres:["cuocio","cuoci","cuoce","cuociamo","cuocete","cuociono"], fut:"cuocerò", pp:"cotto", aux:"avere",
+      cong:["cuocia","cuocia","cuocia","cuociamo","cuociate","cuociano"] },
+    nuocere: { pres:["nuoccio","nuoci","nuoce","nuociamo","nuocete","nuocciono"], fut:"nuocerò", pp:"nuociuto", aux:"avere",
+      cong:["nuoccia","nuoccia","nuoccia","nuociamo","nuociate","nuocciano"] },
+    udire: { pres:["odo","odi","ode","udiamo","udite","odono"], fut:"udirò", pp:"udito", aux:"avere",
+      cong:["oda","oda","oda","udiamo","udiate","odano"] },
   };
 
   // Family donors matched by suffix; longest suffix wins. base = DB key.
@@ -9437,6 +9481,8 @@ function stressWord(w){
   const FAMILY = [
     ["tenere","tenere"],["venire","venire"],["porre","porre"],["trarre","trarre"],
     ["salire","salire"],["uscire","uscire"],
+    ["godere","godere"],["giacere","giacere"],["cuocere","cuocere"],["nuocere","nuocere"],
+    ["sedere","sedere"],
     ["scegliere","scegliere"],["cogliere","cogliere"],["togliere","togliere"],
   ];
   // Closed compound sets for collision-prone bases.
@@ -9584,7 +9630,7 @@ function stressWord(w){
     const pp = irrPP || regPP(inf);
     const aux = auxOf(inf);
     // "reg" = fully regular (endings AND participle). Irregular participle → mark not-fully-regular.
-    const reg = !irrPP;
+    const reg = !irrPP || irrPP === regPP(inf);
     return { ok: true, inf, g, reg, aux, pres, fut, pp, cong,
              source: irrPP ? "regular+irrPP" : "regular" };
   }
@@ -9627,12 +9673,79 @@ function genVerb(spec, r){
   return v;
 }
 
+/* A typed-in verb that is a prefix + one of the hand-written irregular verbs (riscrivere,
+   sorreggere, trascorrere, travedere, sospendere…) is conjugated by copying that verb, exactly
+   like a family member — so the passato remoto, imperfetto and participle come out right
+   (riscrissi, not "riscrivei"). Short bases only clone for their real compounds:
+   tradire/spedire are not dire, guardare is not dare, restare is not stare. */
+const AUTO_BASE_PFX = {
+  dire:["ri","dis","contrad","contra","bene","male","strabene","stramale","pre","in","inter"],
+  fare:["ri","dis","ridis","s","stra","soddis","sodis","contraf","sopraf","assue","disassue","dissue","mansue",
+        "lique","putre","rare","tume","stupe","torre","arte","mal","pre"],
+  stare:["sotto","sopra"], dare:["ri"], morire:["pre","ri"] };       // intimorire is not morire
+const AUTO_BASE_NO = ["andare","essere","avere","bere"];          // mandare, tessere… are not compounds
+const AUTO_SKIP = ["provvedere","stridere"];                     // compounds that drifted from their base
+function autoModel(inf){
+  if (AUTO_SKIP.includes(inf)) return null;
+  const irr = M => M && (!M.reg || REM_IRR[M.inf] || IMPF_IRR[M.inf]);
+  let best = null;
+  const take = (stem, M, f) => {
+    if (!irr(M) || !inf.endsWith(stem) || inf.length <= stem.length) return;
+    if (best && best.stem.length >= stem.length) return;
+    best = {stem, M, f};
+  };
+  VERBS.forEach(M => {
+    if (M.refl || M.custom) return;
+    if (AUTO_BASE_NO.includes(M.inf)) return;
+    const ok = AUTO_BASE_PFX[M.inf];
+    if (ok && !ok.includes(inf.slice(0, inf.length - M.inf.length))) return;
+    take(M.inf, M, {base:M.inf, stem:M.inf, members:[], note:""});
+  });
+  FAMILIES.forEach(f => {                                         // -durre, -spondere: stem shorter than the base
+    if (f.stem === f.base || f.stem === "parire") return;          // sparire/trasparire are -isc-, not apparire
+    take(f.stem, famModel(f), f);
+  });
+  return best;
+}
+/* passato remoto of a typed-in -ere verb with an irregular participle and no model verb:
+   the strong forms (io, lui, loro) are built on the participle — punto → punsi, fritto → frissi,
+   espresso → espressi, connesso → connessi — the others stay regular (pungesti, pungemmo). */
+const AUTO_REM_STEM = {giacere:"giacqu", nuocere:"nocqu", provvedere:"provvid"};
+function autoRemoto(inf, pp){
+  if (!inf.endsWith("ere") || inf === "esigere") return null;
+  const W = inf.slice(0, -2);
+  let S = null;
+  const k = Object.keys(AUTO_REM_STEM).find(b => inf.endsWith(b));
+  if (k) S = inf.slice(0, inf.length - k.length) + AUTO_REM_STEM[k];
+  else if (!pp || pp === inf.slice(0,-3)+"uto" || pp === inf.slice(0,-3)+"iuto") return null;
+  else if (inf.endsWith("mettere"))   S = inf.slice(0, -7) + "mis";
+  else if (inf.endsWith("stringere")) S = inf.slice(0, -9) + "strins";
+  else if (/tto$/.test(pp))     S = pp.slice(0, -3) + "ss";
+  else if (/sso$/.test(pp))     S = pp.slice(0, -1);
+  else if (/sto$/.test(pp))     S = pp.slice(0, -3) + "s";
+  else if (/so$/.test(pp))      S = pp.slice(0, -1);
+  else if (/[nlr]to$/.test(pp)) S = pp.slice(0, -2) + "s";
+  if (!S) return null;
+  return [S+"i", W+"sti", S+"e", W+"mmo", W+"ste", S+"ero"];
+}
+
 function materialize(spec){
   if (spec.fam) return famMaterialize(spec);          // a member of a base-verb family: copy the base's forms
   if (VERBS.some(v => v.inf === spec.inf)) return null;
   const r = conjugate(spec.inf);
   if (!r || !r.ok) return null;
+  const am = autoModel(spec.inf);
+  if (am){
+    // compounds keep essere only where the base is a motion/state verb whose compounds stay
+    // intransitive (rinascere, accadere, sottostare); aggiungere, assalire take avere
+    const aux = (spec.aux === "avere" || spec.aux === "essere") ? spec.aux
+              : (am.M.aux === "essere" && !["giungere","salire"].includes(am.M.inf) ? "essere" : "avere");
+    const c = famClone(spec.inf, {f:am.f, model:am.M, b:spec.en, custom:true, aux, comp:spec.comp});
+    if (c){ VERBS.push(c); return c; }
+  }
   const v = genVerb(spec, r);
+  const rem = autoRemoto(v.inf, v.pp);
+  if (rem && !REM_IRR[v.inf]){ REM_IRR[v.inf] = rem; v.reg = false; }
   CONG[v.inf] = r.cong;
   ING[v.inf]  = v.enBase ? _firstWord(v.enBase, _ing) : "";
   COMP[v.inf] = (spec.comp && spec.comp[0]) ? spec.comp : ["spesso", "often"];
@@ -9832,8 +9945,8 @@ function famForms(inf){
    the deck, the Study tab and the audio export all treat it like a hand-written verb. */
 function famClone(inf, opts){
   opts = opts || {};
-  const f = FAM[inf] || FAM[FAM_OF[inf]]; if(!f) return null;
-  const M = famModel(f); if(!M) return null;
+  const f = opts.f || FAM[inf] || FAM[FAM_OF[inf]]; if(!f) return null;
+  const M = opts.model || famModel(f); if(!M) return null;
   const mp = famPrefix(M.inf, f.stem), np = famPrefix(inf, f.stem);
   if(mp === null || np === null) return null;
   const sw = s => famSwap(s, mp, np), swA = a => a.map(sw);
@@ -9841,7 +9954,7 @@ function famClone(inf, opts){
   if(pres.concat(fut, [pp]).some(x=>!x)) return null;
   const v = {inf, pres, fut, pp, aux: opts.aux || M.aux, reg: M.reg, g: M.g,
              travel:false, freq: FREQ_VERB[inf] || 0, famClone:true, custom: !!opts.custom};
-  if(M.latin) v.latin = sw(M.latin);
+  if(M.latin && M.latin.slice(0, mp.length) === mp) v.latin = np + M.latin.slice(mp.length);   // no accent: estra-, not estrà-
   const ing = famEnglish(v, opts.b);
   [CONG, REM_IRR, IMPF_IRR, CONGI_IRR].forEach(T=>{ if(T[M.inf]) T[inf] = swA(T[M.inf]); });
   if(GER_IRR[M.inf]) GER_IRR[inf] = sw(GER_IRR[M.inf]);
@@ -10528,6 +10641,12 @@ function wireFamBox(v){
   });
   box.querySelectorAll(".fadd").forEach(el=>el.onclick=e=>{ e.stopPropagation(); famAdd(el.dataset.add, v.inf); });
 }
+/* most notes describe the present, future and participle; when the passato remoto is
+   irregular too and the note doesn't say so, spell out its strong forms (io, lui/lei, loro) */
+function remWhy(v){
+  if(!v.why || /remoto/i.test(v.why) || !hasTense(v,"passatoRemoto") || !irregularIn(v,"passatoRemoto")) return "";
+  return ' Passato remoto is irregular too: <b>'+[0,2,5].map(i=>form(v,"passatoRemoto",i)).join(", ")+'</b>.';
+}
 function drawStudy(){
   if(studyTab === "rules") return drawRules();
   $("studyTitle").textContent = "Study";
@@ -10563,7 +10682,7 @@ function drawStudy(){
             '<span class="badge" style="background:#20262f;color:var(--dim)">used '+v.freq+'× in your transcripts</span>'+'</div>';
   html += '<div class="why">'+ (v.why ? v.why :
             (v.reg ? 'Follows the '+GROUP_LABEL[v.g]+' pattern exactly across every tense — see the Rules tab.'
-                   : 'Irregular forms; learn them as they come.')) +'</div>';
+                   : 'Irregular forms; learn them as they come.')) + remWhy(v) +'</div>';
   html += famBox(v);
   show.forEach(t=>{
     if(!hasTense(v,t.id)){
@@ -11193,7 +11312,7 @@ function addUserVerb(){
   USER_SPECS.push(spec); saveUserSpecs(); sortVerbs();
   if (!S.verbs.includes(inf)) S.verbs.push(inf); save(); resetTenseCache();
   $("niInf").value = ""; $("niEn").value = ""; niAuxMode = "auto"; niSetAux();
-  const tag = r.reg ? ("regular " + (GROUP_LABEL[r.g] || r.g)) : "irregular";
+  const tag = v.reg ? ("regular " + (GROUP_LABEL[v.g] || v.g)) : "irregular";
   niFeedback("niok", "Added <b>" + inf + "</b> (" + tag + ", auxiliary <b>" + v.aux + "</b>). It's in your deck and the Study tab — all " + TENSES.length + " tenses.");
   drawChips(); drawUserVerbs();
 }
