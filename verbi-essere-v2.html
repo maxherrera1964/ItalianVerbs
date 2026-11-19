@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verbi con l'ausiliare essere</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --txt:#151a21; --dim:#5b6675; --line:#d7dce3;
+  --mov:#2563eb; --mov-bg:rgba(37,99,235,.07); --mov-box:rgba(37,99,235,.13);
+  --cam:#059669; --cam-bg:rgba(5,150,105,.07); --cam-box:rgba(5,150,105,.13);
+  --alt:#7c3aed; --alt-bg:rgba(124,58,237,.07); --alt-box:rgba(124,58,237,.13);
+  --accent:#c2410c;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#12161c; --panel:#1a2029; --txt:#eef2f6; --dim:#97a3b2; --line:#2e3744;
+  --mov:#60a5fa; --mov-bg:rgba(96,165,250,.08); --mov-box:rgba(96,165,250,.16);
+  --cam:#34d399; --cam-bg:rgba(52,211,153,.08); --cam-box:rgba(52,211,153,.16);
+  --alt:#a78bfa; --alt-bg:rgba(167,139,250,.08); --alt-box:rgba(167,139,250,.16);
+  --accent:#fb923c; color-scheme:dark;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;
+  padding:24px max(16px,env(safe-area-inset-left)) 40px max(16px,env(safe-area-inset-right))}
+main{max-width:980px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--dim);margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+svg text{font-family:inherit}
+
+/* overview map */
+.map{display:block;width:100%;height:auto}
+.map .hub{fill:var(--txt)}
+.map .hubt{fill:var(--bg);font-size:20px;font-weight:800;letter-spacing:.04em}
+.map .lnk{stroke:var(--line);stroke-width:3;fill:none}
+.map .n{font-size:15px;font-weight:700}
+.map .c{font-size:30px;font-weight:800}
+.map .d{fill:var(--dim);font-size:12.5px}
+.map a{cursor:pointer}
+.map a:hover .bub{stroke-width:3}
+/* phones: the map's text would be too small, so show three stacked buttons instead */
+.mapm{display:none;gap:8px}
+.mapm a{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--txt);border:2px solid;border-radius:14px;padding:10px 14px}
+.mapm b{font-size:26px;font-weight:800;min-width:40px}
+.mapm span{display:block;font-weight:700}
+.mapm small{display:block;color:var(--dim);font-size:13px}
+.mapm .hubm{text-align:center;font-weight:800;letter-spacing:.06em;color:var(--dim);font-size:13px}
+@media (max-width:600px){ .map{display:none} .mapm{display:grid} }
+
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:16px 0 4px;color:var(--dim);font-size:14px}
+.controls label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.legend{display:flex;gap:14px;flex-wrap:wrap}
+.legend span{display:flex;gap:6px;align-items:center}
+.sw{width:22px;height:14px;border-radius:5px;border:1.5px solid var(--dim)}
+.sw.fam{border-style:dashed}
+.badge{font-size:10.5px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:0 6px;line-height:16px;white-space:nowrap}
+
+/* groups */
+section.grp{margin-top:28px;border-radius:16px;padding:16px;border:1px solid var(--line)}
+section.mov{background:var(--mov-bg)} section.cam{background:var(--cam-bg)} section.alt{background:var(--alt-bg)}
+.ghead{display:flex;gap:12px;align-items:center;margin-bottom:4px}
+.ghead svg{flex:none}
+.ghead h2{margin:0;font-size:20px}
+.mov .ghead h2,.mov .pp{color:var(--mov)} .cam .ghead h2,.cam .pp{color:var(--cam)} .alt .ghead h2,.alt .pp{color:var(--alt)}
+.count{font-size:13px;color:var(--dim);font-weight:600;margin-left:6px}
+.why{color:var(--dim);margin:0 0 14px;font-size:14.5px}
+.subs{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:12px}
+.sg{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.sgh{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.sgh svg{flex:none}
+.sgh b{font-size:15px}
+.sgh small{display:block;color:var(--dim);font-size:12.5px;line-height:1.3}
+.mov .sgh svg *{stroke:var(--mov)} .cam .sgh svg *{stroke:var(--cam)} .alt .sgh svg *{stroke:var(--alt)}
+.mov .sgh svg .fill{fill:var(--mov);stroke:none} .cam .sgh svg .fill{fill:var(--cam);stroke:none} .alt .sgh svg .fill{fill:var(--alt);stroke:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);border-radius:10px;padding:5px 9px;background:var(--panel);cursor:pointer;text-align:left;font:inherit;color:inherit;min-width:0}
+.mov .chip{border-color:var(--mov-box)} .cam .chip{border-color:var(--cam-box)} .alt .chip{border-color:var(--alt-box)}
+.chip.fam{border-style:dashed}
+.chip:hover{filter:brightness(.97)}
+.chip .inf{font-weight:700;font-size:15px}
+.chip .pp{font-style:italic;font-size:13px;font-weight:600}
+.chip .en{display:block;color:var(--dim);font-size:12px;line-height:1.25}
+.chip .row{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.chip .extra{display:none;font-size:12.5px;color:var(--txt);margin-top:4px;border-top:1px solid var(--line);padding-top:4px;max-width:230px}
+.chip.open .extra{display:block}
+body.nopp .chip .pp{display:none}
+body.nofam .chip.fam{display:none}
+.rule{margin-top:28px}
+.rule h3{margin:0 0 8px;font-size:17px}
+.rule ul{margin:0;padding-left:18px}
+.rule li{margin:5px 0}
+.rule b{color:var(--accent)}
+.note{color:var(--dim);font-size:13.5px;margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+<h1>Verbi con l'ausiliare <i>essere</i></h1>
+<p class="sub">The 81 verbs in your conjugator that form the passato prossimo with <i>essere</i>, grouped by meaning · tap a verb for more</p>
+
+<div class="card">
+<svg class="map" viewBox="0 0 900 250" role="img" aria-label="Essere branches into three groups: motion, change of state, and other verbs">
+  <path class="lnk" d="M404 125 C 360 125, 350 70, 311 70"/>
+  <path class="lnk" d="M450 171 L 450 175"/>
+  <path class="lnk" d="M496 125 C 540 125, 550 70, 589 70"/>
+  <circle class="hub" cx="450" cy="125" r="46"/>
+  <text class="hubt" x="450" y="132" text-anchor="middle">ESSERE</text>
+
+  <a href="#mov"><g>
+    <rect class="bub" x="40" y="22" width="270" height="96" rx="16" fill="var(--mov-bg)" stroke="var(--mov)" stroke-width="2"/>
+    <text class="c" x="70" y="72" fill="var(--mov)" id="cnt-mov">28</text>
+    <text class="n" x="122" y="58" fill="var(--mov)">Movimento</text>
+    <text class="d" x="122" y="78">going from A to B</text>
+    <text class="d" x="122" y="96">andare, venire, uscire…</text>
+  </g></a>
+  <a href="#cam"><g>
+    <rect class="bub" x="315" y="176" width="270" height="68" rx="16" fill="var(--cam-bg)" stroke="var(--cam)" stroke-width="2"/>
+    <text class="c" x="345" y="221" fill="var(--cam)" id="cnt-cam">19</text>
+    <text class="n" x="397" y="205" fill="var(--cam)">Cambiamento di stato</text>
+    <text class="d" x="397" y="225">becoming something else: older, pale, rotten…</text>
+  </g></a>
+  <a href="#alt"><g>
+    <rect class="bub" x="590" y="22" width="270" height="96" rx="16" fill="var(--alt-bg)" stroke="var(--alt)" stroke-width="2"/>
+    <text class="c" x="620" y="72" fill="var(--alt)" id="cnt-alt">34</text>
+    <text class="n" x="672" y="58" fill="var(--alt)">Altri verbi</text>
+    <text class="d" x="672" y="78">being, happening, seeming,</text>
+    <text class="d" x="672" y="96">piacere-type, weather…</text>
+  </g></a>
+</svg>
+<div class="mapm">
+  <div class="hubm">ESSERE →</div>
+  <a href="#mov" style="border-color:var(--mov);background:var(--mov-bg)"><b style="color:var(--mov)" id="cntm-mov">28</b><div><span style="color:var(--mov)">Movimento</span><small>going from A to B · andare, venire, uscire…</small></div></a>
+  <a href="#cam" style="border-color:var(--cam);background:var(--cam-bg)"><b style="color:var(--cam)" id="cntm-cam">19</b><div><span style="color:var(--cam)">Cambiamento di stato</span><small>becoming something else: older, pale, rotten…</small></div></a>
+  <a href="#alt" style="border-color:var(--alt);background:var(--alt-bg)"><b style="color:var(--alt)" id="cntm-alt">34</b><div><span style="color:var(--alt)">Altri verbi</span><small>being, happening, seeming, piacere-type, weather…</small></div></a>
+</div>
+</div>
+
+<div class="controls">
+  <label><input type="checkbox" id="showPP" checked> show passato prossimo</label>
+  <label><input type="checkbox" id="showFam" checked> show family verbs</label>
+  <span class="legend">
+    <span><i class="sw"></i> in your deck</span>
+    <span><i class="sw fam"></i> family verb (one-tap add)</span>
+    <span><i class="badge">+avere</i> also takes avere in another sense</span>
+  </span>
+</div>
+
+<div id="groups"></div>
+
+<div class="card rule">
+  <h3>The rule of thumb</h3>
+  <ul>
+    <li><b>Essere</b> when the subject isn't acting <i>on</i> anything: it <b>moves</b> somewhere, <b>changes</b> state, or simply <b>is / happens / seems</b>. That's why the participle agrees with the subject: <i>Vale è andat<b>a</b> · siamo partit<b>i</b></i>.</li>
+    <li>Add a <b>direct object</b> and the same verb switches to <b>avere</b>: <i>sono salito</i> but <i>ho salito le scale</i> · <i>è cresciuto</i> but <i>ha cresciuto due figli</i>.</li>
+    <li>Movement <b>in itself</b>, with no direction, usually takes <b>avere</b>: <i>ho camminato, ho corso, ho nuotato, ho viaggiato, ho passeggiato</i>. That's why these aren't on this page.</li>
+    <li>Every reflexive and pronominal verb takes essere too (<i>mi sono alzato, ci siamo sposati, me ne sono andato</i>). They're in your deck but not listed here.</li>
+  </ul>
+</div>
+<p class="note">Built from the auxiliaries in italianverbs.html, which were checked against Wiktionary and Treccani. Group boundaries are a study aid: a few verbs could sit in two groups (<i>apparire</i> is also "to seem"; <i>sorgere</i> and <i>tramontare</i> are the sun moving but also mean "to arise" and "to fade"; <i>restare</i> and <i>rimanere</i> are often taught next to the motion verbs as "not moving").</p>
+</main>
+
+<script>
+/* [infinitive, past participle, English, in deck?, "+avere" note, impersonal/3rd-person-only participle (no /a)] */
+const GROUPS = [
+ {id:"mov", title:"Verbi di movimento", en:"Motion with a direction or destination",
+  why:"Going from one place to another, in, out, up, down, away or back. The participle agrees with whoever moved.",
+  icon:"mov",
+  subs:[
+   {t:"Andare e venire", e:"go and come", g:"lr", v:[
+     ["andare","andato","to go",1],["venire","venuto","to come",1],
+     ["provenire","provenuto","to come from",1],["pervenire","pervenuto","to arrive / to reach",0]]},
+   {t:"Arrivare e partire", e:"arrive and leave", g:"arr", v:[
+     ["arrivare","arrivato","to arrive",1],["giungere","giunto","to arrive / to reach",1],
+     ["sopraggiungere","sopraggiunto","to turn up",0],["partire","partito","to leave / to depart",1],
+     ["ripartire","ripartito","to leave again",1],
+     ["atterrare","atterrato","to land",1,"<i>ho atterrato</i> is also accepted"],
+     ["sbarcare","sbarcato","to get off (a boat)",1,"<i>hanno sbarcato le merci</i> = unloaded the goods"]]},
+   {t:"Entrare e uscire", e:"in and out", g:"box", v:[
+     ["entrare","entrato","to enter / to go in",1],["rientrare","rientrato","to come back in / home",1],
+     ["uscire","uscito","to go out",1],["emergere","emerso","to emerge / to come out",1],
+     ["riemergere","riemerso","to resurface",0]]},
+   {t:"Salire e scendere", e:"up and down", g:"ud", v:[
+     ["salire","salito","to go up / to get on",1,"<i>ho salito le scale</i> (with an object)"],
+     ["risalire","risalito","to go back up / to date back",1,"<i>ho risalito il fiume</i> (with an object)"],
+     ["scendere","sceso","to go down / to get off",1,"<i>ho sceso le scale</i> (with an object)"],
+     ["ascendere","asceso","to ascend",0],["discendere","disceso","to descend",0],
+     ["cadere","caduto","to fall",1],
+     ["precipitare","precipitato","to fall / to crash",1,"<i>non precipitiamo le cose</i> = let's not rush things"],
+     ["affondare","affondato","to sink",1,"<i>hanno affondato la nave</i> = sank the ship"]]},
+   {t:"Tornare", e:"coming back", g:"back", v:[
+     ["tornare","tornato","to return / to go back",1],["ritornare","ritornato","to come back",1],
+     ["rincasare","rincasato","to get home",1]]},
+   {t:"Scappare", e:"getting away", g:"run", v:[
+     ["scappare","scappato","to escape / to run off",1],["fuggire","fuggito","to flee",1],
+     ["sfuggire","sfuggito","to slip away / to escape",1],
+     ["evadere","evaso","to escape / to break out",1,"<i>ha evaso le tasse</i> = evaded taxes"]]},
+   {t:"Il sole", e:"rising and setting", g:"sun", v:[
+     ["sorgere","sorto","to rise / to come up",1,null,1],["tramontare","tramontato","to set / to fade",1,null,1]]},
+   {t:"Senza volerlo", e:"involuntary movement", g:"slip", v:[
+     ["scivolare","scivolato","to slip / to slide",1],
+     ["inciampare","inciampato","to trip",1,"<i>ho inciampato</i> is also correct"],
+     ["scorrere","scorso","to flow / to scroll",1,"<i>ho scorso il testo</i> = I skimmed the text"]]},
+  ]},
+ {id:"cam", title:"Verbi di cambiamento di stato", en:"Change of state",
+  why:"The subject ends up different from how it started: older, thinner, healed, gone, born, dead. Nobody is acted on.",
+  icon:"cam",
+  subs:[
+   {t:"Diventare", e:"becoming", g:"ab", v:[
+     ["diventare","diventato","to become",1],["divenire","divenuto","to become (formal)",0]]},
+   {t:"Vita e morte", e:"life and death", g:"life", v:[
+     ["nascere","nato","to be born",1],["rinascere","rinato","to be reborn",0],
+     ["morire","morto","to die",1],["svenire","svenuto","to faint",1],
+     ["annegare","annegato","to drown",1,"<i>annegare i dispiaceri</i> = to drown your sorrows"],
+     ["affogare","affogato","to drown / to be swamped",1]]},
+   {t:"Il corpo e l'età", e:"growing, weight, age", g:"size", v:[
+     ["crescere","cresciuto","to grow / to grow up",1,"<i>ha cresciuto due figli</i> = raised two kids"],
+     ["decrescere","decresciuto","to decrease",0],
+     ["ingrassare","ingrassato","to put on weight",1],["dimagrire","dimagrito","to lose weight",1],
+     ["invecchiare","invecchiato","to age / to get old",1,"<i>quel taglio ti ha invecchiato</i> = made you look older"],
+     ["ringiovanire","ringiovanito","to look younger",1,"<i>la vacanza ti ha ringiovanito</i> = made you look younger"]]},
+   {t:"Salute e mente", e:"health and mind", g:"health", v:[
+     ["guarire","guarito","to recover",1,"<i>il medico ha guarito il paziente</i> = cured"],
+     ["peggiorare","peggiorato","to get worse",1,"<i>ha peggiorato le cose</i> = made things worse"],
+     ["impazzire","impazzito","to go crazy",1]]},
+   {t:"Il viso", e:"changing color", g:"face", v:[
+     ["arrossire","arrossito","to blush",1],["impallidire","impallidito","to turn pale",1]]},
+   {t:"Scoppiare", e:"bursting", g:"burst", v:[
+     ["esplodere","esploso","to explode",1,"<i>ha esploso due colpi</i> = fired two shots"],
+     ["scoppiare","scoppiato","to burst / to break out",1]]},
+   {t:"La natura", e:"blooming and rotting", g:"flower", v:[
+     ["fiorire","fiorito","to bloom",1,null,1],["marcire","marcito","to rot / to go bad",1,null,1]]},
+   {t:"Apparire e sparire", e:"appearing and disappearing", g:"appear", v:[
+     ["apparire","apparso","to appear",1],["comparire","comparso","to appear / to show up",1],
+     ["sparire","sparito","to disappear",1],["scomparire","scomparso","to disappear / to pass away",1]]},
+   {t:"Scadere", e:"running out", g:"clock", v:[
+     ["scadere","scaduto","to expire",1],["decadere","decaduto","to decline / to lapse",0]]},
+  ]},
+ {id:"alt", title:"Altri verbi con essere", en:"Neither motion nor change",
+  why:"Being and staying, things that happen, seeming, the \"flipped\" piacere-type verbs, cost and duration, belonging, weather. In all of them the subject isn't doing anything to anything.",
+  icon:"alt",
+  subs:[
+   {t:"Essere e restare", e:"being and staying", g:"stay", v:[
+     ["essere","stato","to be",1],["stare","stato","to stay / to be",1],
+     ["restare","restato","to stay / to remain",1],["rimanere","rimasto","to stay / to remain",1],
+     ["esistere","esistito","to exist",1],["sussistere","sussistito","to exist / to hold true",0],
+     ["sopravvivere","sopravvissuto","to survive",1]]},
+   {t:"Succedere", e:"things that happen", g:"spark", v:[
+     ["succedere","successo","to happen",1,null,1],["capitare","capitato","to happen / to come up",1,null,1],
+     ["accadere","accaduto","to happen",1,null,1],["avvenire","avvenuto","to happen",0,null,1],
+     ["sopravvenire","sopravvenuto","to arise",0,null,1]]},
+   {t:"Sembrare", e:"seeming", g:"eye", v:[
+     ["sembrare","sembrato","to seem",1],["parere","parso","to seem",1],
+     ["risultare","risultato","to turn out",1]]},
+   {t:"Piacere & co.", e:"flipped verbs: <i>mi piace, mi manca</i>", g:"flip", v:[
+     ["piacere","piaciuto","to please (= to like)",1,null,1],["dispiacere","dispiaciuto","to be sorry",1,null,1],
+     ["mancare","mancato","to be missing (= to miss)",1,"<i>ha mancato il bersaglio</i> = missed the target",1],
+     ["bastare","bastato","to be enough",1,null,1],["occorrere","occorso","to be needed",1,null,1],
+     ["rincrescere","rincresciuto","to be sorry",0,null,1],
+     ["convenire","convenuto","to be worth it / to gather",1,"<i>abbiamo convenuto</i> = we agreed",1]]},
+   {t:"Costo, valore, durata", e:"cost, worth, duration", g:"coin", v:[
+     ["costare","costato","to cost",1,null,1],["valere","valso","to be worth",1,null,1],
+     ["equivalere","equivalso","to be equivalent",0,null,1],["durare","durato","to last",1,null,1]]},
+   {t:"Dipendere e appartenere", e:"relations", g:"link", v:[
+     ["dipendere","dipeso","to depend",1,null,1],
+     ["appartenere","appartenuto","to belong",1,"<i>ha appartenuto</i> is also accepted",1],
+     ["consistere","consistito","to consist",0,null,1]]},
+   {t:"Il tempo", e:"weather (impersonal)", g:"cloud", v:[
+     ["piovere","piovuto","to rain",1,"<i>ha piovuto</i> is also correct",2],
+     ["nevicare","nevicato","to snow",1,"<i>ha nevicato</i> is also correct",2]]},
+   {t:"Riuscire e altri", e:"managing, stepping in", g:"check", v:[
+     ["riuscire","riuscito","to manage / to succeed",1],["intervenire","intervenuto","to step in",1],
+     ["ricorrere","ricorso","to turn to / to resort to",0]]},
+  ]},
+];
+
+/* small line icons, 34×34 */
+const G = {
+ lr:   '<path d="M5 12h22m-5-5 5 5-5 5M29 22H7m5-5-5 5 5 5" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ arr:  '<circle class="fill" cx="27" cy="17" r="4"/><path d="M4 17h16m-5-5 5 5-5 5" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ box:  '<rect x="13" y="7" width="17" height="20" rx="2" fill="none" stroke-width="2.2"/><path d="M2 17h17m-5-5 5 5-5 5" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ ud:   '<path d="M11 28V6m-6 6 6-6 6 6M23 6v22m-6-6 6 6 6-6" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ back: '<path d="M24 26V14a7 7 0 0 0-14 0v4m-5-5 5 5 5-5" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ run:  '<path d="M14 17h17m-5-5 5 5-5 5M3 11h8M5 17h6M3 23h8" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ slip: '<path d="M4 9c5 0 6 4 11 4s6 4 11 4M22 28l6-5-7-2" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ ab:   '<circle cx="8" cy="17" r="5" fill="none" stroke-width="2.2"/><rect x="21" y="11" width="11" height="12" rx="1.5" class="fill"/><path d="M14 17h5" stroke-width="2.2" stroke-linecap="round"/>',
+ life: '<path d="M4 25c4 0 4-14 8-14s4 14 8 14 4-8 6-8 2 4 4 4" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ size: '<circle cx="9" cy="20" r="4" fill="none" stroke-width="2.2"/><circle cx="24" cy="15" r="8" fill="none" stroke-width="2.2"/>',
+ health:'<path d="M17 29S5 21 5 13a6 6 0 0 1 12-2 6 6 0 0 1 12 2c0 8-12 16-12 16z" fill="none" stroke-width="2.3" stroke-linejoin="round"/><path d="M13 17h8m-4-4v8" stroke-width="2.2" stroke-linecap="round"/>',
+ appear:'<circle class="fill" cx="9" cy="17" r="5"/><circle cx="25" cy="17" r="5" fill="none" stroke-width="2.2" stroke-dasharray="3 3"/>',
+ clock:'<circle cx="17" cy="17" r="12" fill="none" stroke-width="2.2"/><path d="M17 10v7l5 4" fill="none" stroke-width="2.4" stroke-linecap="round"/>',
+ stay: '<path d="M8 6v22M26 6v22M8 17h18" fill="none" stroke-width="2.4" stroke-linecap="round"/>',
+ spark:'<path d="M17 4v7M17 23v7M4 17h7M23 17h7M8 8l5 5M21 21l5 5M26 8l-5 5M13 21l-5 5" fill="none" stroke-width="2.2" stroke-linecap="round"/>',
+ eye:  '<path d="M3 17s5-9 14-9 14 9 14 9-5 9-14 9S3 17 3 17z" fill="none" stroke-width="2.2"/><circle class="fill" cx="17" cy="17" r="4"/>',
+ flip: '<path d="M6 12h20l-5-5M28 22H8l5 5" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ coin: '<circle cx="17" cy="17" r="12" fill="none" stroke-width="2.2"/><path d="M21 12.5a5 5 0 1 0 0 9M10 15.5h8M10 18.5h8" fill="none" stroke-width="2" stroke-linecap="round"/>',
+ link: '<rect x="3" y="12" width="15" height="10" rx="5" fill="none" stroke-width="2.2"/><rect x="16" y="12" width="15" height="10" rx="5" fill="none" stroke-width="2.2"/>',
+ cloud:'<path d="M10 22a6 6 0 0 1 1-12 8 8 0 0 1 15 3 5 5 0 0 1-1 9z" fill="none" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 26l-2 4M18 26l-2 4M24 26l-2 4" stroke-width="2" stroke-linecap="round"/>',
+ check:'<path d="M6 18l7 7L28 9" fill="none" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>',
+ sun:  '<circle cx="17" cy="20" r="6" fill="none" stroke-width="2.2"/><path d="M3 28h28M17 6v4M7 11l3 3M27 11l-3 3" fill="none" stroke-width="2.2" stroke-linecap="round"/>',
+ face: '<circle cx="17" cy="17" r="12" fill="none" stroke-width="2.2"/><circle class="fill" cx="10.5" cy="20" r="2.6"/><circle class="fill" cx="23.5" cy="20" r="2.6"/><path d="M13 14h.01M21 14h.01" stroke-width="3" stroke-linecap="round"/>',
+ burst:'<path d="M17 3l2.5 8 8-3-5 7 8 3.5-8.5 1.5 3 8-8-5-5 7-.5-8.5L4 23l5.5-6.5L3 12l8.5.5z" fill="none" stroke-width="2" stroke-linejoin="round"/>',
+ flower:'<circle cx="17" cy="12" r="3" class="fill"/><path d="M17 15v15M17 24c-4 0-7-2-8-5 4 0 7 2 8 5zM17 21c3 0 5-2 6-4-3 0-5 1-6 4M12 9a5 5 0 0 1 10 0M12 15a5 5 0 0 0 10 0" fill="none" stroke-width="2" stroke-linecap="round"/>',
+ mov:  '<path d="M4 24c6-14 18-14 24-4m0 0-1-7m1 7-7-1" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+ cam:  '<circle cx="9" cy="17" r="6" fill="none" stroke-width="2.4"/><rect x="21" y="10" width="12" height="14" rx="2" class="fill"/><path d="M16 17h3" stroke-width="2.4" stroke-linecap="round"/>',
+ alt:  '<path d="M6 13h22M6 21h22" stroke-width="2.8" stroke-linecap="round"/>',
+};
+const icon = (k,size) => `<svg width="${size}" height="${size}" viewBox="0 0 34 34" aria-hidden="true">${G[k]}</svg>`;
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+
+/* passato prossimo, 3rd person: è andato/a · weather: è piovuto */
+function pp3(pp, mode){
+  if(mode===2) return "è " + pp;
+  return "è " + pp.slice(0,-1) + "o/a";
+}
+
+const root = document.getElementById("groups");
+let total = 0;
+for(const g of GROUPS){
+  const n = g.subs.reduce((a,s)=>a+s.v.length,0); total += n;
+  document.getElementById("cnt-"+g.id).textContent = n;
+  document.getElementById("cntm-"+g.id).textContent = n;
+  const sec = document.createElement("section");
+  sec.className = "grp " + g.id; sec.id = g.id;
+  sec.innerHTML = `<div class="ghead" style="color:var(--${g.id})">${icon(g.icon,40).replace('<svg','<svg style="stroke:currentColor"')}
+      <h2>${g.title}<span class="count">${n} verbs · ${g.en}</span></h2></div>
+    <p class="why">${g.why}</p>
+    <div class="subs">${g.subs.map(s=>`
+      <div class="sg"><div class="sgh">${icon(s.g,34)}<div><b>${s.t}</b><small>${s.e}</small></div></div>
+        <div class="chips">${s.v.map(([inf,pp,en,deck,av,mode])=>`
+          <button class="chip${deck?"":" fam"}" type="button">
+            <span class="row"><span class="inf">${inf}</span>${av?'<span class="badge">+avere</span>':""}</span>
+            <span class="pp">${pp3(pp,mode)}</span>
+            <span class="en">${esc(en)}</span>
+            <span class="extra">${deck?"In your deck.":"Family verb — add it from the Families panel in your conjugator."}${av?"<br><b>Also avere:</b> "+av:""}</span>
+          </button>`).join("")}</div></div>`).join("")}
+    </div>`;
+  root.appendChild(sec);
+}
+document.querySelector(".sub").firstChild.textContent = `The ${total} verbs in your conjugator that form the passato prossimo with `;
+
+root.addEventListener("click", e=>{ const c=e.target.closest(".chip"); if(c) c.classList.toggle("open"); });
+document.getElementById("showPP").addEventListener("change", e=>document.body.classList.toggle("nopp", !e.target.checked));
+document.getElementById("showFam").addEventListener("change", e=>document.body.classList.toggle("nofam", !e.target.checked));
+</script>
+</body>
+</html>

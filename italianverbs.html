@@ -4640,6 +4640,138 @@ Object.assign(META, {
   "piovere": {g:"ere", reg:false, why:"Impersonal: piove, è piovuto (ha piovuto is also correct). Irregular passato remoto piovve, piovvero; the rest is regular -ere. The plural is figurative: piovono critiche = criticism is raining down."},
   "nevicare": {g:"are", reg:true, why:"Impersonal, used only in the 3rd person singular: nevica, è nevicato (ha nevicato is also correct). Regular -care verb: nevicherà."}
 });
+/* --- essere verbs added November 2026: motion, change of state, nature --- */
+VERBS.push(
+  {inf:"atterrare", en:"to land",
+   pres:["atterro", "atterri", "atterra", "atterriamo", "atterrate", "atterrano"],
+   fut:["atterrerò", "atterrerai", "atterrerà", "atterreremo", "atterrerete", "atterreranno"],
+   pp:"atterrato", aux:"essere",
+   enBase:"land", en3:"lands", enPast:"landed", enPart:"landed", enFut:"will land"},
+
+  {inf:"sbarcare", en:"to disembark / to get off (a boat)",
+   pres:["sbarco", "sbarchi", "sbarca", "sbarchiamo", "sbarcate", "sbarcano"],
+   fut:["sbarcherò", "sbarcherai", "sbarcherà", "sbarcheremo", "sbarcherete", "sbarcheranno"],
+   pp:"sbarcato", aux:"essere",
+   enBase:"get off", en3:"gets off", enPast:"got off", enPart:"gotten off", enFut:"will get off"},
+
+  {inf:"rincasare", en:"to get home / to come home",
+   pres:["rincaso", "rincasi", "rincasa", "rincasiamo", "rincasate", "rincasano"],
+   fut:["rincaserò", "rincaserai", "rincaserà", "rincaseremo", "rincaserete", "rincaseranno"],
+   pp:"rincasato", aux:"essere",
+   enBase:"get home", en3:"gets home", enPast:"got home", enPart:"gotten home", enFut:"will get home"},
+
+  {inf:"evadere", en:"to escape / to break out",
+   pres:["evado", "evadi", "evade", "evadiamo", "evadete", "evadono"],
+   fut:["evaderò", "evaderai", "evaderà", "evaderemo", "evaderete", "evaderanno"],
+   pp:"evaso", aux:"essere",
+   enBase:"escape", en3:"escapes", enPast:"escaped", enPart:"escaped", enFut:"will escape"},
+
+  {inf:"precipitare", en:"to fall / to crash / to rush",
+   pres:["precipito", "precipiti", "precipita", "precipitiamo", "precipitate", "precipitano"],
+   fut:["precipiterò", "precipiterai", "precipiterà", "precipiteremo", "precipiterete", "precipiteranno"],
+   pp:"precipitato", aux:"essere",
+   enBase:"fall", en3:"falls", enPast:"fell", enPart:"fallen", enFut:"will fall"},
+
+  {inf:"affondare", en:"to sink",
+   pres:["affondo", "affondi", "affonda", "affondiamo", "affondate", "affondano"],
+   fut:["affonderò", "affonderai", "affonderà", "affonderemo", "affonderete", "affonderanno"],
+   pp:"affondato", aux:"essere",
+   enBase:"sink", en3:"sinks", enPast:"sank", enPart:"sunk", enFut:"will sink"},
+
+  {inf:"invecchiare", en:"to age / to get old",
+   pres:["invecchio", "invecchi", "invecchia", "invecchiamo", "invecchiate", "invecchiano"],
+   fut:["invecchierò", "invecchierai", "invecchierà", "invecchieremo", "invecchierete", "invecchieranno"],
+   pp:"invecchiato", aux:"essere",
+   enBase:"age", en3:"ages", enPast:"aged", enPart:"aged", enFut:"will age"},
+
+  {inf:"ringiovanire", en:"to look younger / to get younger",
+   pres:["ringiovanisco", "ringiovanisci", "ringiovanisce", "ringiovaniamo", "ringiovanite", "ringiovaniscono"],
+   fut:["ringiovanirò", "ringiovanirai", "ringiovanirà", "ringiovaniremo", "ringiovanirete", "ringiovaniranno"],
+   pp:"ringiovanito", aux:"essere",
+   enBase:"look younger", en3:"looks younger", enPast:"looked younger", enPart:"looked younger", enFut:"will look younger"},
+
+  {inf:"arrossire", en:"to blush",
+   pres:["arrossisco", "arrossisci", "arrossisce", "arrossiamo", "arrossite", "arrossiscono"],
+   fut:["arrossirò", "arrossirai", "arrossirà", "arrossiremo", "arrossirete", "arrossiranno"],
+   pp:"arrossito", aux:"essere",
+   enBase:"blush", en3:"blushes", enPast:"blushed", enPart:"blushed", enFut:"will blush"},
+
+  {inf:"impallidire", en:"to turn pale",
+   pres:["impallidisco", "impallidisci", "impallidisce", "impallidiamo", "impallidite", "impallidiscono"],
+   fut:["impallidirò", "impallidirai", "impallidirà", "impallidiremo", "impallidirete", "impallidiranno"],
+   pp:"impallidito", aux:"essere",
+   enBase:"turn pale", en3:"turns pale", enPast:"turned pale", enPart:"turned pale", enFut:"will turn pale"},
+
+  {inf:"esplodere", en:"to explode / to burst",
+   pres:["esplodo", "esplodi", "esplode", "esplodiamo", "esplodete", "esplodono"],
+   fut:["esploderò", "esploderai", "esploderà", "esploderemo", "esploderete", "esploderanno"],
+   pp:"esploso", aux:"essere",
+   enBase:"explode", en3:"explodes", enPast:"exploded", enPart:"exploded", enFut:"will explode"},
+
+  {inf:"scoppiare", en:"to burst / to break out",
+   pres:["scoppio", "scoppi", "scoppia", "scoppiamo", "scoppiate", "scoppiano"],
+   fut:["scoppierò", "scoppierai", "scoppierà", "scoppieremo", "scoppierete", "scoppieranno"],
+   pp:"scoppiato", aux:"essere",
+   enBase:"burst", en3:"bursts", enPast:"burst", enPart:"burst", enFut:"will burst"},
+
+  {inf:"annegare", en:"to drown",
+   pres:["annego", "anneghi", "annega", "anneghiamo", "annegate", "annegano"],
+   fut:["annegherò", "annegherai", "annegherà", "annegheremo", "annegherete", "annegheranno"],
+   pp:"annegato", aux:"essere",
+   enBase:"drown", en3:"drowns", enPast:"drowned", enPart:"drowned", enFut:"will drown"},
+
+  {inf:"affogare", en:"to drown / to be swamped",
+   pres:["affogo", "affoghi", "affoga", "affoghiamo", "affogate", "affogano"],
+   fut:["affogherò", "affogherai", "affogherà", "affogheremo", "affogherete", "affogheranno"],
+   pp:"affogato", aux:"essere",
+   enBase:"drown", en3:"drowns", enPast:"drowned", enPart:"drowned", enFut:"will drown"},
+
+  {inf:"fiorire", en:"to bloom / to flower",
+   pres:["fiorisco", "fiorisci", "fiorisce", "fioriamo", "fiorite", "fioriscono"],
+   fut:["fiorirò", "fiorirai", "fiorirà", "fioriremo", "fiorirete", "fioriranno"],
+   pp:"fiorito", aux:"essere",
+   enBase:"bloom", en3:"blooms", enPast:"bloomed", enPart:"bloomed", enFut:"will bloom"},
+
+  {inf:"marcire", en:"to rot / to go bad",
+   pres:["marcisco", "marcisci", "marcisce", "marciamo", "marcite", "marciscono"],
+   fut:["marcirò", "marcirai", "marcirà", "marciremo", "marcirete", "marciranno"],
+   pp:"marcito", aux:"essere",
+   enBase:"rot", en3:"rots", enPast:"rotted", enPart:"rotted", enFut:"will rot"},
+
+  {inf:"sorgere", en:"to rise / to come up",
+   pres:["sorgo", "sorgi", "sorge", "sorgiamo", "sorgete", "sorgono"],
+   fut:["sorgerò", "sorgerai", "sorgerà", "sorgeremo", "sorgerete", "sorgeranno"],
+   pp:"sorto", aux:"essere",
+   enBase:"rise", en3:"rises", enPast:"rose", enPart:"risen", enFut:"will rise"},
+
+  {inf:"tramontare", en:"to set (the sun) / to fade",
+   pres:["tramonto", "tramonti", "tramonta", "tramontiamo", "tramontate", "tramontano"],
+   fut:["tramonterò", "tramonterai", "tramonterà", "tramonteremo", "tramonterete", "tramonteranno"],
+   pp:"tramontato", aux:"essere",
+   enBase:"set", en3:"sets", enPast:"set", enPart:"set", enFut:"will set"}
+);
+TRAVEL.push("atterrare", "sbarcare");
+/* --- essere verbs added November 2026: motion, change of state, nature --- */
+Object.assign(META, {
+  "atterrare": {g:"are", reg:true, why:"Regular. Takes essere (siamo atterrati alle otto); avere is also accepted. The opposite is decollare, to take off."},
+  "sbarcare": {g:"are", reg:true, why:"Regular -care verb: tu sbarchi, sbarcherò. Getting off a boat is intransitive with essere (siamo sbarcati a Capri); unloading cargo is transitive with avere. Lo sbarco = the landing."},
+  "rincasare": {g:"are", reg:true, why:"Regular, with essere: sono rincasato/a tardi. Built on casa: it means rientrare a casa."},
+  "evadere": {g:"ere", reg:false, why:"Irregular participle evaso and passato remoto evasi, evase, evasero (like invadere → invaso). Escaping is intransitive with essere: è evaso dal carcere. Transitive uses take avere: evadere le tasse (to evade taxes), evadere una pratica (to deal with a file)."},
+  "precipitare": {g:"are", reg:true, why:"Regular. Stress: precìpito. Intransitive with essere: l'aereo è precipitato (crashed), la situazione è precipitata (came to a head). Transitive (to rush something) with avere: non precipitiamo le cose."},
+  "affondare": {g:"are", reg:true, why:"Regular. Intransitive with essere: la nave è affondata. Sinking something is transitive with avere: hanno affondato la nave."},
+  "invecchiare": {g:"are", reg:true, why:"Regular -iare verb: tu invecchi, invecchierò. Takes essere: sono invecchiato/a. Making someone look older is transitive with avere: quel taglio ti ha invecchiato."},
+  "ringiovanire": {g:"isc", reg:true, why:"Regular -isc- verb: ringiovanisco. Essere when you look younger (sei ringiovanito!); avere when something makes you look younger (la vacanza ti ha ringiovanito)."},
+  "arrossire": {g:"isc", reg:true, why:"Regular -isc- verb: arrossisco, arrossisci. Takes essere: sono arrossito/a. Built on rosso."},
+  "impallidire": {g:"isc", reg:true, why:"Regular -isc- verb: impallidisco. Takes essere: è impallidito/a. Built on pallido."},
+  "esplodere": {g:"ere", reg:false, why:"Irregular participle esploso and passato remoto esplosi, esplose, esplosero. Intransitive with essere: è esplosa una bomba, è esploso di rabbia. Firing a shot is transitive with avere: ha esploso due colpi."},
+  "scoppiare": {g:"are", reg:true, why:"Regular -iare verb: tu scoppi, scoppierò. Takes essere. Scoppiare a ridere / a piangere = to burst out laughing / crying; è scoppiata la guerra = war broke out."},
+  "annegare": {g:"are", reg:true, why:"Regular -gare verb: tu anneghi, annegherò. Essere when you drown (è annegato); avere when you drown something: annegare i dispiaceri nell'alcol. Figurative: sto annegando nel lavoro = I'm swamped with work."},
+  "affogare": {g:"are", reg:true, why:"Regular -gare verb: tu affoghi, affogherò. Same as annegare, a little more colloquial: affogare nei debiti, nel traffico. In the kitchen, uova affogate = poached eggs, and an affogato is ice cream drowned in espresso."},
+  "fiorire": {g:"isc", reg:true, why:"Regular -isc- verb: fiorisce, fioriscono. Takes essere: sono fioriti i gerani. Il fiore = flower; also figurative, to flourish."},
+  "marcire": {g:"isc", reg:true, why:"Regular -isc- verb: marcisce, marciscono. Takes essere: è marcito il pane. Marcio = rotten."},
+  "sorgere": {g:"ere", reg:false, why:"Irregular participle sorto and passato remoto sorse, sorsero. Takes essere: il sole è sorto, è sorto un problema. Il sorgere del sole = sunrise."},
+  "tramontare": {g:"are", reg:true, why:"Regular. Takes essere: il sole è tramontato. Il tramonto = sunset. Figurative: to fade, to have had its day (certe mode non tramontano mai)."}
+});
 VERBS.forEach(v=>{
   Object.assign(v, META[v.inf]);
   v.travel = TRAVEL.includes(v.inf);
@@ -5319,6 +5451,27 @@ Object.assign(ING, {
   "piovere":"raining",
   "nevicare":"snowing"
 });
+/* --- essere verbs added November 2026: motion, change of state, nature --- */
+Object.assign(ING, {
+  "atterrare":"landing",
+  "sbarcare":"getting off",
+  "rincasare":"getting home",
+  "evadere":"escaping",
+  "precipitare":"falling",
+  "affondare":"sinking",
+  "invecchiare":"aging",
+  "ringiovanire":"looking younger",
+  "arrossire":"blushing",
+  "impallidire":"turning pale",
+  "esplodere":"exploding",
+  "scoppiare":"bursting",
+  "annegare":"drowning",
+  "affogare":"drowning",
+  "fiorire":"blooming",
+  "marcire":"rotting",
+  "sorgere":"rising",
+  "tramontare":"setting"
+});
 
 // participle with agreement for essere-verbs: stato -> stato/a (sing), stati/e (plural)
 function participle(v,i){
@@ -5509,6 +5662,12 @@ Object.assign(REM_IRR, {
   "cuocere":["cossi", "cuocesti", "cosse", "cuocemmo", "cuoceste", "cossero"],
   "friggere":["frissi", "friggesti", "frisse", "friggemmo", "friggeste", "frissero"],
   "piovere":["piovvi", "piovesti", "piovve", "piovemmo", "pioveste", "piovvero"]
+});
+/* --- essere verbs added November 2026: motion, change of state, nature --- */
+Object.assign(REM_IRR, {
+  "evadere":["evasi", "evadesti", "evase", "evademmo", "evadeste", "evasero"],
+  "esplodere":["esplosi", "esplodesti", "esplose", "esplodemmo", "esplodeste", "esplosero"],
+  "sorgere":["sorsi", "sorgesti", "sorse", "sorgemmo", "sorgeste", "sorsero"]
 });
 GER_IRR.riempire = "riempiendo";      // from the old infinitive riempiere
 function passatoRemoto(v,i){
@@ -5737,7 +5896,11 @@ const CONG_CHE = ["congiuntivo","congiuntivoPassato"];        // Che io …!
 const CONG_SE  = ["congiuntivoImpf","congiuntivoTrapassato"]; // Se io …
 /* imperativo has no io — every card-building loop asks this instead of assuming 0..5 */
 /* impersonal verbs (volerci: ci vuole un'ora, ci vogliono due ore) only have the 3rd person, singular and plural */
-const LIB_IMPERS = ["succedere","bastare","costare","capitare","durare","parere","piovere","nevicare"];
+const LIB_IMPERS = ["succedere","bastare","costare","capitare","durare","parere","piovere","nevicare",
+                     "accadere","dispiacere","occorrere","scorrere","fiorire","marcire","sorgere","tramontare","provenire"];
+NO_PROG.push("occorrere","provenire");      // "sta occorrendo", "sta provenendo" aren't used
+NO_IMP.push("svenire","provenire","precipitare","invecchiare","ringiovanire","arrossire","impallidire",
+            "esplodere","scoppiare","annegare","affogare");   // nobody commands these: "svieni!", "arrossisci!"
 const IMPERS_SING = ["nevicare"];   // weather with no natural plural: only nevica
 const IMPERS = LIB_IMPERS.slice();   // only "it" / "they" (ci vuole-style verbs are added further down)
 /* imperativo drills only tu, noi and voi — the formal Lei / Loro commands are borrowed from the
@@ -6299,6 +6462,23 @@ Object.assign(COMP, {
   "pescare":["dal molo", "off the pier"],
   "godere":["la vista dal balcone", "the view from the balcony"]
 });
+/* --- essere verbs added November 2026: motion, change of state, nature --- */
+Object.assign(COMP, {
+  "atterrare":["a Fiumicino alle otto", "at Fiumicino at eight"],
+  "sbarcare":["dal traghetto", "the ferry"],
+  "rincasare":["tardi", "late"],
+  "evadere":["dalla routine", "from the routine"],
+  "precipitare":["dalle scale", "down the stairs"],
+  "affondare":["nella neve", "into the snow"],
+  "invecchiare":["di colpo", "all of a sudden"],
+  "ringiovanire":["dopo la vacanza", "after the vacation"],
+  "arrossire":["per l'imbarazzo", "with embarrassment"],
+  "impallidire":["per lo spavento", "with fright"],
+  "esplodere":["di rabbia", "with anger"],
+  "scoppiare":["a ridere", "laughing"],
+  "annegare":["nel lavoro", "in work"],
+  "affogare":["nei debiti", "in debt"]
+});
 /* cleaner English verbs for the gloss (the card's own gloss keeps the slashes) */
 const SENT_V = {
   fare:  {b:"take",    t3:"takes",   p:"took",     f:"will take",         g:"taking"},
@@ -6479,6 +6659,10 @@ GEN_EN.interessare = {b:"get",t3:"gets",p:"got",pp:"gotten",g:"getting"};   // g
 Object.assign(GEN_EN, {
   saltare:{b:"skip",t3:"skips",p:"skipped",pp:"skipped",g:"skipping"},
   appoggiare:{b:"put",t3:"puts",p:"put",pp:"put",g:"putting"}
+});
+Object.assign(GEN_EN, {
+  scoppiare:{b: "burst out", t3: "bursts out", p: "burst out", pp: "burst out", g: "bursting out"},
+  provenire:{b: "come", t3: "comes", p: "came", pp: "come", g: "coming"}
 });
 const REFL = ["mi","ti","si","ci","vi","si"];
 
@@ -9014,6 +9198,27 @@ Object.assign(EVERYDAY, {
   "tranquillizzarsi":["dopo la notizia", "after the news"],
   "adattarsi":["alla vita in Italia", "to life in Italy"]
 });
+/* --- essere verbs added November 2026: motion, change of state, nature --- */
+Object.assign(EVERYDAY, {
+  "atterrare":["a Fiumicino alle otto", "at Fiumicino at eight"],
+  "sbarcare":["dal traghetto", "the ferry"],
+  "rincasare":["tardi", "late"],
+  "evadere":["dalla routine", "from the routine"],
+  "precipitare":["dalle scale", "down the stairs", {"neg": true}],
+  "affondare":["nella neve", "into the snow"],
+  "invecchiare":["di colpo", "all of a sudden", {"cls": "O"}],
+  "ringiovanire":["dopo la vacanza", "after the vacation"],
+  "arrossire":["per l'imbarazzo", "with embarrassment"],
+  "impallidire":["per lo spavento", "with fright"],
+  "esplodere":["di rabbia", "with anger"],
+  "scoppiare":["a ridere", "laughing", {"b": "burst out", "t3": "bursts out", "p": "burst out", "pp": "burst out", "g": "bursting out"}],
+  "annegare":["nel lavoro", "in work", {"cls": "O"}],
+  "affogare":["nei debiti", "in debt", {"cls": "O"}],
+  "svenire":["per il caldo", "from the heat", {"neg": true}],
+  "sopravvivere":["a tutto", "everything"],
+  "scomparire":["senza lasciare traccia", "without a trace"],
+  "comparire":["all'improvviso alla porta", "suddenly at the door"],
+});
 const EV_FRAMES = {
   p:  [["Di solito {S} {V} {O}.","Usually {S} {V} {O}."],["Ogni tanto {S} {V} {O}.","Every now and then {S} {V} {O}."]],
   pp: [["Ieri {S} {V} {O}.","Yesterday {S} {V} {O}."],["La settimana scorsa {S} {V} {O}.","Last week {S} {V} {O}."]],
@@ -10127,7 +10332,7 @@ function stressWord(w){
     porgere: "porto", accorgere: "accorto", assumere: "assunto", esprimere: "espresso",
     dividere: "diviso", ridere: "riso", persuadere: "persuaso", invadere: "invaso",
     redigere: "redatto", cuocere: "cotto", nuocere: "nuociuto", giacere: "giaciuto",
-    godere: "goduto", esigere: "esatto", espellere: "espulso", ardere: "arso", mordere: "morso",
+    godere: "goduto", esigere: "esatto", espellere: "espulso", esplodere: "esploso", ardere: "arso", mordere: "morso",
     affiggere: "affisso", infiggere: "infisso", crocifiggere: "crocifisso", prefiggere: "prefisso", udire: "udito",
     radere: "raso", ledere: "leso", rodere: "roso", scindere: "scisso", espandere: "espanso",
   };
@@ -10870,6 +11075,15 @@ FAMILIES.filter(f=>f.virtual).forEach(f=>{
   const v = famClone(f.base, {b:f.b, aux: f.aux==="e" ? "essere" : "avere", comp:f.comp});
   if (v) VERBS.push(v);
 });
+/* everyday family verbs that are part of the deck from the start (the rest stay one-tap additions) */
+const DECK_FAMILY = ["svenire", "sopravvivere", "scomparire", "comparire", "provenire", "accadere", "dispiacere", "occorrere", "scorrere"];
+const DECK_FAMILY_COMP = {"svenire": ["per il caldo", "from the heat"], "sopravvivere": ["all'incidente", "the accident"], "scomparire": ["senza lasciare traccia", "without a trace"], "comparire": ["all'improvviso alla porta", "suddenly at the door"], "provenire": ["da una famiglia di musicisti", "from a family of musicians"]};
+DECK_FAMILY.forEach(inf=>{
+  if (VERBS.some(v => v.inf === inf)) return;
+  const m = FAM_MEMBER[inf]; if (!m) return;
+  const v = famClone(inf, {b:m[1], aux: m[2]==="e" ? "essere" : "avere", comp: DECK_FAMILY_COMP[inf]});
+  if (v) VERBS.push(v);
+});
 /* --- weather verbs (impersonal): hand-written sentences; plural piovere is figurative (piovono critiche) --- */
 CURATED["piovere"] = {
   p:[["In autunno a Firenze {V} spesso.", "In autumn it often rains in Florence."], ["Sui social {V} commenti di ogni tipo.", "On social media comments of every kind are pouring in."]],
@@ -11053,6 +11267,169 @@ Object.assign(FAM_EN_IRR, {
   leave:["leaves","left","left","leaving"], sneak:["sneaks","snuck","snuck","sneaking"], slip:["slips","slipped","slipped","slipping"],
   show:["shows","showed","shown","showing"]
 });
+/* --- impersonal essere verbs (things, not people, as subject): hand-written sentences; compound tenses use masculine subjects --- */
+CURATED["provenire"] = {
+  p:[["Questo vino {V} dalla Toscana.", "This wine comes from Tuscany."], ["Da dove {V} questi pomodori?", "Where do these tomatoes come from?"]],
+  pp:[["Il rumore {V} dalla cantina.", "The noise came from the cellar."], ["I soldi {V} da una donazione privata.", "The money came from a private donation."]],
+  i:[["Il profumo di pane {V} dal forno all'angolo.", "The smell of bread came from the bakery on the corner."], ["I suoi nonni {V} dalla Sicilia.", "His grandparents came from Sicily."]],
+  f:[["Il finanziamento {V} dall'Europa.", "The funding will come from Europe."], ["I nuovi studenti {V} da tutto il mondo.", "The new students will come from all over the world."]],
+  c:[["Secondo la polizia, il segnale {V} da Napoli.", "According to the police, the signal apparently comes from Naples."], ["Secondo l'etichetta, questi prodotti {V} dall'Italia.", "According to the label, these products supposedly come from Italy."]],
+  cp:[["Secondo i giornali, l'ordine {V} dal ministero.", "According to the papers, the order allegedly came from the ministry."], ["Secondo gli esperti, quei reperti {V} da Pompei.", "According to the experts, those finds supposedly came from Pompeii."]],
+  cg:[["Non so da dove {V} questo odore.", "I don't know where this smell comes from."], ["Credo che questi formaggi {V} dalla Sardegna.", "I think these cheeses come from Sardinia."]],
+  ci:[["Se il vino {V} da qui, costerebbe meno.", "If the wine came from around here, it would cost less."], ["Se i pomodori {V} dall'orto, sarebbero più buoni.", "If the tomatoes came from the garden, they'd taste better."]],
+  cgp:[["Nessuno sa da dove {V} quel messaggio.", "Nobody knows where that message came from."], ["Pare che i fondi {V} dall'estero.", "Apparently the funds came from abroad."]],
+  cgt:[["Se il consiglio {V} da un esperto, l'avrei seguito.", "If the advice had come from an expert, I would have followed it."], ["Se i soldi {V} da lui, l'avrei saputo.", "If the money had come from him, I would have known."]],
+  tp:[["Ho scoperto che il regalo {V} da mio zio.", "I found out the gift had come from my uncle."], ["Ci hanno detto che i quadri {V} da una collezione privata.", "They told us the paintings had come from a private collection."]],
+  tr:[["Dopo che {V} l'ordine dal re, l'esercito partì.", "After the order had come from the king, the army set out."], ["Appena {V} i rinforzi da Roma, la città resistette.", "As soon as reinforcements had come from Rome, the city held out."]],
+  fa:[["Il rumore {V} dal piano di sopra.", "The noise must have come from upstairs."], ["Quei soldi {V} da un'eredità.", "That money must have come from an inheritance."]],
+  pr:[["La famiglia Medici {V} dal Mugello.", "The Medici family came from the Mugello."], ["I primi abitanti {V} dal mare.", "The first inhabitants came from the sea."]]
+};
+CURATED["accadere"] = {
+  p:[["Raramente qui {V} qualcosa di interessante.", "Something interesting rarely happens here."], ["Sono cose che {V} a tutti.", "These things happen to everyone."]],
+  pp:[["Cosa {V} ieri sera in piazza?", "What happened in the square last night?"], ["Durante la notte {V} due incidenti.", "Two accidents happened during the night."]],
+  i:[["A quei tempi non {V} mai niente di nuovo.", "Back then nothing new ever happened."], ["In quella casa {V} fatti strani.", "Strange things used to happen in that house."]],
+  f:[["Vedrai che non {V} niente.", "You'll see, nothing will happen."], ["Nei prossimi mesi {V} grandi cambiamenti.", "Big changes will happen in the coming months."]],
+  c:[["Con più controlli non {V} un disastro così.", "With more checks a disaster like this wouldn't happen."], ["Con regole più chiare non {V} questi errori.", "With clearer rules these mistakes wouldn't happen."]],
+  cp:[["Con un po' di attenzione non {V} niente.", "With a bit of care nothing would have happened."], ["Senza quella decisione non {V} tanti problemi.", "Without that decision so many problems wouldn't have happened."]],
+  cg:[["Temo che {V} qualcosa di grave.", "I'm afraid something serious will happen."], ["Non voglio che {V} altri incidenti.", "I don't want any more accidents to happen."]],
+  ci:[["Se {V} qualcosa, ti avviserei subito.", "If anything happened, I'd let you know right away."], ["Se {V} altri guasti, cambierei macchina.", "If more breakdowns happened, I'd change cars."]],
+  cgp:[["Non so cosa {V} ieri sera.", "I don't know what happened last night."], ["Mi pare che {V} dei fatti gravi.", "It seems to me some serious things have happened."]],
+  cgt:[["Se {V} qualcosa, me l'avrebbero detto.", "If something had happened, they would have told me."], ["Se {V} altri incidenti, avrebbero chiuso il ponte.", "If more accidents had happened, they would have closed the bridge."]],
+  tp:[["Quando sono arrivato, {VG} tutto.", "When I got there, it had all already happened."], ["Prima di quel giorno non {VM} fatti simili.", "Nothing like it had ever happened before that day."]],
+  tr:[["Dopo che {V} il fatto, nessuno ne parlò più.", "After it had happened, nobody spoke of it again."], ["Appena {V} quegli eventi, la città cambiò.", "As soon as those events had happened, the city changed."]],
+  fa:[["{V} qualcosa: c'è la polizia sotto casa.", "Something must have happened: the police are outside."], ["{V} dei guasti: le luci sono spente.", "There must have been some breakdowns: the lights are off."]],
+  pr:[["Nel 1908 {V} il terremoto di Messina.", "The Messina earthquake happened in 1908."], ["In quegli anni {V} tanti cambiamenti.", "Many changes happened in those years."]],
+  pg:[["Cosa {V} là fuori?", "What's happening out there?"], ["In questi giorni {V} cose incredibili.", "Incredible things are happening these days."]],
+  ipg:[["Nessuno capiva cosa {V}.", "Nobody understood what was happening."], ["Mentre eravamo via {V} molte cose.", "Lots of things were happening while we were away."]],
+  fpg:[["A quest'ora in ufficio {V} di tutto.", "By now all sorts of things will be happening at the office."], ["Domani a quest'ora {V} grandi cose.", "This time tomorrow great things will be happening."]]
+};
+CURATED["dispiacere"] = {
+  p:[["Mi {V}, ma non posso venire.", "I'm sorry, but I can't come."], ["Mi {V} tanto i tuoi problemi.", "I'm really sorry about your problems."]],
+  pp:[["Mi {V} non salutarti alla festa.", "I was sorry not to say hi to you at the party."], ["Ci {V} molto i tuoi commenti.", "Your comments really hurt us."]],
+  i:[["Mi {V} lasciare Firenze.", "I was sorry to leave Florence."], ["Ai nonni {V} i nostri litigi.", "Our fights used to upset our grandparents."]],
+  f:[["Ti {V} perdere lo spettacolo.", "You'll be sorry to miss the show."], ["A Giulia {V} questi cambiamenti.", "Giulia won't like these changes."]],
+  c:[["Ti {V} se apro la finestra?", "Would you mind if I opened the window?"], ["Non ti {V} un paio di giorni di riposo, vero?", "You wouldn't mind a couple of days off, would you?"]],
+  cp:[["Mi {V} perdere il tuo matrimonio.", "I would have been sorry to miss your wedding."], ["Gli {V} i tuoi commenti.", "Your comments would have upset him."]],
+  cg:[["Spero che non ti {V} se arrivo tardi.", "I hope you don't mind if I'm late."], ["Temo che gli {V} le mie decisioni.", "I'm afraid he won't like my decisions."]],
+  ci:[["Se non ti {V}, vorrei sedermi qui.", "If you didn't mind, I'd like to sit here."], ["Se ti {V} i miei consigli, dimmelo.", "If my advice bothered you, tell me."]],
+  cgp:[["Credo che gli {V} non essere invitato.", "I think he was hurt not to be invited."], ["Spero che non ti {V} i miei commenti.", "I hope my comments didn't upset you."]],
+  cgt:[["Se gli {V} davvero, l'avrebbe detto.", "If he had really minded, he would have said so."], ["Se ti {V} i miei scherzi, avresti dovuto dirmelo.", "If my jokes had bothered you, you should have told me."]],
+  tp:[["Gli {V} lasciare la squadra, ma non aveva scelta.", "He had been sorry to leave the team, but he had no choice."], ["Ci {V} molto i loro commenti.", "Their comments had really hurt us."]],
+  tr:[["Dopo che gli {V} quel commento, non parlò più.", "After that comment had upset him, he said no more."], ["Appena gli {V} quei discorsi, se ne andò.", "As soon as those remarks had upset him, he left."]],
+  fa:[["Gli {V} non essere invitato.", "He must have been hurt not to be invited."], ["Le {V} i tuoi commenti.", "Your comments must have upset her."]],
+  pr:[["A tutti {V} la sua partenza.", "Everyone was sorry he left."], ["Al re {V} quelle parole.", "Those words displeased the king."]]
+};
+CURATED["occorrere"] = {
+  p:[["Per entrare {V} il passaporto.", "You need a passport to get in."], ["Per questa ricetta {V} tre uova.", "This recipe needs three eggs."]],
+  pp:[["Per finire il lavoro {V} un mese.", "It took a month to finish the job."], ["Per convincerlo {V} tre giorni.", "It took three days to convince him."]],
+  i:[["A quei tempi {V} un permesso speciale.", "Back then you needed a special permit."], ["Per arrivare in città {V} due giorni di viaggio.", "It used to take two days' travel to reach the city."]],
+  f:[["{V} un po' di pazienza.", "It will take a bit of patience."], ["{V} almeno due mesi per i lavori.", "The work will need at least two months."]],
+  c:[["{V} un miracolo per vincere.", "It would take a miracle to win."], ["Per finire in tempo {V} altri due operai.", "We'd need two more workers to finish on time."]],
+  cp:[["Per arrivare in tempo {V} un taxi.", "We would have needed a taxi to arrive on time."], ["Per vincere {V} altri due gol.", "Two more goals would have been needed to win."]],
+  cg:[["Non credo che {V} il visto.", "I don't think you need a visa."], ["Penso che {V} due persone per spostarlo.", "I think it takes two people to move it."]],
+  ci:[["Se {V} aiuto, chiamami.", "Should you need help, call me."], ["Se {V} altri soldi, te li presterei.", "If more money were needed, I'd lend it to you."]],
+  cgp:[["Non so quanto tempo {V}.", "I don't know how much time it took."], ["Credo che {V} due anni per costruirlo.", "I think it took two years to build."]],
+  cgt:[["Se {V} un medico, l'avremmo chiamato.", "If a doctor had been needed, we would have called one."], ["Se {V} altri giorni, saremmo rimasti.", "If more days had been needed, we would have stayed."]],
+  tp:[["Per convincerla {V} un pomeriggio intero.", "It had taken a whole afternoon to convince her."], ["Per il permesso {V} sei mesi.", "The permit had taken six months."]],
+  tr:[["Dopo che {V} un anno intero di restauri, la chiesa riaprì.", "After a whole year of restoration had been needed, the church reopened."], ["Dopo che {V} tre mesi di prove, lo spettacolo debuttò.", "After three months of rehearsals had been needed, the show opened."]],
+  fa:[["{V} un bel coraggio per dirglielo.", "It must have taken real courage to tell him."], ["{V} anni per costruire questa cattedrale.", "It must have taken years to build this cathedral."]],
+  pr:[["Per costruire il Duomo {V} più di un secolo.", "It took more than a century to build the Duomo."], ["Per finire la cupola {V} sedici anni.", "It took sixteen years to finish the dome."]]
+};
+CURATED["scorrere"] = {
+  p:[["Il fiume {V} lento sotto il ponte.", "The river flows slowly under the bridge."], ["In vacanza le giornate {V} veloci.", "On vacation the days fly by."]],
+  pp:[["Il tempo {V} in fretta.", "Time flew by."], ["Alla fine del film {V} i titoli di coda.", "The end credits rolled at the end of the film."]],
+  i:[["Un ruscello {V} dietro la casa.", "A stream ran behind the house."], ["Sullo schermo {V} i risultati delle partite.", "The match results were scrolling across the screen."]],
+  f:[["Vedrai che il tempo {V} in fretta.", "You'll see, time will fly."], ["Fra poco {V} i titoli di coda.", "The credits will roll soon."]],
+  c:[["Con meno auto il traffico {V} meglio.", "With fewer cars the traffic would flow better."], ["Con un buon montaggio i dialoghi {V} meglio.", "With good editing the dialogue would flow better."]],
+  cp:[["Con un'altra strada il traffico {V} meglio.", "With a different road the traffic would have flowed better."], ["Senza la pausa i minuti {V} più in fretta.", "Without the break the minutes would have gone by faster."]],
+  cg:[["Speriamo che oggi il traffico {V}.", "Let's hope the traffic moves today."], ["Bisogna che i lavori {V} senza intoppi.", "The work needs to run smoothly."]],
+  ci:[["Se il tempo {V} più piano, sarei felice.", "If time went by more slowly, I'd be happy."], ["Se le auto {V} meglio, arriveremmo prima.", "If the cars moved better, we'd get there sooner."]],
+  cgp:[["Non mi sembra che {V} così tanto tempo.", "It doesn't feel like that much time has passed."], ["Pare che alla festa {V} fiumi di vino.", "Apparently rivers of wine flowed at the party."]],
+  cgt:[["Se il traffico {V} meglio, saremmo arrivati in tempo.", "If the traffic had moved better, we'd have arrived on time."], ["Se i giorni {V} più lenti, avremmo visto tutto.", "If the days had gone by more slowly, we'd have seen everything."]],
+  tp:[["Era tardi: {VG} un altro anno.", "It was late: another year had already gone by."], ["Quando ci siamo rivisti, {V} vent'anni.", "When we met again, twenty years had gone by."]],
+  tr:[["Dopo che {V} un lungo silenzio, qualcuno parlò.", "After a long silence had passed, someone spoke."], ["Appena {V} i titoli di coda, si accesero le luci.", "As soon as the credits had rolled, the lights came on."]],
+  fa:[["Da allora {V} tanto tempo.", "A lot of time must have passed since then."], ["In quella riunione {V} fiumi di parole.", "Rivers of words must have flowed at that meeting."]],
+  pr:[["Per secoli il fiume {V} libero.", "For centuries the river flowed freely."], ["Quel giorno {V} fiumi di lacrime.", "Rivers of tears flowed that day."]],
+  pg:[["Stamattina il traffico {V} bene.", "The traffic is moving well this morning."], ["Guarda: {V} i titoli di coda.", "Look: the credits are rolling."]],
+  ipg:[["Mentre parlavamo, il tempo {V} veloce.", "While we talked, time was flying."], ["Mentre aspettavamo, {V} i minuti.", "While we waited, the minutes were ticking by."]],
+  fpg:[["A quest'ora il traffico {V} meglio.", "By now the traffic will be moving better."], ["A quest'ora {V} i titoli di coda.", "By now the credits will be rolling."]]
+};
+CURATED["fiorire"] = {
+  p:[["In aprile il glicine {V} in tutta Firenze.", "In April the wisteria blooms all over Florence."], ["Ogni primavera {V} i mandorli in Sicilia.", "Every spring the almond trees blossom in Sicily."]],
+  pp:[["Quest'anno il ciliegio {V} presto.", "This year the cherry tree bloomed early."], ["Sul balcone {V} i gerani.", "The geraniums have bloomed on the balcony."]],
+  i:[["Nel giardino della nonna {V} sempre un grande gelsomino.", "A big jasmine always used to bloom in grandma's garden."], ["A maggio {V} i limoni a Sorrento.", "In May the lemon trees used to blossom in Sorrento."]],
+  f:[["Fra un mese {V} il glicine.", "The wisteria will bloom in a month."], ["Con questo sole {V} presto i tulipani.", "With this sun the tulips will bloom soon."]],
+  c:[["Con più sole questo limone {V} di più.", "With more sun this lemon tree would flower more."], ["Con un po' d'acqua {V} anche le rose.", "With a little water even the roses would bloom."]],
+  cp:[["Senza la gelata il pesco {V} già.", "Without the frost the peach tree would already have bloomed."], ["Con più pioggia {V} tutti i fiori del prato.", "With more rain all the meadow flowers would have bloomed."]],
+  cg:[["Spero che il gelsomino {V} prima dell'estate.", "I hope the jasmine blooms before summer."], ["Aspetto che {V} i tulipani per fare le foto.", "I'm waiting for the tulips to bloom to take pictures."]],
+  ci:[["Se il limone {V}, avremmo i limoni a giugno.", "If the lemon tree flowered, we'd have lemons by June."], ["Se {V} i mandorli, la valle sarebbe tutta bianca.", "If the almond trees blossomed, the valley would be all white."]],
+  cgp:[["Credo che il ciliegio {V} la settimana scorsa.", "I think the cherry tree bloomed last week."], ["Pare che quest'anno {V} presto i mandorli.", "Apparently the almond trees bloomed early this year."]],
+  cgt:[["Se il pesco {V} prima, avremmo avuto più frutta.", "If the peach tree had bloomed earlier, we'd have had more fruit."], ["Se {V} i gerani, il balcone sarebbe stato bellissimo.", "If the geraniums had bloomed, the balcony would have looked beautiful."]],
+  tp:[["Quando siamo tornati, {VG} il glicine.", "When we got back, the wisteria had already bloomed."], ["A marzo {VG} i mandorli.", "By March the almond trees had already blossomed."]],
+  tr:[["Dopo che {V} il ciliegio, arrivò il gelo.", "After the cherry tree had bloomed, the frost came."], ["Appena {V} i mandorli, tornarono le api.", "As soon as the almond trees had blossomed, the bees came back."]],
+  fa:[["Ormai {V} il glicine: è maggio.", "The wisteria must have bloomed by now: it's May."], ["Ormai {V} i limoni a Sorrento.", "The lemon trees in Sorrento must have blossomed by now."]],
+  pr:[["Quella primavera il vecchio ulivo {V} di nuovo.", "That spring the old olive tree flowered again."], ["Dopo la guerra {V} nuovi teatri in tutta Italia.", "After the war new theaters flourished all over Italy."]],
+  pg:[["Guarda, {V} il glicine!", "Look, the wisteria is blooming!"], ["In questi giorni {V} i ciliegi.", "The cherry trees are blooming these days."]],
+  ipg:[["Mentre eravamo via, {V} il gelsomino.", "While we were away, the jasmine was blooming."], ["Quando siamo arrivati, {V} i limoni.", "When we arrived, the lemon trees were blossoming."]],
+  fpg:[["La settimana prossima {V} il glicine.", "Next week the wisteria will be blooming."], ["A quest'ora in Giappone {V} i ciliegi.", "By now the cherry trees will be blooming in Japan."]]
+};
+CURATED["marcire"] = {
+  p:[["Con questo caldo il pane {V} in due giorni.", "In this heat the bread goes bad in two days."], ["Se non li mangi, i pomodori {V}.", "If you don't eat them, the tomatoes go bad."]],
+  pp:[["Il melone {V}: buttalo.", "The melon has gone bad: throw it out."], ["In frigo {V} i peperoni.", "The peppers went bad in the fridge."]],
+  i:[["Il legno della barca {V} lentamente.", "The wood of the boat was slowly rotting."], ["In cantina {V} i vecchi mobili.", "The old furniture was rotting in the cellar."]],
+  f:[["Se lo lasci al sole, il formaggio {V}.", "If you leave it in the sun, the cheese will go bad."], ["Senza frigo {V} tutti i funghi.", "Without a fridge all the mushrooms will go bad."]],
+  c:[["Fuori dal frigo il pesce {V} subito.", "Outside the fridge the fish would go off right away."], ["Con tutta questa pioggia {V} i raccolti.", "With all this rain the crops would rot."]],
+  cp:[["Senza il frigo il pesce {V}.", "Without the fridge the fish would have gone off."], ["Con altra pioggia {V} tutti i raccolti.", "With more rain all the crops would have rotted."]],
+  cg:[["Mangiamo il melone prima che {V}.", "Let's eat the melon before it goes bad."], ["Non voglio che {V} questi pomodori.", "I don't want these tomatoes to go to waste."]],
+  ci:[["Se il legno {V}, cadrebbe il tetto.", "If the wood rotted, the roof would fall in."], ["Se {V} i raccolti, sarebbe un disastro.", "If the crops rotted, it would be a disaster."]],
+  cgp:[["Temo che il melone {V}.", "I'm afraid the melon has gone bad."], ["Credo che {V} i funghi.", "I think the mushrooms have gone bad."]],
+  cgt:[["Se il legno {V}, il ponte sarebbe crollato.", "If the wood had rotted, the bridge would have collapsed."], ["Se {V} i semi, non sarebbe nato niente.", "If the seeds had rotted, nothing would have grown."]],
+  tp:[["Quando siamo tornati, il pane {VG}.", "When we got back, the bread had already gone bad."], ["Prima di allora non {VM} i limoni sull'albero.", "Before then the lemons had never rotted on the tree."]],
+  tr:[["Dopo che {V} il raccolto, il paese patì la fame.", "After the harvest had rotted, the village went hungry."], ["Appena {V} i pali, la recinzione cadde.", "As soon as the posts had rotted, the fence fell down."]],
+  fa:[["{V} il melone: c'è un odore strano.", "The melon must have gone bad: there's a strange smell."], ["{V} i pomodori: buttali.", "The tomatoes must have gone bad: throw them out."]],
+  pr:[["Quell'inverno il raccolto {V} nei campi.", "That winter the harvest rotted in the fields."], ["Con l'alluvione {V} tutti i raccolti.", "With the flood all the crops rotted."]],
+  pg:[["Questo legno {V}: bisogna cambiarlo.", "This wood is rotting: it needs replacing."], ["Nel cesto {V} i pomodori.", "The tomatoes are going bad in the basket."]],
+  ipg:[["Il vecchio pontile {V}.", "The old pier was rotting."], ["In fondo al frigo {V} dei peperoni.", "Some peppers were going bad at the back of the fridge."]],
+  fpg:[["Con questo caldo il pesce {V} già.", "In this heat the fish will already be going bad."], ["A quest'ora {V} i frutti caduti.", "By now the fallen fruit will be rotting."]]
+};
+CURATED["sorgere"] = {
+  p:[["D'estate il sole {V} alle sei.", "In summer the sun rises at six."], ["Spesso {V} dei dubbi all'ultimo momento.", "Doubts often come up at the last minute."]],
+  pp:[["Il sole {V} dietro le colline.", "The sun rose behind the hills."], ["Durante la riunione {V} nuovi problemi.", "New problems came up during the meeting."]],
+  i:[["Da casa nostra vedevamo il sole che {V} dal mare.", "From our house we watched the sun rising from the sea."], ["Ogni giorno {V} nuovi ostacoli.", "New obstacles kept coming up every day."]],
+  f:[["Domani il sole {V} alle sei e mezza.", "Tomorrow the sun will rise at six thirty."], ["Vedrai che {V} altri problemi.", "You'll see, other problems will come up."]],
+  c:[["Senza la sua firma {V} un problema serio.", "Without his signature a serious problem would arise."], ["Con un piano chiaro non {V} questi dubbi.", "With a clear plan these doubts wouldn't come up."]],
+  cp:[["Senza quel ritardo non {V} nessun problema.", "Without that delay no problem would have come up."], ["Con più chiarezza non {V} tanti malintesi.", "With more clarity so many misunderstandings wouldn't have come up."]],
+  cg:[["Aspettiamo che {V} il sole per partire.", "Let's wait for the sun to rise before we leave."], ["Speriamo che non {V} altri problemi.", "Let's hope no other problems come up."]],
+  ci:[["Se {V} un problema, ti chiamerei.", "If a problem came up, I'd call you."], ["Se {V} dei dubbi, ne parleremmo.", "If any doubts came up, we'd talk about them."]],
+  cgp:[["Credo che {V} un malinteso.", "I think a misunderstanding has come up."], ["Pare che {V} dei problemi col contratto.", "It seems some problems have come up with the contract."]],
+  cgt:[["Se {V} un problema, ce l'avrebbero detto.", "If a problem had come up, they would have told us."], ["Se {V} altri dubbi, avremmo rinviato.", "If other doubts had come up, we would have postponed."]],
+  tp:[["Quando siamo arrivati in cima, {VG} il sole.", "When we reached the top, the sun had already risen."], ["Prima di allora non {VM} problemi.", "Before then no problems had ever come up."]],
+  tr:[["Appena {V} il sole, partimmo.", "As soon as the sun had risen, we set off."], ["Dopo che {V} quei dubbi, nessuno firmò.", "After those doubts had arisen, nobody signed."]],
+  fa:[["{V} un problema: non rispondono più.", "A problem must have come up: they're not answering anymore."], ["{V} dei dubbi: hanno rinviato tutto.", "Some doubts must have come up: they've postponed everything."]],
+  pr:[["Quel mattino il sole {V} rosso sul mare.", "That morning the sun rose red over the sea."], ["Nel Medioevo {V} i primi comuni.", "The first city-states arose in the Middle Ages."]],
+  pg:[["Svegliati: {V} il sole!", "Wake up: the sun is rising!"], ["Con il cantiere {V} nuovi problemi.", "New problems are coming up with the construction work."]],
+  ipg:[["Quando siamo partiti, {V} il sole.", "When we left, the sun was rising."], ["Mentre firmavamo, {V} dei dubbi.", "While we were signing, some doubts were coming up."]],
+  fpg:[["A quest'ora in Giappone {V} il sole.", "By now the sun will be rising in Japan."], ["Fra poco {V} le prime difficoltà.", "Soon the first difficulties will be coming up."]]
+};
+CURATED["tramontare"] = {
+  p:[["A Sorrento il sole {V} sul mare.", "In Sorrento the sun sets over the sea."], ["Certi sogni non {V} mai.", "Some dreams never fade."]],
+  pp:[["Il sole {V} un'ora fa.", "The sun went down an hour ago."], ["Con quella sconfitta {V} i nostri sogni.", "With that defeat our dreams faded."]],
+  i:[["Ogni sera guardavamo il sole che {V}.", "Every evening we watched the sun going down."], ["A quell'ora {V} le ultime stelle.", "At that hour the last stars were setting."]],
+  f:[["Stasera il sole {V} alle sette.", "Tonight the sun will set at seven."], ["Certe mode non {V} mai.", "Some fashions will never fade."]],
+  c:[["Con l'ora legale il sole {V} più tardi.", "With daylight saving time the sun would set later."], ["Senza di lui {V} tanti progetti.", "Without him many projects would fade away."]],
+  cp:[["Senza quell'errore il suo successo non {V} così presto.", "Without that mistake his success wouldn't have faded so soon."], ["Con un po' di fortuna non {V} i nostri progetti.", "With a bit of luck our plans wouldn't have faded."]],
+  cg:[["Aspettiamo che {V} il sole per cenare.", "Let's wait for the sun to set before dinner."], ["Spero che non {V} mai certe tradizioni.", "I hope certain traditions never fade."]],
+  ci:[["Se il sole {V} più tardi, resteremmo in spiaggia.", "If the sun set later, we'd stay on the beach."], ["Se {V} queste tradizioni, sarebbe un peccato.", "If these traditions faded, it would be a shame."]],
+  cgp:[["Credo che il sole {V} da poco.", "I think the sun set a little while ago."], ["Pare che {V} i vecchi metodi.", "Apparently the old methods have had their day."]],
+  cgt:[["Se il sole {V}, avremmo acceso il fuoco.", "If the sun had set, we would have lit the fire."], ["Se {V} quei sogni, non saremmo qui.", "If those dreams had faded, we wouldn't be here."]],
+  tp:[["Quando siamo arrivati in spiaggia, {VG} il sole.", "When we got to the beach, the sun had already set."], ["A quel punto {VG} i tempi d'oro.", "By then the golden days had already passed."]],
+  tr:[["Appena {V} il sole, accesero i lampioni.", "As soon as the sun had set, they turned on the streetlights."], ["Dopo che {V} quegli ideali, il partito si sciolse.", "After those ideals had faded, the party broke up."]],
+  fa:[["Ormai {V} il sole: è buio.", "The sun must have set by now: it's dark."], ["Ormai {V} i tempi delle lettere scritte a mano.", "The days of handwritten letters must be over by now."]],
+  pr:[["Quella sera il sole {V} tra le nuvole.", "That evening the sun set among the clouds."], ["Con la caduta dell'impero {V} molti privilegi.", "With the fall of the empire many privileges faded away."]],
+  pg:[["Guarda: {V} il sole dietro il campanile!", "Look: the sun is setting behind the bell tower!"], ["{V} le ultime stelle.", "The last stars are setting."]],
+  ipg:[["Quando siamo arrivati sulla terrazza, {V} il sole.", "When we reached the terrace, the sun was setting."], ["Mentre parlavamo, {V} le stelle.", "While we were talking, the stars were setting."]],
+  fpg:[["A quest'ora a Sorrento {V} il sole.", "By now the sun will be setting in Sorrento."], ["Fra poco {V} le ultime stelle.", "Soon the last stars will be setting."]]
+};
 function reflEnglish(b){
   if(/^be /.test(b)){
     const r = b.slice(3);
@@ -11268,6 +11645,13 @@ if(S.ver !== VER){                                // migrate: switch on the new 
 }
 if(!S.filt || typeof S.filt!=="object") S.filt = {travel:false, reg:null, aux:null};
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
+/* verbs added to the conjugator since this browser last opened it are switched on once,
+   so new verbs show up in a saved selection; verbs you switch off later stay off */
+const ADDED_NOV_2026 = ["lavare", "pulire", "stirare", "riempire", "svuotare", "versare", "apparecchiare", "sparecchiare", "riparare", "appoggiare", "bussare", "cuocere", "friggere", "bollire", "arrostire", "mescolare", "gustare", "guidare", "attraversare", "passeggiare", "saltare", "scivolare", "inciampare", "traslocare", "affittare", "noleggiare", "consegnare", "ritirare", "telefonare", "chiacchierare", "gridare", "sussurrare", "domandare", "richiamare", "caricare", "scaricare", "ricaricare", "stampare", "cliccare", "digitare", "navigare", "fotografare", "filmare", "registrare", "sfogliare", "annullare", "indovinare", "pronunciare", "guarire", "tossire", "starnutire", "ingrassare", "dimagrire", "pesare", "annusare", "festeggiare", "divorziare", "consigliare", "osare", "proibire", "vietare", "prestare", "suonare", "anticipare", "ritardare", "programmare", "pianificare", "calcolare", "sommare", "moltiplicare", "sciare", "pescare", "godere", "piovere", "nevicare", "annoiarsi", "vergognarsi", "pentirsi", "riposarsi", "sdraiarsi", "ammalarsi", "sbrigarsi", "affrettarsi", "calmarsi", "tranquillizzarsi", "adattarsi", "atterrare", "sbarcare", "rincasare", "evadere", "precipitare", "affondare", "invecchiare", "ringiovanire", "arrossire", "impallidire", "esplodere", "scoppiare", "annegare", "affogare", "fiorire", "marcire", "sorgere", "tramontare", "svenire", "sopravvivere", "scomparire", "comparire", "provenire", "accadere", "dispiacere", "occorrere", "scorrere"];
+if(!Array.isArray(S.knownVerbs)) S.knownVerbs = VERBS.map(v=>v.inf).filter(x=>!ADDED_NOV_2026.includes(x));
+{ const fresh = VERBS.map(v=>v.inf).filter(x=>!S.knownVerbs.includes(x));
+  if(fresh.length) S.verbs = Array.from(new Set(S.verbs.concat(fresh)));
+  S.knownVerbs = VERBS.map(v=>v.inf); save(); }
 
 let deck=[], pos=0, flipped=false, curPhrase="", curDobj;
 
