@@ -4033,7 +4033,7 @@ Object.assign(META, {
   "nuotare": {g:"are", reg:true, why:"Regular."},
   "conquistare": {g:"are", reg:true, why:"Regular, with avere. Conquistare qualcuno = to win someone's heart."},
   "unire": {g:"isc", reg:true, why:"Regular -isc- verb: unisco, unisci."},
-  "volare": {g:"are", reg:true, why:"Regular. Usually avere (ho volato), but essere for movement and figuratively: il tempo è volato (time flew)."},
+  "volare": {g:"are", reg:true, why:"Regular. Avere for the flying itself (ho volato con una compagnia low cost), essere when you name where you flew to or from (sono volato a Palermo) and figuratively: il tempo è volato (time flew)."},
   "complicare": {g:"are", reg:true, why:"Regular -care verb: tu complichi, complicherò. Stress: còmplico."},
   "valutare": {g:"are", reg:true, why:"Regular. Stress on the first syllable: vàluto."},
   "stringere": {g:"ere", reg:false, why:"Present and future are regular; irregular participle stretto and passato remoto strinsi."},
@@ -4108,6 +4108,538 @@ Object.assign(META, {
   "parere": {g:"ere", reg:false, why:"Irregular: paio, pari, pare, paiono; future parr-; participle parso; passato remoto parve; takes essere. Mostly used like sembrare: mi pare che… (it seems to me that…), mi pare giusto."}
 });
 
+/* --- everyday verbs added November 2026: home, food, getting around, phone & computer, weather, health, social life, planning, free time --- */
+VERBS.push(
+  {inf:"lavare", en:"to wash",
+   pres:["lavo", "lavi", "lava", "laviamo", "lavate", "lavano"],
+   fut:["laverò", "laverai", "laverà", "laveremo", "laverete", "laveranno"],
+   pp:"lavato", aux:"avere",
+   enBase:"wash", en3:"washes", enPast:"washed", enPart:"washed", enFut:"will wash"},
+
+  {inf:"pulire", en:"to clean",
+   pres:["pulisco", "pulisci", "pulisce", "puliamo", "pulite", "puliscono"],
+   fut:["pulirò", "pulirai", "pulirà", "puliremo", "pulirete", "puliranno"],
+   pp:"pulito", aux:"avere",
+   enBase:"clean", en3:"cleans", enPast:"cleaned", enPart:"cleaned", enFut:"will clean"},
+
+  {inf:"stirare", en:"to iron",
+   pres:["stiro", "stiri", "stira", "stiriamo", "stirate", "stirano"],
+   fut:["stirerò", "stirerai", "stirerà", "stireremo", "stirerete", "stireranno"],
+   pp:"stirato", aux:"avere",
+   enBase:"iron", en3:"irons", enPast:"ironed", enPart:"ironed", enFut:"will iron"},
+
+  {inf:"riempire", en:"to fill",
+   pres:["riempio", "riempi", "riempie", "riempiamo", "riempite", "riempiono"],
+   fut:["riempirò", "riempirai", "riempirà", "riempiremo", "riempirete", "riempiranno"],
+   pp:"riempito", aux:"avere",
+   enBase:"fill", en3:"fills", enPast:"filled", enPart:"filled", enFut:"will fill"},
+
+  {inf:"svuotare", en:"to empty",
+   pres:["svuoto", "svuoti", "svuota", "svuotiamo", "svuotate", "svuotano"],
+   fut:["svuoterò", "svuoterai", "svuoterà", "svuoteremo", "svuoterete", "svuoteranno"],
+   pp:"svuotato", aux:"avere",
+   enBase:"empty", en3:"empties", enPast:"emptied", enPart:"emptied", enFut:"will empty"},
+
+  {inf:"versare", en:"to pour",
+   pres:["verso", "versi", "versa", "versiamo", "versate", "versano"],
+   fut:["verserò", "verserai", "verserà", "verseremo", "verserete", "verseranno"],
+   pp:"versato", aux:"avere",
+   enBase:"pour", en3:"pours", enPast:"poured", enPart:"poured", enFut:"will pour"},
+
+  {inf:"apparecchiare", en:"to set the table",
+   pres:["apparecchio", "apparecchi", "apparecchia", "apparecchiamo", "apparecchiate", "apparecchiano"],
+   fut:["apparecchierò", "apparecchierai", "apparecchierà", "apparecchieremo", "apparecchierete", "apparecchieranno"],
+   pp:"apparecchiato", aux:"avere",
+   enBase:"set the table", en3:"sets the table", enPast:"set the table", enPart:"set the table", enFut:"will set the table"},
+
+  {inf:"sparecchiare", en:"to clear the table",
+   pres:["sparecchio", "sparecchi", "sparecchia", "sparecchiamo", "sparecchiate", "sparecchiano"],
+   fut:["sparecchierò", "sparecchierai", "sparecchierà", "sparecchieremo", "sparecchierete", "sparecchieranno"],
+   pp:"sparecchiato", aux:"avere",
+   enBase:"clear the table", en3:"clears the table", enPast:"cleared the table", enPart:"cleared the table", enFut:"will clear the table"},
+
+  {inf:"riparare", en:"to repair / to fix",
+   pres:["riparo", "ripari", "ripara", "ripariamo", "riparate", "riparano"],
+   fut:["riparerò", "riparerai", "riparerà", "ripareremo", "riparerete", "ripareranno"],
+   pp:"riparato", aux:"avere",
+   enBase:"fix", en3:"fixes", enPast:"fixed", enPart:"fixed", enFut:"will fix"},
+
+  {inf:"appoggiare", en:"to lean / to put down / to support",
+   pres:["appoggio", "appoggi", "appoggia", "appoggiamo", "appoggiate", "appoggiano"],
+   fut:["appoggerò", "appoggerai", "appoggerà", "appoggeremo", "appoggerete", "appoggeranno"],
+   pp:"appoggiato", aux:"avere",
+   enBase:"lean", en3:"leans", enPast:"leaned", enPart:"leaned", enFut:"will lean"},
+
+  {inf:"bussare", en:"to knock",
+   pres:["busso", "bussi", "bussa", "bussiamo", "bussate", "bussano"],
+   fut:["busserò", "busserai", "busserà", "busseremo", "busserete", "busseranno"],
+   pp:"bussato", aux:"avere",
+   enBase:"knock", en3:"knocks", enPast:"knocked", enPart:"knocked", enFut:"will knock"},
+
+  {inf:"cuocere", en:"to cook",
+   pres:["cuocio", "cuoci", "cuoce", "cuociamo", "cuocete", "cuociono"],
+   fut:["cuocerò", "cuocerai", "cuocerà", "cuoceremo", "cuocerete", "cuoceranno"],
+   pp:"cotto", aux:"avere",
+   enBase:"cook", en3:"cooks", enPast:"cooked", enPart:"cooked", enFut:"will cook"},
+
+  {inf:"friggere", en:"to fry",
+   pres:["friggo", "friggi", "frigge", "friggiamo", "friggete", "friggono"],
+   fut:["friggerò", "friggerai", "friggerà", "friggeremo", "friggerete", "friggeranno"],
+   pp:"fritto", aux:"avere",
+   enBase:"fry", en3:"fries", enPast:"fried", enPart:"fried", enFut:"will fry"},
+
+  {inf:"bollire", en:"to boil",
+   pres:["bollo", "bolli", "bolle", "bolliamo", "bollite", "bollono"],
+   fut:["bollirò", "bollirai", "bollirà", "bolliremo", "bollirete", "bolliranno"],
+   pp:"bollito", aux:"avere",
+   enBase:"boil", en3:"boils", enPast:"boiled", enPart:"boiled", enFut:"will boil"},
+
+  {inf:"arrostire", en:"to roast / to grill",
+   pres:["arrostisco", "arrostisci", "arrostisce", "arrostiamo", "arrostite", "arrostiscono"],
+   fut:["arrostirò", "arrostirai", "arrostirà", "arrostiremo", "arrostirete", "arrostiranno"],
+   pp:"arrostito", aux:"avere",
+   enBase:"roast", en3:"roasts", enPast:"roasted", enPart:"roasted", enFut:"will roast"},
+
+  {inf:"mescolare", en:"to stir / to mix",
+   pres:["mescolo", "mescoli", "mescola", "mescoliamo", "mescolate", "mescolano"],
+   fut:["mescolerò", "mescolerai", "mescolerà", "mescoleremo", "mescolerete", "mescoleranno"],
+   pp:"mescolato", aux:"avere",
+   enBase:"stir", en3:"stirs", enPast:"stirred", enPart:"stirred", enFut:"will stir"},
+
+  {inf:"gustare", en:"to savor / to enjoy",
+   pres:["gusto", "gusti", "gusta", "gustiamo", "gustate", "gustano"],
+   fut:["gusterò", "gusterai", "gusterà", "gusteremo", "gusterete", "gusteranno"],
+   pp:"gustato", aux:"avere",
+   enBase:"savor", en3:"savors", enPast:"savored", enPart:"savored", enFut:"will savor"},
+
+  {inf:"guidare", en:"to drive",
+   pres:["guido", "guidi", "guida", "guidiamo", "guidate", "guidano"],
+   fut:["guiderò", "guiderai", "guiderà", "guideremo", "guiderete", "guideranno"],
+   pp:"guidato", aux:"avere",
+   enBase:"drive", en3:"drives", enPast:"drove", enPart:"driven", enFut:"will drive"},
+
+  {inf:"attraversare", en:"to cross",
+   pres:["attraverso", "attraversi", "attraversa", "attraversiamo", "attraversate", "attraversano"],
+   fut:["attraverserò", "attraverserai", "attraverserà", "attraverseremo", "attraverserete", "attraverseranno"],
+   pp:"attraversato", aux:"avere",
+   enBase:"cross", en3:"crosses", enPast:"crossed", enPart:"crossed", enFut:"will cross"},
+
+  {inf:"passeggiare", en:"to stroll / to go for a walk",
+   pres:["passeggio", "passeggi", "passeggia", "passeggiamo", "passeggiate", "passeggiano"],
+   fut:["passeggerò", "passeggerai", "passeggerà", "passeggeremo", "passeggerete", "passeggeranno"],
+   pp:"passeggiato", aux:"avere",
+   enBase:"stroll", en3:"strolls", enPast:"strolled", enPart:"strolled", enFut:"will stroll"},
+
+  {inf:"saltare", en:"to jump / to skip",
+   pres:["salto", "salti", "salta", "saltiamo", "saltate", "saltano"],
+   fut:["salterò", "salterai", "salterà", "salteremo", "salterete", "salteranno"],
+   pp:"saltato", aux:"avere",
+   enBase:"jump", en3:"jumps", enPast:"jumped", enPart:"jumped", enFut:"will jump"},
+
+  {inf:"scivolare", en:"to slip / to slide",
+   pres:["scivolo", "scivoli", "scivola", "scivoliamo", "scivolate", "scivolano"],
+   fut:["scivolerò", "scivolerai", "scivolerà", "scivoleremo", "scivolerete", "scivoleranno"],
+   pp:"scivolato", aux:"essere",
+   enBase:"slip", en3:"slips", enPast:"slipped", enPart:"slipped", enFut:"will slip"},
+
+  {inf:"inciampare", en:"to trip / to stumble",
+   pres:["inciampo", "inciampi", "inciampa", "inciampiamo", "inciampate", "inciampano"],
+   fut:["inciamperò", "inciamperai", "inciamperà", "inciamperemo", "inciamperete", "inciamperanno"],
+   pp:"inciampato", aux:"essere",
+   enBase:"trip", en3:"trips", enPast:"tripped", enPart:"tripped", enFut:"will trip"},
+
+  {inf:"traslocare", en:"to move (house)",
+   pres:["trasloco", "traslochi", "trasloca", "traslochiamo", "traslocate", "traslocano"],
+   fut:["traslocherò", "traslocherai", "traslocherà", "traslocheremo", "traslocherete", "traslocheranno"],
+   pp:"traslocato", aux:"avere",
+   enBase:"move", en3:"moves", enPast:"moved", enPart:"moved", enFut:"will move"},
+
+  {inf:"affittare", en:"to rent",
+   pres:["affitto", "affitti", "affitta", "affittiamo", "affittate", "affittano"],
+   fut:["affitterò", "affitterai", "affitterà", "affitteremo", "affitterete", "affitteranno"],
+   pp:"affittato", aux:"avere",
+   enBase:"rent", en3:"rents", enPast:"rented", enPart:"rented", enFut:"will rent"},
+
+  {inf:"noleggiare", en:"to rent / to hire (a car, a bike…)",
+   pres:["noleggio", "noleggi", "noleggia", "noleggiamo", "noleggiate", "noleggiano"],
+   fut:["noleggerò", "noleggerai", "noleggerà", "noleggeremo", "noleggerete", "noleggeranno"],
+   pp:"noleggiato", aux:"avere",
+   enBase:"rent", en3:"rents", enPast:"rented", enPart:"rented", enFut:"will rent"},
+
+  {inf:"consegnare", en:"to deliver / to hand in",
+   pres:["consegno", "consegni", "consegna", "consegniamo", "consegnate", "consegnano"],
+   fut:["consegnerò", "consegnerai", "consegnerà", "consegneremo", "consegnerete", "consegneranno"],
+   pp:"consegnato", aux:"avere",
+   enBase:"deliver", en3:"delivers", enPast:"delivered", enPart:"delivered", enFut:"will deliver"},
+
+  {inf:"ritirare", en:"to pick up / to collect / to withdraw",
+   pres:["ritiro", "ritiri", "ritira", "ritiriamo", "ritirate", "ritirano"],
+   fut:["ritirerò", "ritirerai", "ritirerà", "ritireremo", "ritirerete", "ritireranno"],
+   pp:"ritirato", aux:"avere",
+   enBase:"pick up", en3:"picks up", enPast:"picked up", enPart:"picked up", enFut:"will pick up"},
+
+  {inf:"telefonare", en:"to phone / to call",
+   pres:["telefono", "telefoni", "telefona", "telefoniamo", "telefonate", "telefonano"],
+   fut:["telefonerò", "telefonerai", "telefonerà", "telefoneremo", "telefonerete", "telefoneranno"],
+   pp:"telefonato", aux:"avere",
+   enBase:"call", en3:"calls", enPast:"called", enPart:"called", enFut:"will call"},
+
+  {inf:"chiacchierare", en:"to chat",
+   pres:["chiacchiero", "chiacchieri", "chiacchiera", "chiacchieriamo", "chiacchierate", "chiacchierano"],
+   fut:["chiacchiererò", "chiacchiererai", "chiacchiererà", "chiacchiereremo", "chiacchiererete", "chiacchiereranno"],
+   pp:"chiacchierato", aux:"avere",
+   enBase:"chat", en3:"chats", enPast:"chatted", enPart:"chatted", enFut:"will chat"},
+
+  {inf:"gridare", en:"to shout",
+   pres:["grido", "gridi", "grida", "gridiamo", "gridate", "gridano"],
+   fut:["griderò", "griderai", "griderà", "grideremo", "griderete", "grideranno"],
+   pp:"gridato", aux:"avere",
+   enBase:"shout", en3:"shouts", enPast:"shouted", enPart:"shouted", enFut:"will shout"},
+
+  {inf:"sussurrare", en:"to whisper",
+   pres:["sussurro", "sussurri", "sussurra", "sussurriamo", "sussurrate", "sussurrano"],
+   fut:["sussurrerò", "sussurrerai", "sussurrerà", "sussurreremo", "sussurrerete", "sussurreranno"],
+   pp:"sussurrato", aux:"avere",
+   enBase:"whisper", en3:"whispers", enPast:"whispered", enPart:"whispered", enFut:"will whisper"},
+
+  {inf:"domandare", en:"to ask",
+   pres:["domando", "domandi", "domanda", "domandiamo", "domandate", "domandano"],
+   fut:["domanderò", "domanderai", "domanderà", "domanderemo", "domanderete", "domanderanno"],
+   pp:"domandato", aux:"avere",
+   enBase:"ask", en3:"asks", enPast:"asked", enPart:"asked", enFut:"will ask"},
+
+  {inf:"richiamare", en:"to call back",
+   pres:["richiamo", "richiami", "richiama", "richiamiamo", "richiamate", "richiamano"],
+   fut:["richiamerò", "richiamerai", "richiamerà", "richiameremo", "richiamerete", "richiameranno"],
+   pp:"richiamato", aux:"avere",
+   enBase:"call back", en3:"calls back", enPast:"called back", enPart:"called back", enFut:"will call back"},
+
+  {inf:"caricare", en:"to load / to charge / to upload",
+   pres:["carico", "carichi", "carica", "carichiamo", "caricate", "caricano"],
+   fut:["caricherò", "caricherai", "caricherà", "caricheremo", "caricherete", "caricheranno"],
+   pp:"caricato", aux:"avere",
+   enBase:"charge", en3:"charges", enPast:"charged", enPart:"charged", enFut:"will charge"},
+
+  {inf:"scaricare", en:"to download / to unload",
+   pres:["scarico", "scarichi", "scarica", "scarichiamo", "scaricate", "scaricano"],
+   fut:["scaricherò", "scaricherai", "scaricherà", "scaricheremo", "scaricherete", "scaricheranno"],
+   pp:"scaricato", aux:"avere",
+   enBase:"download", en3:"downloads", enPast:"downloaded", enPart:"downloaded", enFut:"will download"},
+
+  {inf:"ricaricare", en:"to recharge / to top up",
+   pres:["ricarico", "ricarichi", "ricarica", "ricarichiamo", "ricaricate", "ricaricano"],
+   fut:["ricaricherò", "ricaricherai", "ricaricherà", "ricaricheremo", "ricaricherete", "ricaricheranno"],
+   pp:"ricaricato", aux:"avere",
+   enBase:"recharge", en3:"recharges", enPast:"recharged", enPart:"recharged", enFut:"will recharge"},
+
+  {inf:"stampare", en:"to print",
+   pres:["stampo", "stampi", "stampa", "stampiamo", "stampate", "stampano"],
+   fut:["stamperò", "stamperai", "stamperà", "stamperemo", "stamperete", "stamperanno"],
+   pp:"stampato", aux:"avere",
+   enBase:"print", en3:"prints", enPast:"printed", enPart:"printed", enFut:"will print"},
+
+  {inf:"cliccare", en:"to click",
+   pres:["clicco", "clicchi", "clicca", "clicchiamo", "cliccate", "cliccano"],
+   fut:["cliccherò", "cliccherai", "cliccherà", "cliccheremo", "cliccherete", "cliccheranno"],
+   pp:"cliccato", aux:"avere",
+   enBase:"click", en3:"clicks", enPast:"clicked", enPart:"clicked", enFut:"will click"},
+
+  {inf:"digitare", en:"to type / to enter",
+   pres:["digito", "digiti", "digita", "digitiamo", "digitate", "digitano"],
+   fut:["digiterò", "digiterai", "digiterà", "digiteremo", "digiterete", "digiteranno"],
+   pp:"digitato", aux:"avere",
+   enBase:"type", en3:"types", enPast:"typed", enPart:"typed", enFut:"will type"},
+
+  {inf:"navigare", en:"to browse / to sail",
+   pres:["navigo", "navighi", "naviga", "navighiamo", "navigate", "navigano"],
+   fut:["navigherò", "navigherai", "navigherà", "navigheremo", "navigherete", "navigheranno"],
+   pp:"navigato", aux:"avere",
+   enBase:"browse", en3:"browses", enPast:"browsed", enPart:"browsed", enFut:"will browse"},
+
+  {inf:"fotografare", en:"to photograph",
+   pres:["fotografo", "fotografi", "fotografa", "fotografiamo", "fotografate", "fotografano"],
+   fut:["fotograferò", "fotograferai", "fotograferà", "fotograferemo", "fotograferete", "fotograferanno"],
+   pp:"fotografato", aux:"avere",
+   enBase:"photograph", en3:"photographs", enPast:"photographed", enPart:"photographed", enFut:"will photograph"},
+
+  {inf:"filmare", en:"to film",
+   pres:["filmo", "filmi", "filma", "filmiamo", "filmate", "filmano"],
+   fut:["filmerò", "filmerai", "filmerà", "filmeremo", "filmerete", "filmeranno"],
+   pp:"filmato", aux:"avere",
+   enBase:"film", en3:"films", enPast:"filmed", enPart:"filmed", enFut:"will film"},
+
+  {inf:"registrare", en:"to record / to register",
+   pres:["registro", "registri", "registra", "registriamo", "registrate", "registrano"],
+   fut:["registrerò", "registrerai", "registrerà", "registreremo", "registrerete", "registreranno"],
+   pp:"registrato", aux:"avere",
+   enBase:"record", en3:"records", enPast:"recorded", enPart:"recorded", enFut:"will record"},
+
+  {inf:"sfogliare", en:"to leaf through",
+   pres:["sfoglio", "sfogli", "sfoglia", "sfogliamo", "sfogliate", "sfogliano"],
+   fut:["sfoglierò", "sfoglierai", "sfoglierà", "sfoglieremo", "sfoglierete", "sfoglieranno"],
+   pp:"sfogliato", aux:"avere",
+   enBase:"flip through", en3:"flips through", enPast:"flipped through", enPart:"flipped through", enFut:"will flip through"},
+
+  {inf:"annullare", en:"to cancel",
+   pres:["annullo", "annulli", "annulla", "annulliamo", "annullate", "annullano"],
+   fut:["annullerò", "annullerai", "annullerà", "annulleremo", "annullerete", "annulleranno"],
+   pp:"annullato", aux:"avere",
+   enBase:"cancel", en3:"cancels", enPast:"canceled", enPart:"canceled", enFut:"will cancel"},
+
+  {inf:"indovinare", en:"to guess",
+   pres:["indovino", "indovini", "indovina", "indoviniamo", "indovinate", "indovinano"],
+   fut:["indovinerò", "indovinerai", "indovinerà", "indovineremo", "indovinerete", "indovineranno"],
+   pp:"indovinato", aux:"avere",
+   enBase:"guess", en3:"guesses", enPast:"guessed", enPart:"guessed", enFut:"will guess"},
+
+  {inf:"pronunciare", en:"to pronounce",
+   pres:["pronuncio", "pronunci", "pronuncia", "pronunciamo", "pronunciate", "pronunciano"],
+   fut:["pronuncerò", "pronuncerai", "pronuncerà", "pronunceremo", "pronuncerete", "pronunceranno"],
+   pp:"pronunciato", aux:"avere",
+   enBase:"pronounce", en3:"pronounces", enPast:"pronounced", enPart:"pronounced", enFut:"will pronounce"},
+
+  {inf:"guarire", en:"to recover / to get better / to cure",
+   pres:["guarisco", "guarisci", "guarisce", "guariamo", "guarite", "guariscono"],
+   fut:["guarirò", "guarirai", "guarirà", "guariremo", "guarirete", "guariranno"],
+   pp:"guarito", aux:"essere",
+   enBase:"get better", en3:"gets better", enPast:"got better", enPart:"gotten better", enFut:"will get better"},
+
+  {inf:"tossire", en:"to cough",
+   pres:["tossisco", "tossisci", "tossisce", "tossiamo", "tossite", "tossiscono"],
+   fut:["tossirò", "tossirai", "tossirà", "tossiremo", "tossirete", "tossiranno"],
+   pp:"tossito", aux:"avere",
+   enBase:"cough", en3:"coughs", enPast:"coughed", enPart:"coughed", enFut:"will cough"},
+
+  {inf:"starnutire", en:"to sneeze",
+   pres:["starnutisco", "starnutisci", "starnutisce", "starnutiamo", "starnutite", "starnutiscono"],
+   fut:["starnutirò", "starnutirai", "starnutirà", "starnutiremo", "starnutirete", "starnutiranno"],
+   pp:"starnutito", aux:"avere",
+   enBase:"sneeze", en3:"sneezes", enPast:"sneezed", enPart:"sneezed", enFut:"will sneeze"},
+
+  {inf:"ingrassare", en:"to put on weight",
+   pres:["ingrasso", "ingrassi", "ingrassa", "ingrassiamo", "ingrassate", "ingrassano"],
+   fut:["ingrasserò", "ingrasserai", "ingrasserà", "ingrasseremo", "ingrasserete", "ingrasseranno"],
+   pp:"ingrassato", aux:"essere",
+   enBase:"put on weight", en3:"puts on weight", enPast:"put on weight", enPart:"put on weight", enFut:"will put on weight"},
+
+  {inf:"dimagrire", en:"to lose weight",
+   pres:["dimagrisco", "dimagrisci", "dimagrisce", "dimagriamo", "dimagrite", "dimagriscono"],
+   fut:["dimagrirò", "dimagrirai", "dimagrirà", "dimagriremo", "dimagrirete", "dimagriranno"],
+   pp:"dimagrito", aux:"essere",
+   enBase:"lose weight", en3:"loses weight", enPast:"lost weight", enPart:"lost weight", enFut:"will lose weight"},
+
+  {inf:"pesare", en:"to weigh",
+   pres:["peso", "pesi", "pesa", "pesiamo", "pesate", "pesano"],
+   fut:["peserò", "peserai", "peserà", "peseremo", "peserete", "peseranno"],
+   pp:"pesato", aux:"avere",
+   enBase:"weigh", en3:"weighs", enPast:"weighed", enPart:"weighed", enFut:"will weigh"},
+
+  {inf:"annusare", en:"to sniff / to smell",
+   pres:["annuso", "annusi", "annusa", "annusiamo", "annusate", "annusano"],
+   fut:["annuserò", "annuserai", "annuserà", "annuseremo", "annuserete", "annuseranno"],
+   pp:"annusato", aux:"avere",
+   enBase:"sniff", en3:"sniffs", enPast:"sniffed", enPart:"sniffed", enFut:"will sniff"},
+
+  {inf:"festeggiare", en:"to celebrate",
+   pres:["festeggio", "festeggi", "festeggia", "festeggiamo", "festeggiate", "festeggiano"],
+   fut:["festeggerò", "festeggerai", "festeggerà", "festeggeremo", "festeggerete", "festeggeranno"],
+   pp:"festeggiato", aux:"avere",
+   enBase:"celebrate", en3:"celebrates", enPast:"celebrated", enPart:"celebrated", enFut:"will celebrate"},
+
+  {inf:"divorziare", en:"to get divorced",
+   pres:["divorzio", "divorzi", "divorzia", "divorziamo", "divorziate", "divorziano"],
+   fut:["divorzierò", "divorzierai", "divorzierà", "divorzieremo", "divorzierete", "divorzieranno"],
+   pp:"divorziato", aux:"avere",
+   enBase:"get divorced", en3:"gets divorced", enPast:"got divorced", enPart:"gotten divorced", enFut:"will get divorced"},
+
+  {inf:"consigliare", en:"to advise / to recommend",
+   pres:["consiglio", "consigli", "consiglia", "consigliamo", "consigliate", "consigliano"],
+   fut:["consiglierò", "consiglierai", "consiglierà", "consiglieremo", "consiglierete", "consiglieranno"],
+   pp:"consigliato", aux:"avere",
+   enBase:"recommend", en3:"recommends", enPast:"recommended", enPart:"recommended", enFut:"will recommend"},
+
+  {inf:"osare", en:"to dare",
+   pres:["oso", "osi", "osa", "osiamo", "osate", "osano"],
+   fut:["oserò", "oserai", "oserà", "oseremo", "oserete", "oseranno"],
+   pp:"osato", aux:"avere",
+   enBase:"dare", en3:"dares", enPast:"dared", enPart:"dared", enFut:"will dare"},
+
+  {inf:"proibire", en:"to forbid / to prohibit",
+   pres:["proibisco", "proibisci", "proibisce", "proibiamo", "proibite", "proibiscono"],
+   fut:["proibirò", "proibirai", "proibirà", "proibiremo", "proibirete", "proibiranno"],
+   pp:"proibito", aux:"avere",
+   enBase:"forbid", en3:"forbids", enPast:"forbade", enPart:"forbidden", enFut:"will forbid"},
+
+  {inf:"vietare", en:"to forbid / to ban",
+   pres:["vieto", "vieti", "vieta", "vietiamo", "vietate", "vietano"],
+   fut:["vieterò", "vieterai", "vieterà", "vieteremo", "vieterete", "vieteranno"],
+   pp:"vietato", aux:"avere",
+   enBase:"ban", en3:"bans", enPast:"banned", enPart:"banned", enFut:"will ban"},
+
+  {inf:"prestare", en:"to lend",
+   pres:["presto", "presti", "presta", "prestiamo", "prestate", "prestano"],
+   fut:["presterò", "presterai", "presterà", "presteremo", "presterete", "presteranno"],
+   pp:"prestato", aux:"avere",
+   enBase:"lend", en3:"lends", enPast:"lent", enPart:"lent", enFut:"will lend"},
+
+  {inf:"suonare", en:"to play (an instrument) / to ring",
+   pres:["suono", "suoni", "suona", "suoniamo", "suonate", "suonano"],
+   fut:["suonerò", "suonerai", "suonerà", "suoneremo", "suonerete", "suoneranno"],
+   pp:"suonato", aux:"avere",
+   enBase:"play", en3:"plays", enPast:"played", enPart:"played", enFut:"will play"},
+
+  {inf:"anticipare", en:"to bring forward / to move up",
+   pres:["anticipo", "anticipi", "anticipa", "anticipiamo", "anticipate", "anticipano"],
+   fut:["anticiperò", "anticiperai", "anticiperà", "anticiperemo", "anticiperete", "anticiperanno"],
+   pp:"anticipato", aux:"avere",
+   enBase:"move up", en3:"moves up", enPast:"moved up", enPart:"moved up", enFut:"will move up"},
+
+  {inf:"ritardare", en:"to delay / to be late",
+   pres:["ritardo", "ritardi", "ritarda", "ritardiamo", "ritardate", "ritardano"],
+   fut:["ritarderò", "ritarderai", "ritarderà", "ritarderemo", "ritarderete", "ritarderanno"],
+   pp:"ritardato", aux:"avere",
+   enBase:"delay", en3:"delays", enPast:"delayed", enPart:"delayed", enFut:"will delay"},
+
+  {inf:"programmare", en:"to plan / to schedule / to program",
+   pres:["programmo", "programmi", "programma", "programmiamo", "programmate", "programmano"],
+   fut:["programmerò", "programmerai", "programmerà", "programmeremo", "programmerete", "programmeranno"],
+   pp:"programmato", aux:"avere",
+   enBase:"plan", en3:"plans", enPast:"planned", enPart:"planned", enFut:"will plan"},
+
+  {inf:"pianificare", en:"to plan (in detail)",
+   pres:["pianifico", "pianifichi", "pianifica", "pianifichiamo", "pianificate", "pianificano"],
+   fut:["pianificherò", "pianificherai", "pianificherà", "pianificheremo", "pianificherete", "pianificheranno"],
+   pp:"pianificato", aux:"avere",
+   enBase:"map out", en3:"maps out", enPast:"mapped out", enPart:"mapped out", enFut:"will map out"},
+
+  {inf:"calcolare", en:"to calculate / to work out",
+   pres:["calcolo", "calcoli", "calcola", "calcoliamo", "calcolate", "calcolano"],
+   fut:["calcolerò", "calcolerai", "calcolerà", "calcoleremo", "calcolerete", "calcoleranno"],
+   pp:"calcolato", aux:"avere",
+   enBase:"work out", en3:"works out", enPast:"worked out", enPart:"worked out", enFut:"will work out"},
+
+  {inf:"sommare", en:"to add (up)",
+   pres:["sommo", "sommi", "somma", "sommiamo", "sommate", "sommano"],
+   fut:["sommerò", "sommerai", "sommerà", "sommeremo", "sommerete", "sommeranno"],
+   pp:"sommato", aux:"avere",
+   enBase:"add up", en3:"adds up", enPast:"added up", enPart:"added up", enFut:"will add up"},
+
+  {inf:"moltiplicare", en:"to multiply",
+   pres:["moltiplico", "moltiplichi", "moltiplica", "moltiplichiamo", "moltiplicate", "moltiplicano"],
+   fut:["moltiplicherò", "moltiplicherai", "moltiplicherà", "moltiplicheremo", "moltiplicherete", "moltiplicheranno"],
+   pp:"moltiplicato", aux:"avere",
+   enBase:"multiply", en3:"multiplies", enPast:"multiplied", enPart:"multiplied", enFut:"will multiply"},
+
+  {inf:"sciare", en:"to ski",
+   pres:["scio", "scii", "scia", "sciamo", "sciate", "sciano"],
+   fut:["scierò", "scierai", "scierà", "scieremo", "scierete", "scieranno"],
+   pp:"sciato", aux:"avere",
+   enBase:"ski", en3:"skis", enPast:"skied", enPart:"skied", enFut:"will ski"},
+
+  {inf:"pescare", en:"to fish / to catch",
+   pres:["pesco", "peschi", "pesca", "peschiamo", "pescate", "pescano"],
+   fut:["pescherò", "pescherai", "pescherà", "pescheremo", "pescherete", "pescheranno"],
+   pp:"pescato", aux:"avere",
+   enBase:"fish", en3:"fishes", enPast:"fished", enPart:"fished", enFut:"will fish"},
+
+  {inf:"godere", en:"to enjoy",
+   pres:["godo", "godi", "gode", "godiamo", "godete", "godono"],
+   fut:["godrò", "godrai", "godrà", "godremo", "godrete", "godranno"],
+   pp:"goduto", aux:"avere",
+   enBase:"enjoy", en3:"enjoys", enPast:"enjoyed", enPart:"enjoyed", enFut:"will enjoy"},
+
+  {inf:"piovere", en:"to rain",
+   pres:["piovo", "piovi", "piove", "pioviamo", "piovete", "piovono"],
+   fut:["pioverò", "pioverai", "pioverà", "pioveremo", "pioverete", "pioveranno"],
+   pp:"piovuto", aux:"essere",
+   enBase:"rain", en3:"rains", enPast:"rained", enPart:"rained", enFut:"will rain"},
+
+  {inf:"nevicare", en:"to snow",
+   pres:["nevico", "nevichi", "nevica", "nevichiamo", "nevicate", "nevicano"],
+   fut:["nevicherò", "nevicherai", "nevicherà", "nevicheremo", "nevicherete", "nevicheranno"],
+   pp:"nevicato", aux:"essere",
+   enBase:"snow", en3:"snows", enPast:"snowed", enPart:"snowed", enFut:"will snow"}
+);
+TRAVEL.push("guidare", "attraversare", "passeggiare", "affittare", "noleggiare", "ritirare", "domandare", "scaricare", "ricaricare", "stampare", "fotografare", "annullare", "consigliare", "programmare", "sciare", "pescare");
+
+/* --- everyday verbs added November 2026 --- */
+Object.assign(META, {
+  "lavare": {g:"are", reg:true, why:"Regular. Lavare i piatti = to do the dishes. The reflexive lavarsi is to wash yourself: mi lavo le mani."},
+  "pulire": {g:"isc", reg:true, why:"Regular -isc- verb: pulisco, pulisci, pulisce, puliscono — but puliamo, pulite."},
+  "stirare": {g:"are", reg:true, why:"Regular. Il ferro da stiro = the iron."},
+  "riempire": {g:"ire", reg:false, why:"Irregular presente from the old infinitive riempiere: riempio, riempi, riempie, riempiamo, riempite, riempiono — hence the gerund riempiendo and the congiuntivo riempia. Future riempirò, participle riempito and passato remoto riempii are regular -ire."},
+  "svuotare": {g:"are", reg:true, why:"Regular. The uo stays in every form: svuoto, svuotiamo, svuoterò."},
+  "versare": {g:"are", reg:true, why:"Regular. Also to pay in / deposit: versare dei soldi sul conto."},
+  "apparecchiare": {g:"are", reg:true, why:"Regular -iare verb: the i drops before i (tu apparecchi) and stays before e (apparecchierò). The opposite is sparecchiare."},
+  "sparecchiare": {g:"are", reg:true, why:"Regular -iare verb: tu sparecchi, sparecchierò. The opposite of apparecchiare."},
+  "riparare": {g:"are", reg:true, why:"Regular. Ripararsi = to take shelter: ripararsi dalla pioggia."},
+  "appoggiare": {g:"are", reg:true, why:"Regular -giare verb: tu appoggi, appoggerò. Also to support (an idea or a person): ti appoggio."},
+  "bussare": {g:"are", reg:true, why:"Regular. Bussare alla porta = to knock on the door. Chi bussa? = Who's knocking?"},
+  "cuocere": {g:"ere", reg:false, why:"Irregular: cuocio, cuoci, cuociono · participle cotto · passato remoto cossi, cosse, cossero. Older spellings drop the u when it isn't stressed (cociamo, cocevo); cuoc- throughout is standard today. Cuocere is to cook something (la pasta cuoce in dieci minuti); cucinare is to cook as an activity."},
+  "friggere": {g:"ere", reg:false, why:"Regular present and future; irregular participle fritto and passato remoto frissi, frisse, frissero — the -gg- turns into -tt- / -ss- like leggere."},
+  "bollire": {g:"ire", reg:true, why:"Regular -ire without -isc-: bollo, bolli, bolle. L'acqua bolle = the water is boiling."},
+  "arrostire": {g:"isc", reg:true, why:"Regular -isc- verb: arrostisco, arrostisci. L'arrosto = the roast."},
+  "mescolare": {g:"are", reg:true, why:"Regular. Stress on the first syllable: mèscolo, mèscolano."},
+  "gustare": {g:"are", reg:true, why:"Regular. Gustare is to savor, to enjoy the taste; assaggiare is to taste (try a little)."},
+  "guidare": {g:"are", reg:true, why:"Regular. La patente di guida = driver's license."},
+  "attraversare": {g:"are", reg:true, why:"Regular. Attraversare la strada = to cross the street."},
+  "passeggiare": {g:"are", reg:true, why:"Regular -giare verb: tu passeggi, passeggerò. La passeggiata = the walk; fare due passi = to take a short walk."},
+  "saltare": {g:"are", reg:true, why:"Regular. Also to skip: saltare la colazione. When something blows or gets called off it takes essere: è saltata la luce, è saltato l'appuntamento."},
+  "scivolare": {g:"are", reg:true, why:"Regular, with essere: sono scivolato/a. Stress on the first syllable: scìvolo, scìvolano."},
+  "inciampare": {g:"are", reg:true, why:"Regular. It takes essere or avere (sono inciampato / ho inciampato); essere is more common."},
+  "traslocare": {g:"are", reg:true, why:"Regular -care verb: tu traslochi, traslocherò. Il trasloco = the move."},
+  "affittare": {g:"are", reg:true, why:"Regular. Affittare = to rent a home, out or in (affittasi = for rent). For cars and bikes Italians say noleggiare."},
+  "noleggiare": {g:"are", reg:true, why:"Regular -giare verb: tu noleggi, noleggerò. Noleggiare is for vehicles and equipment; affittare is for homes."},
+  "consegnare": {g:"are", reg:true, why:"Regular -gnare verb: noi consegniamo, che voi consegniate — the i stays after gn."},
+  "ritirare": {g:"are", reg:true, why:"Regular. Ritirare un pacco, ritirare i soldi (to withdraw money). Ritirarsi = to retire / to withdraw."},
+  "telefonare": {g:"are", reg:true, why:"Regular. It takes a: telefonare a Marco → gli telefono (not lo telefono). Stress: telèfono."},
+  "chiacchierare": {g:"are", reg:true, why:"Regular. Stress: chiàcchiero, chiàcchierano. Fare due chiacchiere = to have a chat."},
+  "gridare": {g:"are", reg:true, why:"Regular. Gridare aiuto = to shout for help."},
+  "sussurrare": {g:"are", reg:true, why:"Regular."},
+  "domandare": {g:"are", reg:true, why:"Regular. A synonym of chiedere, a little more formal: domandare qualcosa a qualcuno. Una domanda = a question."},
+  "richiamare": {g:"are", reg:true, why:"Regular: ri- + chiamare. La richiamo più tardi = I'll call you back later (formal). Also to call someone's attention / to tell off."},
+  "caricare": {g:"are", reg:true, why:"Regular -care verb: tu carichi, caricherò. Caricare il telefono = to charge the phone; caricare una foto = to upload a photo."},
+  "scaricare": {g:"are", reg:true, why:"Regular -care verb: tu scarichi, scaricherò. Also to unload (the car) — and il telefono è scarico = the phone is dead."},
+  "ricaricare": {g:"are", reg:true, why:"Regular -care verb: ri- + caricare. Ricaricare il cellulare = to top up / recharge the phone."},
+  "stampare": {g:"are", reg:true, why:"Regular. La stampante = the printer."},
+  "cliccare": {g:"are", reg:true, why:"Regular -care verb: tu clicchi, cliccherò. Cliccare su = to click on."},
+  "digitare": {g:"are", reg:true, why:"Regular. Stress on the first syllable: dìgito. Digitare il PIN = to enter the PIN."},
+  "navigare": {g:"are", reg:true, why:"Regular -gare verb: tu navighi, navigherò. Navigare su internet = to browse the web; also to sail. Stress: nàvigo."},
+  "fotografare": {g:"are", reg:true, why:"Regular. Stress: fotògrafo — the same word as il fotògrafo, the photographer."},
+  "filmare": {g:"are", reg:true, why:"Regular."},
+  "registrare": {g:"are", reg:true, why:"Regular. Registrare un messaggio vocale = to record a voice message; registrarsi = to sign up / check in."},
+  "sfogliare": {g:"are", reg:true, why:"Regular -gliare verb: tu sfogli, sfoglierò. La pasta sfoglia = puff pastry."},
+  "annullare": {g:"are", reg:true, why:"Regular. Annullare una prenotazione = to cancel a booking (for appointments disdire is also common)."},
+  "indovinare": {g:"are", reg:true, why:"Regular. Indovina! = Guess! · Indovina chi c'è = Guess who's here."},
+  "pronunciare": {g:"are", reg:true, why:"Regular -ciare verb: the i drops before e and i (tu pronunci, pronuncerò). La pronuncia = pronunciation."},
+  "guarire": {g:"isc", reg:true, why:"Regular -isc- verb: guarisco, guarisci. It takes essere when you recover (sono guarito/a) and avere when you cure someone (il medico ha guarito il paziente)."},
+  "tossire": {g:"isc", reg:true, why:"Regular -ire verb with two accepted presente forms: tossisco (the more common one) or tosso."},
+  "starnutire": {g:"isc", reg:true, why:"Regular -isc- verb: starnutisco. Lo starnuto = sneeze; when someone sneezes Italians say Salute!"},
+  "ingrassare": {g:"are", reg:true, why:"Regular. It takes essere: sono ingrassato/a di due chili. With an object it means to fatten (avere)."},
+  "dimagrire": {g:"isc", reg:true, why:"Regular -isc- verb: dimagrisco. It takes essere: sono dimagrito/a."},
+  "pesare": {g:"are", reg:true, why:"Regular. Pesare la farina = to weigh the flour; quanto pesi? = how much do you weigh? Also figurative: mi pesa = it's hard for me."},
+  "annusare": {g:"are", reg:true, why:"Regular. Annusare is to sniff something on purpose; to give off a smell is avere un odore / profumare."},
+  "festeggiare": {g:"are", reg:true, why:"Regular -giare verb: tu festeggi, festeggerò. La festa = the party."},
+  "divorziare": {g:"are", reg:true, why:"Regular -iare verb: tu divorzi, divorzierò. It takes avere: hanno divorziato."},
+  "consigliare": {g:"are", reg:true, why:"Regular -gliare verb: tu consigli, consiglierò. Mi consiglia un buon ristorante? = Can you recommend a good restaurant?"},
+  "osare": {g:"are", reg:true, why:"Regular. Followed directly by the infinitive: non oso chiedere = I don't dare ask. Come osi? = How dare you?"},
+  "proibire": {g:"isc", reg:true, why:"Regular -isc- verb: proibisco. Proibire a qualcuno di fare qualcosa. È proibito fumare = smoking is prohibited."},
+  "vietare": {g:"are", reg:true, why:"Regular. Vietato! = Forbidden! · divieto di sosta = no parking."},
+  "prestare": {g:"are", reg:true, why:"Regular. Prestare = to lend; to borrow is farsi prestare or prendere in prestito: mi presti la penna? = can I borrow your pen?"},
+  "suonare": {g:"are", reg:true, why:"Regular, and the uo stays: suoniamo, suonerò. Suonare la chitarra = to play the guitar; il telefono suona = the phone is ringing; suonare il campanello = to ring the bell. (Games and sports use giocare.)"},
+  "anticipare": {g:"are", reg:true, why:"Regular. Stress: antìcipo. Anticipare la partenza = to leave earlier. The opposite is rimandare / posticipare."},
+  "ritardare": {g:"are", reg:true, why:"Regular. For people and trains Italians usually say essere in ritardo: il treno è in ritardo."},
+  "programmare": {g:"are", reg:true, why:"Regular. Programmare le vacanze = to plan the vacation; also to program a computer."},
+  "pianificare": {g:"are", reg:true, why:"Regular -care verb: tu pianifichi, pianificherò. Stress: pianìfico."},
+  "calcolare": {g:"are", reg:true, why:"Regular. Stress: càlcolo, càlcolano."},
+  "sommare": {g:"are", reg:true, why:"Regular. Sommare is to add numbers (la somma = the sum); aggiungere is to add something to something."},
+  "moltiplicare": {g:"are", reg:true, why:"Regular -care verb: tu moltiplichi, moltiplicherò. Stress: moltìplico."},
+  "sciare": {g:"are", reg:true, why:"Regular, but watch the i: scio, scii, scia, sciamo, sciate, sciano · future scierò · congiuntivo scii, sciino. The i is stressed in scìo, scìi, scìa."},
+  "pescare": {g:"are", reg:true, why:"Regular -care verb: tu peschi, pescherò. Also to draw (a card) or to catch someone out."},
+  "godere": {g:"ere", reg:false, why:"One irregular piece: the future drops its -e-, godrò, godrai, and so does the condizionale, godrei. Everything else is regular -ere. Godere di = to enjoy (godere di buona salute); godersi qualcosa = to enjoy something; godersela = to have a great time."},
+  "piovere": {g:"ere", reg:false, why:"Impersonal: piove, è piovuto (ha piovuto is also correct). Irregular passato remoto piovve, piovvero; the rest is regular -ere. The plural is figurative: piovono critiche = criticism is raining down."},
+  "nevicare": {g:"are", reg:true, why:"Impersonal, used only in the 3rd person singular: nevica, è nevicato (ha nevicato is also correct). Regular -care verb: nevicherà."}
+});
 VERBS.forEach(v=>{
   Object.assign(v, META[v.inf]);
   v.travel = TRAVEL.includes(v.inf);
@@ -4709,6 +5241,84 @@ Object.assign(ING, {
   "durare":"lasting",
   "parere":"seeming"
 });
+/* --- everyday verbs added November 2026 --- */
+Object.assign(ING, {
+  "lavare":"washing",
+  "pulire":"cleaning",
+  "stirare":"ironing",
+  "riempire":"filling",
+  "svuotare":"emptying",
+  "versare":"pouring",
+  "apparecchiare":"setting the table",
+  "sparecchiare":"clearing the table",
+  "riparare":"fixing",
+  "appoggiare":"leaning",
+  "bussare":"knocking",
+  "cuocere":"cooking",
+  "friggere":"frying",
+  "bollire":"boiling",
+  "arrostire":"roasting",
+  "mescolare":"stirring",
+  "gustare":"savoring",
+  "guidare":"driving",
+  "attraversare":"crossing",
+  "passeggiare":"strolling",
+  "saltare":"jumping",
+  "scivolare":"slipping",
+  "inciampare":"tripping",
+  "traslocare":"moving",
+  "affittare":"renting",
+  "noleggiare":"renting",
+  "consegnare":"delivering",
+  "ritirare":"picking up",
+  "telefonare":"calling",
+  "chiacchierare":"chatting",
+  "gridare":"shouting",
+  "sussurrare":"whispering",
+  "domandare":"asking",
+  "richiamare":"calling back",
+  "caricare":"charging",
+  "scaricare":"downloading",
+  "ricaricare":"recharging",
+  "stampare":"printing",
+  "cliccare":"clicking",
+  "digitare":"typing",
+  "navigare":"browsing",
+  "fotografare":"photographing",
+  "filmare":"filming",
+  "registrare":"recording",
+  "sfogliare":"flipping through",
+  "annullare":"canceling",
+  "indovinare":"guessing",
+  "pronunciare":"pronouncing",
+  "guarire":"getting better",
+  "tossire":"coughing",
+  "starnutire":"sneezing",
+  "ingrassare":"putting on weight",
+  "dimagrire":"losing weight",
+  "pesare":"weighing",
+  "annusare":"sniffing",
+  "festeggiare":"celebrating",
+  "divorziare":"getting divorced",
+  "consigliare":"recommending",
+  "osare":"daring",
+  "proibire":"forbidding",
+  "vietare":"banning",
+  "prestare":"lending",
+  "suonare":"playing",
+  "anticipare":"moving up",
+  "ritardare":"delaying",
+  "programmare":"planning",
+  "pianificare":"mapping out",
+  "calcolare":"working out",
+  "sommare":"adding up",
+  "moltiplicare":"multiplying",
+  "sciare":"skiing",
+  "pescare":"fishing",
+  "godere":"enjoying",
+  "piovere":"raining",
+  "nevicare":"snowing"
+});
 
 // participle with agreement for essere-verbs: stato -> stato/a (sing), stati/e (plural)
 function participle(v,i){
@@ -4894,6 +5504,13 @@ Object.assign(REM_IRR, {
   "succedere":["successi", "succedesti", "successe", "succedemmo", "succedeste", "successero"],
   "parere":["parvi", "paresti", "parve", "paremmo", "pareste", "parvero"]
 });
+/* --- everyday verbs added November 2026 --- */
+Object.assign(REM_IRR, {
+  "cuocere":["cossi", "cuocesti", "cosse", "cuocemmo", "cuoceste", "cossero"],
+  "friggere":["frissi", "friggesti", "frisse", "friggemmo", "friggeste", "frissero"],
+  "piovere":["piovvi", "piovesti", "piovve", "piovemmo", "pioveste", "piovvero"]
+});
+GER_IRR.riempire = "riempiendo";      // from the old infinitive riempiere
 function passatoRemoto(v,i){
   v = RB(v);                                      // reflexive entries conjugate their plain verb
   if(REM_IRR[v.inf]) return REM_IRR[v.inf][i];
@@ -4999,6 +5616,11 @@ const CONG = {
 /* --- verbs added from the Love is Blind transcripts --- */
 Object.assign(CONG, {
   "parere":["paia", "paia", "paia", "paiamo", "paiate", "paiano"]
+});
+/* --- everyday verbs added November 2026 --- */
+Object.assign(CONG, {
+  "riempire":["riempia", "riempia", "riempia", "riempiamo", "riempiate", "riempiano"],
+  "sciare":["scii", "scii", "scii", "sciamo", "sciate", "sciino"]
 });
 function congiuntivo(v,i){
   v = RB(v);                                      // reflexive entries conjugate their plain verb
@@ -5115,13 +5737,16 @@ const CONG_CHE = ["congiuntivo","congiuntivoPassato"];        // Che io …!
 const CONG_SE  = ["congiuntivoImpf","congiuntivoTrapassato"]; // Se io …
 /* imperativo has no io — every card-building loop asks this instead of assuming 0..5 */
 /* impersonal verbs (volerci: ci vuole un'ora, ci vogliono due ore) only have the 3rd person, singular and plural */
-const LIB_IMPERS = ["succedere","bastare","costare","capitare","durare","parere"];
+const LIB_IMPERS = ["succedere","bastare","costare","capitare","durare","parere","piovere","nevicare"];
+const IMPERS_SING = ["nevicare"];   // weather with no natural plural: only nevica
 const IMPERS = LIB_IMPERS.slice();   // only "it" / "they" (ci vuole-style verbs are added further down)
 function personIdxs(t, v){
-  if(v && IMPERS.includes(v.inf)) return t==="imperativo" ? [] : [2,5];
+  if(v && IMPERS.includes(v.inf)) return t==="imperativo" ? [] : (IMPERS_SING.includes(v.inf) ? [2] : [2,5]);
   return t==="imperativo" ? [1,2,3,4,5] : [0,1,2,3,4,5];
 }
 function resetTenseCache(){ for(const k in HAS_T) delete HAS_T[k]; }
+/* verbs with no past participle in current use — and so no compound tenses (Treccani, Devoto-Oli, Sabatini-Coletti) */
+const NO_PP = ["irrompere"];
 function hasTense(v,t){
   const key = v.inf+"|"+t;
   if(key in HAS_T) return HAS_T[key];
@@ -5129,6 +5754,7 @@ function hasTense(v,t){
   if(PROGRESSIVE.includes(t) && NO_PROG.includes(v.inf)) ok = false;   // stative verbs take no progressive, in any tense
   else if(t==="imperativo" && NO_IMP.includes(v.inf)) ok = false;      // can't naturally command these
   else if(COMPOUND_AUX[t] && (!v.pp || !auxTable(t)[v.aux])) ok = false;   // needs a participle and a known auxiliary
+  else if(COMPOUND_AUX[t] && NO_PP.includes(v.inf)) ok = false;            // defective: no participle in use, so no compound tenses
   else {
     try{
       const idx = personIdxs(t,v);
@@ -5520,7 +6146,7 @@ Object.assign(COMP, {
   "nuotare":["in piscina prima del lavoro", "in the pool before work"],
   "conquistare":["i suoceri con il tiramisù", "the in-laws with tiramisù"],
   "unire":["due tavoli per la cena", "two tables for dinner"],
-  "volare":["a Palermo con un volo low cost", "to Palermo on a budget flight"],
+  "volare":["con una compagnia low cost", "with a budget airline"],
   "complicare":["le cose semplici", "simple things"],
   "valutare":["le offerte di lavoro", "the job offers"],
   "stringere":["la mano ai nuovi colleghi", "hands with the new colleagues"],
@@ -5593,6 +6219,82 @@ Object.assign(COMP, {
   "capitare":["qualcosa", "something"],
   "durare":["poco", "little"],
   "parere":["poco", "little"]
+});
+/* --- everyday verbs added November 2026 --- */
+Object.assign(COMP, {
+  "lavare":["i piatti dopo cena", "the dishes after dinner"],
+  "pulire":["la cucina", "the kitchen"],
+  "stirare":["le camicie", "the shirts"],
+  "riempire":["la bottiglia d'acqua", "the water bottle"],
+  "svuotare":["la lavastoviglie", "the dishwasher"],
+  "versare":["il vino agli ospiti", "the wine for the guests"],
+  "apparecchiare":["per cena", "for dinner"],
+  "sparecchiare":["dopo cena", "after dinner"],
+  "riparare":["la bicicletta", "the bike"],
+  "appoggiare":["la borsa sulla sedia", "the bag on the chair"],
+  "bussare":["alla porta", "on the door"],
+  "cuocere":["la pasta al dente", "the pasta al dente"],
+  "friggere":["le zucchine", "the zucchini"],
+  "bollire":["l'acqua per la pasta", "the water for the pasta"],
+  "arrostire":["la carne sulla brace", "the meat on the grill"],
+  "mescolare":["il sugo", "the sauce"],
+  "gustare":["un buon caffè", "a good coffee"],
+  "guidare":["fino a Firenze", "to Florence"],
+  "attraversare":["la strada sulle strisce", "the street at the crosswalk"],
+  "passeggiare":["sul lungomare", "along the seafront"],
+  "saltare":["la colazione", "breakfast"],
+  "scivolare":["sul ghiaccio", "on the ice"],
+  "inciampare":["nel tappeto", "on the rug"],
+  "traslocare":["in un appartamento più grande", "to a bigger apartment"],
+  "affittare":["una casa al mare", "a house by the sea"],
+  "noleggiare":["una macchina all'aeroporto", "a car at the airport"],
+  "consegnare":["il pacco al vicino", "the package to the neighbor"],
+  "ritirare":["i biglietti alla cassa", "the tickets at the box office"],
+  "telefonare":["alla nonna", "grandma"],
+  "chiacchierare":["con i vicini", "with the neighbors"],
+  "gridare":["dalla finestra", "from the window"],
+  "sussurrare":["un segreto", "a secret"],
+  "domandare":["la strada a un passante", "a passerby for directions"],
+  "richiamare":["più tardi", "later"],
+  "caricare":["il telefono", "the phone"],
+  "scaricare":["l'app del treno", "the train app"],
+  "ricaricare":["la carta dei trasporti", "the transit card"],
+  "stampare":["la carta d'imbarco", "the boarding pass"],
+  "cliccare":["sul link", "on the link"],
+  "digitare":["il PIN", "the PIN"],
+  "navigare":["su internet", "the web"],
+  "fotografare":["il tramonto", "the sunset"],
+  "filmare":["la festa", "the party"],
+  "registrare":["un messaggio vocale", "a voice message"],
+  "sfogliare":["il giornale", "the newspaper"],
+  "annullare":["la prenotazione", "the reservation"],
+  "indovinare":["la risposta", "the answer"],
+  "pronunciare":["bene le doppie", "double consonants well"],
+  "guarire":["in pochi giorni", "in a few days"],
+  "tossire":["tutta la notte", "all night"],
+  "starnutire":["per il polline", "because of the pollen"],
+  "ingrassare":["durante le feste", "over the holidays"],
+  "dimagrire":["con la dieta mediterranea", "on the Mediterranean diet"],
+  "pesare":["la farina per la torta", "the flour for the cake"],
+  "annusare":["il melone al mercato", "the melon at the market"],
+  "festeggiare":["l'anniversario con una cena fuori", "the anniversary with a dinner out"],
+  "divorziare":["dopo vent'anni", "after twenty years"],
+  "consigliare":["un buon ristorante", "a good restaurant"],
+  "osare":["chiedere un aumento", "to ask for a raise"],
+  "proibire":["di fumare in casa", "smoking in the house"],
+  "vietare":["il parcheggio davanti al cancello", "parking in front of the gate"],
+  "prestare":["la macchina a mio fratello", "my brother the car"],
+  "suonare":["la chitarra", "the guitar"],
+  "anticipare":["la riunione", "the meeting"],
+  "ritardare":["la partenza", "the departure"],
+  "programmare":["le vacanze", "the vacation"],
+  "pianificare":["il budget del mese", "the month's budget"],
+  "calcolare":["la mancia", "the tip"],
+  "sommare":["le spese", "the expenses"],
+  "moltiplicare":["le dosi per sei persone", "the quantities for six people"],
+  "sciare":["sulle Dolomiti", "in the Dolomites"],
+  "pescare":["dal molo", "off the pier"],
+  "godere":["la vista dal balcone", "the view from the balcony"]
 });
 /* cleaner English verbs for the gloss (the card's own gloss keeps the slashes) */
 const SENT_V = {
@@ -5684,7 +6386,7 @@ const GEN_COMP = {
   salire:["sul treno","on the train"],
   scendere:["dal treno","off the train"],
   valere:["molto","a lot"],
-  convenire:["su questo punto","on this point"],
+  convenire:["a Roma per il congresso","in Rome for the conference"],   // the gather sense (essere); "convenire su" = to agree takes avere
   importare:["vino dalla Francia","wine from France"],
   costringere:["tutti a partire","everyone to leave"],
   obbligare:["tutti a partire","everyone to leave"],
@@ -5710,7 +6412,7 @@ const GEN_COMP = {
   mentire:["a tutti","to everyone"],
   funzionare:["bene","well"],
   squillare:["a mezzanotte","at midnight"],
-  interessare:["a tutti","everyone"],
+  interessare:["i ragazzi alla storia","the kids interested in history"],   // transitive (avere); "interessare a" = to matter to takes essere
   riguardare:["tutti","everyone"],
   sbagliare:["strada","the wrong road"],
   esistere:["in questo mondo","in this world"],
@@ -5769,6 +6471,12 @@ const GEN_EN = {
   spiare:{b:"spy on",t3:"spies on",p:"spied on",pp:"spied on",g:"spying on"},
   frequentare:{b:"frequent",t3:"frequents",p:"frequented",pp:"frequented",g:"frequenting"}
 };
+GEN_EN.interessare = {b:"get",t3:"gets",p:"got",pp:"gotten",g:"getting"};   // get the kids interested in history
+/* everyday verbs added November 2026: the sense the example sentences use */
+Object.assign(GEN_EN, {
+  saltare:{b:"skip",t3:"skips",p:"skipped",pp:"skipped",g:"skipping"},
+  appoggiare:{b:"put",t3:"puts",p:"put",pp:"put",g:"putting"}
+});
 const REFL = ["mi","ti","si","ci","vi","si"];
 
 /* The generator draws from RNG. Normally that's Math.random (the 🎲 button gives a new
@@ -8131,7 +8839,7 @@ Object.assign(EVERYDAY, {
   "nuotare":["in piscina prima del lavoro", "in the pool before work"],
   "conquistare":["i suoceri con il tiramisù", "the in-laws with tiramisù"],
   "unire":["due tavoli per la cena", "two tables for dinner"],
-  "volare":["a Palermo con un volo low cost", "to Palermo on a budget flight"],
+  "volare":["con una compagnia low cost", "with a budget airline"],
   "complicare":["le cose semplici", "simple things", {"neg": true}],
   "valutare":["le offerte di lavoro", "the job offers"],
   "stringere":["la mano ai nuovi colleghi", "hands with the new colleagues"],
@@ -8214,6 +8922,94 @@ Object.assign(EVERYDAY, {
   "avvicinarsi":["al palco per vedere meglio", "to the stage to see better"],
   "dedicarsi":["al giardinaggio nel weekend", "on gardening on weekends"],
   "stressarsi":["per le piccole cose", "about little things", {"neg": true}]
+});
+/* --- everyday verbs added November 2026 --- */
+Object.assign(EVERYDAY, {
+  "lavare":["i piatti dopo cena", "the dishes after dinner"],
+  "pulire":["la cucina", "the kitchen"],
+  "stirare":["le camicie", "the shirts"],
+  "riempire":["la bottiglia d'acqua", "the water bottle"],
+  "svuotare":["la lavastoviglie", "the dishwasher"],
+  "versare":["il vino agli ospiti", "the wine for the guests"],
+  "apparecchiare":["per cena", "for dinner"],
+  "sparecchiare":["dopo cena", "after dinner"],
+  "riparare":["la bicicletta", "the bike"],
+  "appoggiare":["la borsa sulla sedia", "the bag on the chair", {"b": "put", "t3": "puts", "p": "put", "pp": "put", "g": "putting"}],
+  "bussare":["alla porta", "on the door"],
+  "cuocere":["la pasta al dente", "the pasta al dente"],
+  "friggere":["le zucchine", "the zucchini"],
+  "bollire":["l'acqua per la pasta", "the water for the pasta"],
+  "arrostire":["la carne sulla brace", "the meat on the grill"],
+  "mescolare":["il sugo", "the sauce"],
+  "gustare":["un buon caffè", "a good coffee"],
+  "guidare":["fino a Firenze", "to Florence"],
+  "attraversare":["la strada sulle strisce", "the street at the crosswalk"],
+  "passeggiare":["sul lungomare", "along the seafront"],
+  "saltare":["la colazione", "breakfast", {"b": "skip", "t3": "skips", "p": "skipped", "pp": "skipped", "g": "skipping"}],
+  "scivolare":["sul ghiaccio", "on the ice", {"neg": true}],
+  "inciampare":["nel tappeto", "on the rug", {"neg": true}],
+  "traslocare":["in un appartamento più grande", "to a bigger apartment", {"cls": "O"}],
+  "affittare":["una casa al mare", "a house by the sea"],
+  "noleggiare":["una macchina all'aeroporto", "a car at the airport"],
+  "consegnare":["il pacco al vicino", "the package to the neighbor"],
+  "ritirare":["i biglietti alla cassa", "the tickets at the box office"],
+  "telefonare":["alla nonna", "grandma"],
+  "chiacchierare":["con i vicini", "with the neighbors"],
+  "gridare":["dalla finestra", "from the window"],
+  "sussurrare":["un segreto", "a secret"],
+  "domandare":["la strada a un passante", "a passerby for directions"],
+  "richiamare":["più tardi", "later"],
+  "caricare":["il telefono", "the phone"],
+  "scaricare":["l'app del treno", "the train app"],
+  "ricaricare":["la carta dei trasporti", "the transit card"],
+  "stampare":["la carta d'imbarco", "the boarding pass"],
+  "cliccare":["sul link", "on the link"],
+  "digitare":["il PIN", "the PIN"],
+  "navigare":["su internet", "the web"],
+  "fotografare":["il tramonto", "the sunset"],
+  "filmare":["la festa", "the party"],
+  "registrare":["un messaggio vocale", "a voice message"],
+  "sfogliare":["il giornale", "the newspaper"],
+  "annullare":["la prenotazione", "the reservation"],
+  "indovinare":["la risposta", "the answer"],
+  "pronunciare":["bene le doppie", "double consonants well"],
+  "guarire":["in pochi giorni", "in a few days"],
+  "tossire":["tutta la notte", "all night", {"neg": true}],
+  "starnutire":["per il polline", "because of the pollen", {"neg": true}],
+  "ingrassare":["durante le feste", "over the holidays", {"cls": "O"}],
+  "dimagrire":["con la dieta mediterranea", "on the Mediterranean diet", {"cls": "O"}],
+  "pesare":["la farina per la torta", "the flour for the cake"],
+  "annusare":["il melone al mercato", "the melon at the market"],
+  "festeggiare":["l'anniversario con una cena fuori", "the anniversary with a dinner out"],
+  "divorziare":["dopo vent'anni", "after twenty years", {"cls": "O", "noImp": true}],
+  "consigliare":["un buon ristorante", "a good restaurant"],
+  "osare":["chiedere un aumento", "to ask for a raise"],
+  "proibire":["di fumare in casa", "smoking in the house"],
+  "vietare":["il parcheggio davanti al cancello", "parking in front of the gate"],
+  "prestare":["la macchina a mio fratello", "my brother the car"],
+  "suonare":["la chitarra", "the guitar"],
+  "anticipare":["la riunione", "the meeting"],
+  "ritardare":["la partenza", "the departure"],
+  "programmare":["le vacanze", "the vacation"],
+  "pianificare":["il budget del mese", "the month's budget"],
+  "calcolare":["la mancia", "the tip"],
+  "sommare":["le spese", "the expenses"],
+  "moltiplicare":["le dosi per sei persone", "the quantities for six people"],
+  "sciare":["sulle Dolomiti", "in the Dolomites"],
+  "pescare":["dal molo", "off the pier"],
+  "godere":["la vista dal balcone", "the view from the balcony"],
+  /* everyday reflexives */
+  "annoiarsi":["alle riunioni", "at meetings", {"neg": true}],
+  "vergognarsi":["di parlare in pubblico", "to speak in public"],
+  "pentirsi":["della scelta", "the choice"],
+  "riposarsi":["dopo pranzo", "after lunch"],
+  "sdraiarsi":["sul divano", "on the couch"],
+  "ammalarsi":["d'inverno", "in the winter", {"neg": true}],
+  "sbrigarsi":["per non perdere il treno", "so as not to miss the train"],
+  "affrettarsi":["verso l'uscita", "toward the exit"],
+  "calmarsi":["dopo la lite", "after the argument"],
+  "tranquillizzarsi":["dopo la notizia", "after the news"],
+  "adattarsi":["alla vita in Italia", "to life in Italy"]
 });
 const EV_FRAMES = {
   p:  [["Di solito {S} {V} {O}.","Usually {S} {V} {O}."],["Ogni tanto {S} {V} {O}.","Every now and then {S} {V} {O}."]],
@@ -9737,9 +10533,9 @@ function materialize(spec){
   const am = autoModel(spec.inf);
   if (am){
     // compounds keep essere only where the base is a motion/state verb whose compounds stay
-    // intransitive (rinascere, accadere, sottostare); aggiungere, assalire take avere
+    // intransitive (rinascere, accadere, sottostare); aggiungere, assalire, desistere take avere
     const aux = (spec.aux === "avere" || spec.aux === "essere") ? spec.aux
-              : (am.M.aux === "essere" && !["giungere","salire"].includes(am.M.inf) ? "essere" : "avere");
+              : (am.M.aux === "essere" && !["giungere","salire","esistere"].includes(am.M.inf) ? "essere" : "avere");
     const c = famClone(spec.inf, {f:am.f, model:am.M, b:spec.en, custom:true, aux, comp:spec.comp});
     if (c){ VERBS.push(c); return c; }
   }
@@ -9769,7 +10565,8 @@ const FAMILIES = [
    note:"Every <b>-venire</b> verb copies venire form for form — the irregular presente (vengo, vieni, vengono), the future <b>verr-</b>, the passato remoto <b>venni</b> and the participle <b>venuto</b>. Most take <b>essere</b> like venire; the one that takes a direct object (<b>prevenire</b> = to prevent) switches to <b>avere</b>.",
    members:[["avvenire","happen","e"],["convenire","be worth it / agree","e"],["divenire","become","e"],
             ["intervenire","intervene","e"],["pervenire","arrive / reach","e"],["prevenire","prevent","a"],
-            ["provenire","come from","e"],["svenire","faint","e"]]},
+            ["provenire","come from","e"],["rinvenire","find / recover","a"],["sopravvenire","arise / happen","e"],
+            ["svenire","faint","e"]]},
   {base:"tenere", stem:"tenere",
    note:"tengo, tieni, tiene, tengono · future <b>terr-</b> · passato remoto <b>tenni</b> · participle <b>tenuto</b>. The imperativo tu follows the presente: tieni → <b>mantieni!</b>, <b>sostieni!</b> The family takes <b>avere</b>.",
    members:[["appartenere","belong","a"],["contenere","contain","a"],
@@ -9788,21 +10585,27 @@ const FAMILIES = [
    note:"pongo, poni, pongono · future <b>porr-</b> · passato remoto <b>posi</b> · participle <b>posto</b>, and the Latin stem <b>pon-</b> everywhere else (ponevo, ponendo, ponessi). Porre itself is formal; its family is everyday Italian.",
    members:[["comporre","compose","a"],["deporre","lay down / testify","a"],["disporre","arrange","a"],
             ["esporre","expose / exhibit","a"],["imporre","impose","a"],["opporre","oppose","a"],
-            ["proporre","propose","a"],["sottoporre","subject","a"],["supporre","suppose","a"]]},
+            ["proporre","propose","a"],["sottoporre","subject","a"],["supporre","suppose","a"],
+            ["anteporre","put before / prioritize","a"],["contrapporre","contrast / oppose","a"],["posporre","postpone","a"],
+            ["predisporre","prepare / arrange","a"],["presupporre","presuppose","a"],["ricomporre","put back together","a"],
+            ["scomporre","decompose / take apart","a"],["sovrapporre","superimpose / layer","a"]]},
   {base:"trarre", stem:"trarre", virtual:true, b:"draw / pull", aux:"a", comp:["una conclusione","a conclusion"],
    note:"traggo, trai, trae, traggono · future <b>trarr-</b> · passato remoto <b>trassi</b> · participle <b>tratto</b>, and the Latin stem <b>tra-</b> (traevo, traendo).",
    members:[["attrarre","attract","a"],["contrarre","contract","a"],["distrarre","distract","a"],
-            ["estrarre","extract","a"],["ritrarre","portray","a"],["sottrarre","subtract / take away","a"]]},
+            ["estrarre","extract","a"],["ritrarre","portray","a"],["sottrarre","subtract / take away","a"],
+            ["detrarre","deduct","a"],["protrarre","prolong / extend","a"]]},
   {base:"condurre", stem:"durre",
    note:"Every <b>-durre</b> verb runs on the Latin stem <b>-duc-</b> (conduco, conducevo, conducendo) plus three irregular pieces: future <b>-durr-</b>, passato remoto <b>-dussi</b>, participle <b>-dotto</b>.",
    members:[["dedurre","deduce","a"],["indurre","induce / lead to","a"],["introdurre","introduce","a"],
-            ["produrre","produce","a"],["ridurre","reduce","a"],["sedurre","seduce","a"],["tradurre","translate","a"]]},
+            ["produrre","produce","a"],["ridurre","reduce","a"],["sedurre","seduce","a"],["tradurre","translate","a"],
+            ["ricondurre","lead back / trace back","a"],["riprodurre","reproduce","a"]]},
   {base:"mettere", stem:"mettere",
    note:"Only two irregular pieces — passato remoto <b>misi</b> and participle <b>messo</b> — and every -mettere verb copies them: promisi, promesso.",
    members:[["ammettere","admit","a"],["commettere","commit","a"],["compromettere","compromise","a"],
             ["dimettere","discharge","a"],["permettere","allow / permit","a"],["promettere","promise","a"],
             ["rimettere","put back","a"],["scommettere","bet","a"],["smettere","stop / quit","a"],
-            ["trasmettere","broadcast / transmit","a"]]},
+            ["trasmettere","broadcast / transmit","a"],["emettere","emit / issue","a"],["omettere","omit","a"],
+            ["sottomettere","submit / subdue","a"]]},
   {base:"prendere", stem:"prendere",
    note:"Passato remoto <b>presi</b>, participle <b>preso</b>; everything else is regular -ere. Careful: <b>pretendere</b> and <b>intendere</b> only look related — they follow <b>tendere</b> (tesi, teso).",
    members:[["apprendere","learn","a"],["comprendere","understand / include","a"],["intraprendere","undertake","a"],
@@ -9814,12 +10617,12 @@ const FAMILIES = [
   {base:"scrivere", stem:"scrivere",
    note:"Passato remoto <b>scrissi</b>, participle <b>scritto</b> — copied by every member.",
    members:[["descrivere","describe","a"],["iscrivere","enroll / register","a"],["prescrivere","prescribe","a"],
-            ["sottoscrivere","sign / subscribe","a"],["trascrivere","transcribe","a"]]},
+            ["sottoscrivere","sign / subscribe","a"],["trascrivere","transcribe","a"],["riscrivere","rewrite","a"]]},
   {base:"vedere", stem:"vedere",
    note:"Future <b>vedr-</b>, passato remoto <b>vidi</b>, participle <b>visto</b>. Prevedere is also commonly heard with the regular future (prevederò). Look-alike: <b>provvedere</b> keeps a regular future (provvederò) and participle (provveduto).",
    members:[["intravedere","glimpse / make out","a"],["prevedere","foresee / predict","a"],["rivedere","see again / review","a"]]},
   {base:"rompere", stem:"rompere",
-   note:"Passato remoto <b>ruppi</b>, participle <b>rotto</b>.",
+   note:"Passato remoto <b>ruppi</b>, participle <b>rotto</b>. Exception: <b>irrompere</b> (irruppi) has no participle in current use, so it has no compound tenses — say <i>sono entrati di corsa</i> or use the passato remoto: <i>la polizia irruppe nell'edificio</i>.",
    members:[["corrompere","corrupt / bribe","a"],["interrompere","interrupt","a"],["irrompere","burst in","a"]]},
   {base:"muovere", stem:"muovere",
    note:"Passato remoto <b>mossi</b>, participle <b>mosso</b>.",
@@ -9852,8 +10655,9 @@ const FAMILIES = [
    note:"Passato remoto <b>conobbi</b>, participle <b>conosciuto</b> (the -i- keeps the soft \"sh\" sound).",
    members:[["riconoscere","recognize","a"]]},
   {base:"giungere", stem:"giungere", virtual:true, b:"arrive / reach", aux:"e", comp:["a destinazione","at the destination"],
-   note:"Passato remoto <b>giunsi</b>, participle <b>giunto</b>. Giungere takes essere; the members take an object, so <b>avere</b>.",
-   members:[["aggiungere","add","a"],["raggiungere","reach / join","a"]]},
+   note:"Passato remoto <b>giunsi</b>, participle <b>giunto</b>. Giungere takes essere; most members take an object, so <b>avere</b> — sopraggiungere (to turn up) keeps <b>essere</b>.",
+   members:[["aggiungere","add","a"],["raggiungere","reach / join","a"],["congiungere","join / connect","a"],
+            ["soggiungere","add / reply","a"],["sopraggiungere","arrive / turn up","e"]]},
   {base:"rispondere", stem:"spondere",
    note:"Passato remoto <b>risposi</b>, participle <b>risposto</b>.",
    members:[["corrispondere","correspond","a"]]},
@@ -9871,12 +10675,84 @@ const FAMILIES = [
    note:"colgo, cogli, coglie, colgono — <b>-gli-</b> becomes <b>-lg-</b> before -o and -a · passato remoto <b>colsi</b> · participle <b>colto</b>. Togliere, sciogliere and scegliere follow the same pattern without being relatives.",
    members:[["accogliere","welcome","a"],["raccogliere","gather / pick up","a"]]},
   {base:"correre", stem:"correre",
-   note:"Passato remoto <b>corsi</b>, participle <b>corso</b>. Occorrere (to be needed) takes <b>essere</b>; the others take an object, so <b>avere</b>.",
+   note:"Passato remoto <b>corsi</b>, participle <b>corso</b>. The members that describe motion or happening (occorrere, ricorrere, scorrere) take <b>essere</b>; the ones that take an object take <b>avere</b>.",
    members:[["occorrere","be needed","e"],["percorrere","cover / travel along","a"],["rincorrere","chase","a"],
-            ["soccorrere","rescue / help","a"],["trascorrere","spend (time)","a"]]},
+            ["soccorrere","rescue / help","a"],["trascorrere","spend (time)","a"],["concorrere","compete / contribute","a"],
+            ["ricorrere","turn to / resort","e"],["scorrere","flow / scroll","e"]]},
   {base:"chiudere", stem:"chiudere",
    note:"Passato remoto <b>chiusi</b>, participle <b>chiuso</b>.",
-   members:[["rinchiudere","lock up / shut in","a"],["socchiudere","half-close","a"]]},
+   members:[["rinchiudere","lock up / shut in","a"],["socchiudere","half-close","a"],["racchiudere","contain / enclose","a"],
+            ["schiudere","open / hatch","a"]]},
+
+  /* ---- more irregular families: same idea, the members copy the base's irregular pieces ---- */
+  {base:"leggere", stem:"leggere",
+   note:"Passato remoto <b>lessi</b>, participle <b>letto</b> — the -gg- turns into -ss- / -tt-.",
+   members:[["eleggere","elect","a"],["rileggere","reread","a"]]},
+  {base:"reggere", stem:"reggere",
+   note:"Passato remoto <b>ressi</b>, participle <b>retto</b> — the same -gg- → -ss- / -tt- shift as leggere. Proteggere (protessi, protetto) follows the pattern without being a relative.",
+   members:[["correggere","correct","a"],["sorreggere","support / hold up","a"]]},
+  {base:"spingere", stem:"spingere",
+   note:"Passato remoto <b>spinsi</b>, participle <b>spinto</b>: the -nge- verbs drop the g before s and t.",
+   members:[["respingere","reject / push back","a"],["sospingere","push along","a"]]},
+  {base:"stringere", stem:"stringere",
+   note:"Passato remoto <b>strinsi</b>, but participle <b>stretto</b> (not \"strinto\") — the one -ngere family with a -tt- participle.",
+   members:[["costringere","force / compel","a"],["restringere","narrow / restrict","a"]]},
+  {base:"piangere", stem:"piangere",
+   note:"Passato remoto <b>piansi</b>, participle <b>pianto</b>.",
+   members:[["rimpiangere","regret / miss","a"]]},
+  {base:"scendere", stem:"scendere",
+   note:"Passato remoto <b>scesi</b>, participle <b>sceso</b>, auxiliary <b>essere</b> for going down (sono sceso); with an object it takes avere (ho sceso le scale).",
+   members:[["ascendere","ascend / climb","e"],["discendere","descend / come down","e"]]},
+  {base:"chiedere", stem:"chiedere",
+   note:"Passato remoto <b>chiesi</b>, participle <b>chiesto</b>.",
+   members:[["richiedere","request / require","a"]]},
+  {base:"togliere", stem:"togliere",
+   note:"tolgo, togli, toglie, tolgono — <b>-gli-</b> becomes <b>-lg-</b> before -o and -a · passato remoto <b>tolsi</b> · participle <b>tolto</b>. Same pattern as cogliere and scegliere.",
+   members:[["distogliere","divert / distract","a"]]},
+  {base:"concludere", stem:"cludere",
+   note:"Every <b>-cludere</b> verb: passato remoto <b>-clusi</b>, participle <b>-cluso</b>.",
+   members:[["escludere","exclude / rule out","a"],["includere","include","a"],["precludere","preclude","a"]]},
+  {base:"illudere", stem:"ludere",
+   note:"Every <b>-ludere</b> verb: passato remoto <b>-lusi</b>, participle <b>-luso</b>. False friend: <b>deludere</b> = to disappoint.",
+   members:[["alludere","allude / hint","a"],["deludere","disappoint","a"],["eludere","elude / evade","a"]]},
+  {base:"esprimere", stem:"primere",
+   note:"Every <b>-primere</b> verb: passato remoto <b>-pressi</b>, participle <b>-presso</b>. Look-alike: <b>premere</b> (to press) is fully regular (premei, premuto).",
+   members:[["comprimere","compress","a"],["deprimere","depress","a"],["imprimere","imprint / impress","a"],
+            ["opprimere","oppress","a"],["reprimere","repress","a"],["sopprimere","suppress / abolish","a"]]},
+  {base:"esistere", stem:"sistere",
+   note:"Regular in every simple tense — the only surprise is the participle <b>-sistito</b> (an -ere verb with an -ito participle). Esistere takes essere; most of the family takes <b>avere</b>. False friend: <b>assistere a</b> = to attend / witness.",
+   members:[["assistere","attend / witness","a"],["consistere","consist","e"],["insistere","insist","a"],
+            ["persistere","persist","a"],["resistere","resist","a"],["sussistere","exist / hold true","e"]]},
+  {base:"assumere", stem:"sumere",
+   note:"Every <b>-sumere</b> verb: passato remoto <b>-sunsi</b>, participle <b>-sunto</b>.",
+   members:[["presumere","presume","a"],["riassumere","summarize / rehire","a"]]},
+  {base:"risolvere", stem:"solvere",
+   note:"Every <b>-solvere</b> verb: passato remoto <b>-solsi</b>, participle <b>-solto</b>.",
+   members:[["assolvere","acquit / absolve","a"],["dissolvere","dissolve","a"]]},
+  {base:"confondere", stem:"fondere",
+   note:"Every <b>-fondere</b> verb: passato remoto <b>-fusi</b>, participle <b>-fuso</b> — the stem vowel changes, o → u.",
+   members:[["diffondere","spread / broadcast","a"],["infondere","infuse / instill","a"],["rifondere","refund","a"]]},
+  {base:"emergere", stem:"mergere",
+   note:"Every <b>-mergere</b> verb: passato remoto <b>-mersi</b>, participle <b>-merso</b>. Emergere and riemergere take <b>essere</b>; immergere and sommergere take an object, so <b>avere</b>.",
+   members:[["immergere","immerse / plunge","a"],["riemergere","resurface","e"],["sommergere","submerge / flood","a"]]},
+  {base:"valere", stem:"valere",
+   note:"valgo, vali, vale, valgono · future <b>varr-</b> · passato remoto <b>valsi</b> · participle <b>valso</b>.",
+   members:[["equivalere","be equivalent","e"],["prevalere","prevail","a"]]},
+  {base:"crescere", stem:"crescere",
+   note:"Passato remoto <b>crebbi</b>, participle <b>cresciuto</b> (the -i- keeps the soft \"sh\" sound). Crescere takes essere; accrescere takes an object, so <b>avere</b>. Rincrescere is used like piacere: <i>mi rincresce</i> = I'm sorry.",
+   members:[["accrescere","increase / enhance","a"],["decrescere","decrease / decline","e"],["rincrescere","be sorry / regret","e"]]},
+  {base:"dividere", stem:"dividere",
+   note:"Passato remoto <b>divisi</b>, participle <b>diviso</b>.",
+   members:[["condividere","share","a"],["suddividere","subdivide","a"]]},
+  {base:"perdere", stem:"perdere",
+   note:"Passato remoto <b>persi</b>, participle <b>perso</b> (the older perdei / perduto are still correct).",
+   members:[["disperdere","disperse / scatter","a"]]},
+  {base:"appendere", stem:"pendere",
+   note:"Every <b>-pendere</b> verb: passato remoto <b>-pesi</b>, participle <b>-peso</b>. Pendere itself (to hang, lean) is the exception — it stays regular (penduto).",
+   members:[["dipendere","depend","e"],["sospendere","suspend","a"],["spendere","spend","a"]]},
+  {base:"aprire", stem:"aprire",
+   note:"Only the participle is irregular: <b>aperto</b>. The passato remoto is regular (aprii); apersi is an older variant.",
+   members:[["riaprire","reopen","a"]]},
 ];
 const FAM = {}, FAM_OF = {}, FAM_MEMBER = {};
 FAMILIES.forEach(f=>{ FAM[f.base] = f; f.members.forEach(m=>{ FAM_OF[m[0]] = f.base; FAM_MEMBER[m[0]] = m; }); });
@@ -9897,7 +10773,11 @@ const FAM_EN_IRR = {   // word: [3rd person, past, participle, -ing]
   understand:["understands","understood","understood","understanding"], mean:["means","meant","meant","meaning"],
   stop:["stops","stopped","stopped","stopping"], quit:["quits","quit","quit","quitting"],
   admit:["admits","admitted","admitted","admitting"], commit:["commits","committed","committed","committing"],
-  permit:["permits","permitted","permitted","permitting"], seize:["seizes","seized","seized","seizing"]
+  permit:["permits","permitted","permitted","permitting"], seize:["seizes","seized","seized","seizing"],
+  emit:["emits","emitted","emitted","emitting"], omit:["omits","omitted","omitted","omitting"],
+  submit:["submits","submitted","submitted","submitting"], regret:["regrets","regretted","regretted","regretting"],
+  reread:["rereads","reread","reread","rereading"], rewrite:["rewrites","rewrote","rewritten","rewriting"],
+  arise:["arises","arose","arisen","arising"], find:["finds","found","found","finding"]
 };
 function famEnWord(w, k, fn){ return FAM_EN_IRR[w] ? FAM_EN_IRR[w][k] : fn(w); }
 function famEnAlt(b, k, fn){ return b.split(" / ").map(x=>_firstWord(x, w=>famEnWord(w,k,fn))).join(" / "); }
@@ -9987,6 +10867,45 @@ FAMILIES.filter(f=>f.virtual).forEach(f=>{
   const v = famClone(f.base, {b:f.b, aux: f.aux==="e" ? "essere" : "avere", comp:f.comp});
   if (v) VERBS.push(v);
 });
+/* --- weather verbs (impersonal): hand-written sentences; plural piovere is figurative (piovono critiche) --- */
+CURATED["piovere"] = {
+  p:[["In autunno a Firenze {V} spesso.", "In autumn it often rains in Florence."], ["Sui social {V} commenti di ogni tipo.", "On social media comments of every kind are pouring in."]],
+  pp:[["Ieri {V} tutto il giorno.", "Yesterday it rained all day."], ["Dopo il discorso {V} gli applausi.", "After the speech the applause poured in."]],
+  i:[["Quando siamo arrivati a Sorrento {V}.", "When we got to Sorrento it was raining."], ["In quei giorni {V} offerte di lavoro.", "In those days job offers were pouring in."]],
+  f:[["Domani {V} su tutto il Nord.", "Tomorrow it will rain across the North."], ["Vedrai che {V} i reclami.", "You'll see, the complaints will pour in."]],
+  c:[["Senza questo vento {V} già.", "Without this wind it would already be raining."], ["Con un post così {V} i commenti.", "With a post like that the comments would pour in."]],
+  cp:[["Senza il vento {V} tutta la notte.", "Without the wind it would have rained all night."], ["Con una pubblicità in TV {V} gli ordini.", "With a TV ad the orders would have poured in."]],
+  cg:[["Ho paura che {V} proprio domenica.", "I'm afraid it'll rain on Sunday of all days."], ["Spero che {V} gli ordini.", "I hope the orders pour in."]],
+  ci:[["Se {V}, resteremmo a casa.", "If it rained, we'd stay home."], ["Se {V} soldi dal cielo, sarebbe bello.", "If money rained from the sky, it would be nice."]],
+  cgp:[["Sembra che {V} tutta la notte.", "It seems it rained all night."], ["Credo che {V} commenti da tutte le parti.", "I think comments poured in from all sides."]],
+  cgt:[["Se {V}, avremmo annullato la gita.", "If it had rained, we would have canceled the trip."], ["Se {V} gli ordini, avremmo assunto qualcuno.", "If the orders had poured in, we would have hired someone."]],
+  tp:[["La strada era bagnata: {V} durante la notte.", "The road was wet: it had rained during the night."], ["Dopo l'intervista {V} i messaggi.", "After the interview the messages had poured in."]],
+  tr:[["Dopo che {V} per tre giorni, tornò il sole.", "After it had rained for three days, the sun came back."], ["Dopo che {V} i reclami, il direttore si dimise.", "After the complaints had poured in, the director resigned."]],
+  fa:[["La terra è bagnata: {V} stanotte.", "The ground is wet: it must have rained last night."], ["{V} complimenti dopo la cena.", "Compliments must have poured in after the dinner."]],
+  pr:[["Quell'estate non {V} mai.", "That summer it never rained."], ["Durante la battaglia {V} frecce dal cielo.", "During the battle arrows rained from the sky."]],
+  pg:[["Prendi l'ombrello: {V}!", "Take the umbrella: it's raining!"], ["{V} richieste da tutta Italia.", "Requests are pouring in from all over Italy."]],
+  ipg:[["Quando siamo usciti {V} forte.", "When we went out it was raining hard."], ["Mentre parlava, {V} domande dal pubblico.", "While he was talking, questions were raining down from the audience."]],
+  fpg:[["A quest'ora domani {V} a Firenze.", "This time tomorrow it'll be raining in Florence."], ["Domattina {V} le telefonate.", "By tomorrow morning the calls will be pouring in."]]
+};
+CURATED["nevicare"] = {
+  p:[["A Cortina {V} quasi ogni inverno.", "In Cortina it snows almost every winter."]],
+  pp:[["Stanotte {V} in montagna.", "Last night it snowed in the mountains."]],
+  i:[["Da bambini a Natale {V} sempre.", "When we were kids it always snowed at Christmas."]],
+  f:[["Domani {V} sopra i mille metri.", "Tomorrow it will snow above a thousand meters."]],
+  c:[["Con questo freddo {V}, se ci fossero nuvole.", "With this cold it would snow, if there were clouds."]],
+  cp:[["Con due gradi in meno {V}.", "Two degrees colder and it would have snowed."]],
+  cg:[["Speriamo che {V} per Natale.", "Let's hope it snows for Christmas."]],
+  ci:[["Se {V}, andremmo a sciare.", "If it snowed, we'd go skiing."]],
+  cgp:[["Pare che {V} anche a Roma.", "Apparently it snowed even in Rome."]],
+  cgt:[["Se {V}, avremmo fatto un pupazzo di neve.", "If it had snowed, we would have made a snowman."]],
+  tp:[["Era tutto bianco: {V} tutta la notte.", "Everything was white: it had snowed all night."]],
+  tr:[["Dopo che {V} per giorni, le strade furono chiuse.", "After it had snowed for days, the roads were closed."]],
+  fa:[["È tutto bianco: {V} stanotte.", "Everything is white: it must have snowed last night."]],
+  pr:[["Nel 1985 {V} anche a Firenze.", "In 1985 it snowed even in Florence."]],
+  pg:[["Guarda fuori: {V}!", "Look outside: it's snowing!"]],
+  ipg:[["Quando siamo arrivati in albergo {V}.", "When we arrived at the hotel it was snowing."]],
+  fpg:[["Secondo il meteo, stasera {V} in collina.", "According to the forecast, tonight it'll be snowing in the hills."]]
+};
 
 /* ============ REFLEXIVE VERBS ============
    alzarsi, svegliarsi, sentirsi… are their own deck entries (inf ends in -si) but
@@ -10197,6 +11116,25 @@ REFLEXIVES.push(
   ["stressarsi","stressare",["get stressed", "gets stressed", "got stressed", "gotten stressed", "getting stressed"],["per il lavoro", "about work"],
      {"en": "to get stressed (out)"}]
 );
+/* --- everyday reflexives added November 2026 --- */
+REFLEXIVES.push(
+  ["annoiarsi","annoiare",["get bored", "gets bored", "got bored", "gotten bored", "getting bored"],["alle riunioni", "at meetings"]],
+  ["vergognarsi","vergognare",["be embarrassed", "is embarrassed", "was embarrassed", "been embarrassed", "being embarrassed"],["di parlare in pubblico", "to speak in public"],
+     {"noProg": true, "enPres": ["am embarrassed", "are embarrassed", "is embarrassed", "are embarrassed", "are embarrassed", "are embarrassed"], "enPastArr": ["was embarrassed", "were embarrassed", "was embarrassed", "were embarrassed", "were embarrassed", "were embarrassed"], "en": "to be ashamed / to be embarrassed"}],
+  ["pentirsi","pentire",["regret", "regrets", "regretted", "regretted", "regretting"],["della scelta", "the choice"],
+     {"noProg": true, "en": "to regret / to repent (pentirsi di)"}],
+  ["riposarsi","riposare",["rest", "rests", "rested", "rested", "resting"],["dopo pranzo", "after lunch"]],
+  ["sdraiarsi","sdraiare",["lie down", "lies down", "lay down", "lain down", "lying down"],["sul divano", "on the couch"]],
+  ["ammalarsi","ammalare",["get sick", "gets sick", "got sick", "gotten sick", "getting sick"],["d'inverno", "in the winter"],
+     {"noImp": true}],
+  ["sbrigarsi","sbrigare",["hurry up", "hurries up", "hurried up", "hurried up", "hurrying up"],["per non perdere il treno", "so as not to miss the train"]],
+  ["affrettarsi","affrettare",["hurry", "hurries", "hurried", "hurried", "hurrying"],["verso l'uscita", "toward the exit"]],
+  ["calmarsi","calmare",["calm down", "calms down", "calmed down", "calmed down", "calming down"],["dopo la lite", "after the argument"]],
+  ["tranquillizzarsi","tranquillizzare",["settle down", "settles down", "settled down", "settled down", "settling down"],["dopo la notizia", "after the news"],
+     {"en": "to calm down / to stop worrying"}],
+  ["adattarsi","adattare",["adapt", "adapts", "adapted", "adapted", "adapting"],["alla vita in Italia", "to life in Italy"],
+     {"en": "to adapt / to adjust"}]
+);
 REFLEXIVES.forEach(([inf, baseInf, E, comp, x])=>buildRefl(inf, baseInf, E, comp, x, "refl"));
 
 /* ============ PRONOMINAL VERBS ============
@@ -10276,6 +11214,17 @@ const PRONOMINALS = [
   ["tirarsela","tirare","sela","show off",["troppo","too much"],{noImp:true,example:"Se la tira."}]
 ];
 PRONOMINALS.forEach(([inf, baseInf, cl, b, comp, x])=>buildRefl(inf, baseInf, b, comp, x, cl));
+
+/* ============ TAKEN OUT OF THE DECK ============
+   Verbs that are rare in everyday conversation (jargon, abstract or crime-show vocabulary).
+   Their data stays in the file: delete a name from this list to bring the verb back. */
+const DECK_REMOVED = [
+  "allineare","banalizzare","canalizzare","concretizzare","decantare","demolire","direzionare",
+  "finalizzare","irrigidire","metabolizzare","razionalizzare","rincontrare","screditare","sminuire","smussare",
+  "aggravare","pedinare","ricattare","sequestrare","spacciare",
+  "invaghirsi","prostituirsi"
+];
+for(let k = VERBS.length - 1; k >= 0; k--) if(DECK_REMOVED.includes(VERBS[k].inf)) VERBS.splice(k, 1);
 ["fregarsene","infischiarsene"].forEach(k=>{ IMPF_EN[k] = ["didn't care","didn't care","didn't care","didn't care","didn't care","didn't care"]; });
 /* American English throughout: "had gotten up", not "had got up" */
 VERBS.forEach(v=>{ if(/^got\b/.test(v.enPart||"")) v.enPart = v.enPart.replace(/^got\b/,"gotten"); });
