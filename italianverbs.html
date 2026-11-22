@@ -10025,7 +10025,8 @@ function audioSent(v,t,f,subj){
    (there's no separate "lui" command — you only formally address the listener) */
 function audioSlotsFor(t, v){
   if(v && IMPERS.includes(v.inf))                          // ci vuole / ci vogliono: no pronoun to announce
-    return t==="imperativo" ? [] : AUDIO_SLOTS.filter(s=>s.pn==="lui"||s.pn==="loro").map(s=>Object.assign({}, s, {pn:""}));
+    return t==="imperativo" ? [] : AUDIO_SLOTS.filter(s=>(s.pn==="lui"||s.pn==="loro") && personIdxs(t,v).includes(s.i))   // IMPERS_SING (nevica): "it" only
+                                              .map(s=>Object.assign({}, s, {pn:""}));
   if(t!=="imperativo") return AUDIO_SLOTS;
   return AUDIO_SLOTS.filter(s => IMP_PERSONS.includes(s.i));      // tu, noi, voi
 }
@@ -10077,7 +10078,11 @@ function buildAudioScript(){
         const f  = audioAgree(form(v,t,s.i), s.fem);
         const end = t==="imperativo" ? "" : ".";       // the form already ends in "!" for a command
         // conjugated form → an everyday sentence using it → that sentence in English
-        const g = genSentenceFixed(v, t, s.i, s.i===2 ? s.fem : undefined);
+        // one bad sentence must never sink the whole export: fall back to the bare form
+        let g;
+        try{ g = genSentenceFixed(v, t, s.i, s.i===2 ? s.fem : undefined); }
+        catch(err){ console.warn("audio export: no sentence for "+v.inf+" / "+t+" / "+s.i, err); g = null; }
+        if(!g){ lines.push((s.pn ? s.pn+" " : "")+f+end+" [[slnc "+gap+"]]"); return; }
         lines.push((s.pn ? s.pn+" " : "")+f+end+" [[slnc 500]] "+g.it+" [[slnc 700]]");
         if(g.en) lines.push("¶EN¶ "+g.en+" [[slnc "+gap+"]]");
       });
@@ -12712,46 +12717,91 @@ function pageFileName(){
   try{ return decodeURIComponent(location.pathname.split("/").pop()) || "italianverbs.html"; }
   catch(e){ return "italianverbs.html"; }
 }
+/* "/Users/me/gitdirectory/ItalianVerbs" — shown so you know which folder to pick */
+function pageFolderPath(){
+  try{ const p = decodeURIComponent(location.pathname); return p.slice(0, p.lastIndexOf("/")) || p; }
+  catch(e){ return "the folder this page is in"; }
+}
 /* true if the picked folder holds this page (any case: "ItalianVerbs.html" too) */
 async function folderHoldsPage(dir){
   const want = pageFileName().toLowerCase();
   try{ for await (const [name] of dir.entries()) if(name.toLowerCase()===want) return true; }catch(e){}
   return false;
 }
-async function saveToPageFolder(name, txt){
-  let dir = await exportDirGet();
+/* any browser promise that might never settle (Edge can leave a permission request
+   hanging when the click that started it is "too old") gets a deadline */
+function withTimeout(p, ms, what){
+  return Promise.race([p, new Promise((_,rej)=>setTimeout(()=>{
+    const e = new Error(what+" didn't answer within "+Math.round(ms/1000)+"s"); e.name = "TimeoutError"; rej(e); }, ms))]);
+}
+/* Step 1 of an export, run FIRST while the click is still fresh: get write access to
+   the page's folder (remembered handle, or the one-time picker). Returns the folder,
+   false if the wrong folder was picked, or throws (AbortError = picker cancelled). */
+async function getPageFolder(){
+  let dir = await withTimeout(exportDirGet(), 3000, "The saved-folder lookup").catch(()=>null);
   if(dir){
-    let perm = await dir.queryPermission({mode:"readwrite"});
-    if(perm !== "granted") perm = await dir.requestPermission({mode:"readwrite"});
-    if(perm !== "granted") dir = null;
+    try{
+      let perm = await withTimeout(dir.queryPermission({mode:"readwrite"}), 3000, "The permission check");
+      if(perm !== "granted") perm = await withTimeout(dir.requestPermission({mode:"readwrite"}), 30000, "The permission prompt");
+      if(perm !== "granted") dir = null;
+    }catch(e){ console.warn("stored folder unusable, asking again", e); dir = null; }
   }
   if(!dir){
-    $("audioStat").innerHTML = "Pick the folder that contains <b>"+pageFileName()+"</b> — only needed the first time.";
+    $("audioStat").innerHTML = "One-time setup: in the window that opens, choose the folder <b>"+pageFolderPath()+
+      "</b> (the one holding "+pageFileName()+") and click <b>Select</b>, then <b>Save changes</b>/<b>Allow</b>. "+
+      "After this, every export is saved there automatically.";
     dir = await window.showDirectoryPicker({id:"italianverbs-export", mode:"readwrite", startIn:"documents"});
     if(!(await folderHoldsPage(dir))){
       $("audioStat").innerHTML = "That folder (<b>"+dir.name+"</b>) doesn't contain <b>"+pageFileName()+
         "</b>. Tap Export again and pick the folder this page is in.";
       return false;
     }
-    await exportDirSet(dir);
+    await withTimeout(exportDirSet(dir), 3000, "Remembering the folder").catch(()=>{});
   }
-  const fh = await dir.getFileHandle(name, {create:true});
-  const w = await fh.createWritable(); await w.write(txt); await w.close();
+  return dir;
+}
+/* Step 2: write the finished script into that folder */
+async function writeToFolder(dir, name, txt){
+  const fh = await withTimeout(dir.getFileHandle(name, {create:true}), 15000, "Creating the file");
+  const w = await withTimeout(fh.createWritable(), 15000, "Opening the file");
+  await withTimeout(w.write(txt), 60000, "Writing the file"); await withTimeout(w.close(), 60000, "Saving the file");
   $("audioStat").innerHTML = "Saved <b>"+name+"</b> to the <b>"+dir.name+"</b> folder, next to "+pageFileName()+
     ". Now double-click <b>Crea_audio.command</b>. "+
     '<a href="#" id="audioDirReset" style="color:var(--dim)">change folder</a>';
   $("audioDirReset").onclick = async ev=>{ ev.preventDefault(); await exportDirSet(null);
     $("audioStat").innerHTML = "Folder forgotten — the next export will ask you to pick it again."; };
-  return true;
 }
 $("audioDl").onclick = async ()=>{
+  try{ await audioExport(); }
+  catch(err){                                   // never fail silently: say what broke, right under the button
+    console.error("audio export failed", err);
+    $("audioStat").innerHTML = "Export failed: <b>"+String(err && (err.name+": "+err.message) || err)
+      .replace(/</g,"&lt;")+"</b>. Use “Show text” to copy the script instead.";
+  }
+};
+async function audioExport(){
+  if(!audioEstimate().items){ $("audioStat").innerHTML = "Nothing selected — pick some verbs and tenses first."; return; }
+  let folderErr = "", dir = null;
+  if(window.showDirectoryPicker){                // folder access first, while the click still counts
+    try{
+      dir = await getPageFolder();
+      if(dir === false) return;                  // wrong folder picked: message already shown
+    }catch(err){
+      if(err && err.name==="AbortError"){ drawAudio(); return; }      // picker cancelled
+      console.warn("no folder access, falling back to download", err);
+      folderErr = String(err && (err.name+": "+err.message) || err).replace(/</g,"&lt;");
+      dir = null;
+    }
+  }
+  $("audioStat").innerHTML = "Building the audio script…";
+  await new Promise(r=>setTimeout(r, 30));       // let that message appear before the heavy work
   const txt = buildAudioScript();
   if(!txt){ $("audioStat").innerHTML = "Nothing selected — pick some verbs and tenses first."; return; }
-  if(window.showDirectoryPicker){
-    try{ await saveToPageFolder(audioFilename(), txt); return; }
+  if(dir){
+    try{ await writeToFolder(dir, audioFilename(), txt); return; }
     catch(err){
-      if(err && err.name==="AbortError"){ drawAudio(); return; }      // picker cancelled
       console.warn("folder save failed, falling back to download", err);
+      folderErr = String(err && (err.name+": "+err.message) || err).replace(/</g,"&lt;");
     }
   }
   try{
@@ -12760,12 +12810,17 @@ $("audioDl").onclick = async ()=>{
     a.href = URL.createObjectURL(blob);
     a.download = audioFilename();
     document.body.appendChild(a); a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 60000);   // big scripts (16 MB) need time to hand off
+    $("audioStat").innerHTML = "Downloaded <b>"+a.download+"</b> to your Downloads folder"+
+      (folderErr ? " (couldn't save next to the page: "+folderErr+")"
+                 : window.showDirectoryPicker ? ""
+                 : " — this browser can't save into <b>"+pageFolderPath()+"</b>; open the page in <b>Chrome</b> for that")+
+      ". Now double-click <b>Crea_audio.command</b>.";
   }catch(err){                                  // some file:// contexts block blob downloads
     $("audioShow").onclick();
     $("audioStat").innerHTML = "Download blocked here — copy the text below instead.";
   }
-};
+}
 $("audioShow").onclick = ()=>{
   const ta = $("audioOut");
   if(ta.style.display === "none"){
