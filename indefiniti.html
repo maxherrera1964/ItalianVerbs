@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aggettivi e pronomi indefiniti</title>
+<style>
+  :root{
+    --bg:#f6f3ee; --card:#fff; --ink:#222; --muted:#6b6560; --line:#e4ded5;
+    --green:#2e6b4f; --green-soft:#e3efe8; --red:#b23a3a; --red-soft:#f6e1e1; --accent:#c8553d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  header{padding:28px 20px 8px;text-align:center}
+  header h1{margin:0;font-size:1.6rem}
+  header p{margin:4px 0 0;color:var(--muted)}
+  nav{display:flex;justify-content:center;gap:8px;padding:16px;flex-wrap:wrap}
+  nav button{border:1px solid var(--line);background:var(--card);padding:10px 18px;border-radius:999px;font-size:1rem;cursor:pointer;color:var(--ink)}
+  nav button.active{background:var(--green);border-color:var(--green);color:#fff}
+  main{max-width:860px;margin:0 auto;padding:0 16px 48px}
+  section{display:none}
+  section.active{display:block}
+  h2{font-size:1.15rem;margin:28px 0 10px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.95rem}
+  th{background:#efeae2;font-weight:600}
+  tr:last-child td{border-bottom:none}
+  td.it{font-weight:700;color:var(--green);white-space:nowrap}
+  td em{color:var(--muted)}
+  .rules{background:var(--card);border-left:4px solid var(--accent);border-radius:8px;padding:12px 18px;margin-top:24px}
+  .rules li{margin:6px 0}
+  /* Flashcards */
+  .fc-controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 16px}
+  .fc-controls button,.btn{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:.95rem;color:var(--ink)}
+  .btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+  .card-wrap{perspective:1000px;max-width:520px;margin:0 auto}
+  .card{position:relative;height:260px;cursor:pointer;transition:transform .5s;transform-style:preserve-3d}
+  .card.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+  .face.back{transform:rotateY(180deg)}
+  .face .big{font-size:2rem;font-weight:700;color:var(--green)}
+  .face .tag{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px}
+  .face .ex{margin-top:14px;font-style:italic}
+  .face .exen{color:var(--muted);font-size:.9rem}
+  .fc-nav{display:flex;justify-content:space-between;align-items:center;max-width:520px;margin:16px auto 0}
+  .hint{text-align:center;color:var(--muted);font-size:.85rem;margin-top:8px}
+  /* Quiz */
+  .q-box{background:var(--card);border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.08);padding:24px;max-width:620px;margin:0 auto}
+  .q-count{color:var(--muted);text-align:center;font-size:.9rem}
+  .q-text{font-size:1.25rem;text-align:center;margin:12px 0 20px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{border:1px solid var(--line);background:#fff;padding:12px;border-radius:10px;font-size:1rem;cursor:pointer;text-align:center;color:var(--ink)}
+  .opt:hover:not(:disabled){background:#faf8f4}
+  .opt.correct{background:var(--green-soft);border-color:var(--green);color:var(--green);font-weight:600}
+  .opt.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+  .expl{margin-top:16px;padding:12px 14px;border-radius:10px;background:#f3f0ea;display:none}
+  .expl.show{display:block}
+  .q-foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+  .score{font-weight:600}
+  .done{text-align:center}
+  .done .big{font-size:2.2rem;font-weight:700;color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Aggettivi e pronomi indefiniti</h1>
+  <p>Italian indefinite adjectives &amp; pronouns: reference, flashcards, quiz</p>
+</header>
+
+<nav>
+  <button data-tab="ref" class="active">📖 Riferimento</button>
+  <button data-tab="fc">🃏 Flashcard</button>
+  <button data-tab="quiz">✏️ Quiz</button>
+</nav>
+
+<main>
+  <!-- REFERENCE -->
+  <section id="ref" class="active">
+    <h2>Solo aggettivi: always followed by a noun</h2>
+    <table id="t-adj"></table>
+    <h2>Solo pronomi: stand alone</h2>
+    <table id="t-pron"></table>
+    <h2>Aggettivi e pronomi: both</h2>
+    <table id="t-both"></table>
+
+    <div class="rules">
+      <strong>Regole da ricordare</strong>
+      <ol>
+        <li><b>qualche + singolare</b> = <b>alcuni + plurale</b>: <i>qualche amico</i> = <i>alcuni amici</i>.</li>
+        <li><b>Nessuno / niente / nulla after the verb → need <i>non</i></b>: <i>Non ho visto nessuno</i>.<br>
+            <b>Before the verb → no <i>non</i></b>: <i>Nessuno ha visto</i>.</li>
+        <li><b>Nessun / ciascun / alcun</b> shorten before masculine nouns, like <i>un</i>: <i>nessun problema</i>, but <i>nessuno studente</i> (s + consonant, like <i>uno studente</i>).</li>
+        <li><b>Alcun / alcuna</b> (singular) only appear in negative sentences: <i>Non c'è alcun dubbio</i>.</li>
+        <li><b>Ogni</b> never stands alone. As a pronoun it becomes <b>ognuno</b>.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section id="fc">
+    <div class="fc-controls">
+      <button id="fc-dir">Direction: IT → EN</button>
+      <button id="fc-shuffle">🔀 Shuffle</button>
+    </div>
+    <div class="card-wrap">
+      <div class="card" id="card">
+        <div class="face front"><div class="big" id="fc-front"></div><div class="tag" id="fc-front-tag"></div></div>
+        <div class="face back"><div class="big" id="fc-back"></div><div class="tag" id="fc-back-tag"></div><div class="ex" id="fc-ex"></div><div class="exen" id="fc-exen"></div></div>
+      </div>
+    </div>
+    <p class="hint">Tap the card to flip it · ← → arrow keys to move · space to flip</p>
+    <div class="fc-nav">
+      <button class="btn" id="fc-prev">← Indietro</button>
+      <span id="fc-pos"></span>
+      <button class="btn" id="fc-next">Avanti →</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz">
+    <div class="q-box" id="q-box"></div>
+  </section>
+</main>
+
+<script>
+const WORDS = [
+  // group: adj | pron | both
+  {it:"ogni", en:"every, each", type:"adjective", group:"adj", ex:"ogni studente", exen:"every student"},
+  {it:"qualche", en:"some, a few (+ singular noun)", type:"adjective", group:"adj", ex:"qualche amico", exen:"some friends"},
+  {it:"qualunque", en:"any, whatever", type:"adjective", group:"adj", ex:"qualunque persona", exen:"any person"},
+  {it:"qualsiasi", en:"any, whatever (= qualunque)", type:"adjective", group:"adj", ex:"qualsiasi risposta", exen:"any answer"},
+
+  {it:"qualcuno", en:"someone, anyone", type:"pronoun", group:"pron", ex:"Qualcuno vuole venire?", exen:"Does anyone want to come?"},
+  {it:"ognuno", en:"everyone, each one", type:"pronoun", group:"pron", ex:"Ognuno avrà un certificato.", exen:"Everyone will get a certificate."},
+  {it:"chiunque", en:"anyone, whoever", type:"pronoun", group:"pron", ex:"Chiunque ti direbbe la stessa cosa.", exen:"Anyone would tell you the same thing."},
+  {it:"qualcosa", en:"something, anything", type:"pronoun", group:"pron", ex:"Vuoi qualcosa da bere?", exen:"Do you want something to drink?"},
+  {it:"niente / nulla", en:"nothing", type:"pronoun", group:"pron", ex:"Non abbiamo nulla da nascondere.", exen:"We have nothing to hide."},
+
+  {it:"nessuno", en:"no one, nobody, none", type:"pronoun", group:"both", ex:"Nessuno ha visto il film.", exen:"No one saw the film."},
+  {it:"nessun / nessuna", en:"no, not any", type:"adjective", group:"both", ex:"nessun problema, nessuna idea", exen:"no problem, no idea"},
+  {it:"alcuni / alcune", en:"some, a few (plural)", type:"adjective & pronoun", group:"both", ex:"Alcuni di loro hanno parlato con il professore.", exen:"Some of them spoke with the professor."},
+  {it:"alcun / alcuna", en:"no, not any (negative sentences only)", type:"adjective", group:"both", ex:"Non c'è alcun problema.", exen:"There's no problem at all."},
+  {it:"ciascuno", en:"each one", type:"pronoun", group:"both", ex:"Ciascuno dei colleghi ha deciso.", exen:"Each of the colleagues decided."},
+  {it:"ciascun / ciascuna", en:"each", type:"adjective", group:"both", ex:"ciascuna domanda", exen:"each question"},
+  {it:"altro / altra / altri / altre", en:"other, another", type:"adjective & pronoun", group:"both", ex:"Ti serve un'altra penna?", exen:"Do you need another pen?"},
+];
+
+const QUIZ = [
+  {q:"___ di loro hanno parlato con il professor Rossi.", o:["Alcuni","Alcuna","Alcuno"], a:0, e:"<i>Hanno</i> is plural, so you need <b>alcuni</b>. Singular <i>alcuno</i> is only used in negative sentences."},
+  {q:"Ho ___ idea su come risolvere questo problema.", o:["nessuna","nessun","qualche"], a:2, e:"There's no <i>non</i>, so <i>nessuna</i> doesn't fit (you'd need <i>Non ho nessuna idea</i>). <b>Qualche</b> + singular noun."},
+  {q:"___ ha mai visto un film del genere.", o:["Nessuno","Nessun","Alcuni"], a:0, e:"<b>Nessuno</b> before the verb: no <i>non</i> needed. <i>Nessun</i> needs a noun after it, and <i>alcuni</i> would need <i>hanno</i>."},
+  {q:"Non abbiamo ___ da nascondere.", o:["ciascuno","nulla","qualcuno"], a:1, e:"<b>Nulla</b> (or <i>niente</i>) = nothing. After the verb it needs <i>non</i>, the double negative."},
+  {q:"Ho incontrato ___ amico di Luca ieri.", o:["alcun","qualche","alcuni"], a:1, e:"<i>Amico</i> is singular, so <b>qualche</b>. With <i>alcuni</i> it would be <i>alcuni amici</i>."},
+  {q:"Non c'è ___ problema.", o:["alcun","alcuni","qualche"], a:0, e:"In negative sentences, <b>alcun</b> = \"no / not any.\" It shortens before a masculine noun, like <i>un</i>."},
+  {q:"___ avrà un certificato.", o:["Ogni","Ognuno","Qualche"], a:1, e:"<i>Ogni</i> can't stand alone. As a pronoun it becomes <b>ognuno</b> (everyone)."},
+  {q:"___ ti direbbe la stessa cosa.", o:["Qualunque","Chiunque","Qualche"], a:1, e:"<b>Chiunque</b> = anyone (pronoun). <i>Qualunque</i> needs a noun: <i>qualunque persona</i>."},
+  {q:"Se ___ dovesse chiamare, rispondi tu.", o:["qualche","qualcuno","nessun"], a:1, e:"No noun after the blank, so you need the pronoun <b>qualcuno</b> (someone)."},
+  {q:"Ho ___ problema con il computer.", o:["qualcuno","qualche","alcuni"], a:1, e:"Before a singular noun, use <b>qualche</b>. <i>Qualcuno</i> is a pronoun; <i>alcuni</i> needs a plural noun."},
+  {q:"___ dei miei amici stanno partendo per le vacanze.", o:["Qualcuno","Qualche","Alcuni"], a:2, e:"<i>Stanno</i> is plural, so <b>alcuni</b>. <i>Qualcuno</i> would take <i>sta</i>."},
+  {q:"Non ho visto ___ alla festa.", o:["nessuno","nessun","qualche"], a:0, e:"Pronoun after the verb, so <i>non</i> + <b>nessuno</b>. <i>Nessun</i> only goes before a noun."},
+  {q:"___ studente deve portare un libro.", o:["Ognuno","Ogni","Nessun"], a:1, e:"<b>Ogni</b> + singular noun = every. <i>Nessun studente</i> is wrong: before s + consonant it's <i>nessuno studente</i>."},
+  {q:"Vuoi ___ da bere?", o:["qualche","qualcuno","qualcosa"], a:2, e:"<b>Qualcosa</b> = something. <i>Qualche</i> needs a noun; <i>qualcuno</i> is a person."},
+  {q:"Ti serve ___ penna?", o:["altro","un'altra","altra"], a:1, e:"<i>Penna</i> is feminine: <b>un'altra</b> penna = another pen. Note the apostrophe: un' + altra."},
+  {q:"Maria ha ___ amiche in Italia.", o:["alcune","qualche","alcuna"], a:0, e:"<i>Amiche</i> is feminine plural, so <b>alcune</b>. <i>Qualche</i> would need the singular: <i>qualche amica</i>."},
+];
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll("nav button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll("section").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    document.getElementById(b.dataset.tab).classList.add("active");
+  });
+});
+
+/* ---------- Reference ---------- */
+function fillTable(id, group){
+  const rows = WORDS.filter(w=>w.group===group);
+  const t = document.getElementById(id);
+  t.innerHTML = "<tr><th>Italiano</th><th>English</th><th>Esempio</th></tr>" +
+    rows.map(w=>`<tr><td class="it">${w.it}</td><td>${w.en}${group==="both"?` <em>(${w.type})</em>`:""}</td><td><i>${w.ex}</i><br><em>${w.exen}</em></td></tr>`).join("");
+}
+fillTable("t-adj","adj"); fillTable("t-pron","pron"); fillTable("t-both","both");
+
+/* ---------- Flashcards ---------- */
+let deck = WORDS.map((_,i)=>i), pos = 0, itFirst = true;
+const card = document.getElementById("card");
+function showCard(){
+  const w = WORDS[deck[pos]];
+  card.classList.remove("flipped");
+  setTimeout(()=>{
+    document.getElementById("fc-front").textContent = itFirst ? w.it : w.en;
+    document.getElementById("fc-front-tag").textContent = itFirst ? w.type : "→ in italiano?";
+    document.getElementById("fc-back").textContent = itFirst ? w.en : w.it;
+    document.getElementById("fc-back-tag").textContent = w.type;
+    document.getElementById("fc-ex").textContent = w.ex;
+    document.getElementById("fc-exen").textContent = w.exen;
+  }, card.classList.contains("flipped") ? 250 : 0);
+  document.getElementById("fc-pos").textContent = `${pos+1} / ${deck.length}`;
+}
+card.addEventListener("click",()=>card.classList.toggle("flipped"));
+document.getElementById("fc-next").onclick=()=>{pos=(pos+1)%deck.length;showCard();};
+document.getElementById("fc-prev").onclick=()=>{pos=(pos-1+deck.length)%deck.length;showCard();};
+document.getElementById("fc-shuffle").onclick=()=>{deck=shuffle(deck);pos=0;showCard();};
+document.getElementById("fc-dir").onclick=e=>{itFirst=!itFirst;e.target.textContent="Direction: "+(itFirst?"IT → EN":"EN → IT");showCard();};
+document.addEventListener("keydown",e=>{
+  if(!document.getElementById("fc").classList.contains("active")) return;
+  if(e.key==="ArrowRight") document.getElementById("fc-next").click();
+  if(e.key==="ArrowLeft") document.getElementById("fc-prev").click();
+  if(e.key===" "){e.preventDefault();card.classList.toggle("flipped");}
+});
+showCard();
+
+/* ---------- Quiz ---------- */
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let qOrder, qi, score, answered;
+const box = document.getElementById("q-box");
+function startQuiz(){qOrder=shuffle(QUIZ.map((_,i)=>i));qi=0;score=0;renderQ();}
+function renderQ(){
+  if(qi>=qOrder.length){
+    const pct=Math.round(score/qOrder.length*100);
+    box.innerHTML=`<div class="done"><p>Finito!</p><div class="big">${score} / ${qOrder.length}</div><p>${pct>=90?"Bravissimo! 🎉":pct>=70?"Molto bene! 👏":"Continua a studiare, ce la fai! 💪"}</p><button class="btn primary" id="again">Ricomincia</button></div>`;
+    document.getElementById("again").onclick=startQuiz; return;
+  }
+  answered=false;
+  const item=QUIZ[qOrder[qi]];
+  const opts=shuffle(item.o.map((t,i)=>({t,ok:i===item.a})));
+  box.innerHTML=`<div class="q-count">${qi+1} / ${qOrder.length}</div>
+    <div class="q-text">${item.q.replace("___","<b>__________</b>")}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-ok="${o.ok}">${o.t}</button>`).join("")}</div>
+    <div class="expl" id="expl">${item.e}</div>
+    <div class="q-foot"><span class="score">Punteggio: ${score}</span><button class="btn primary" id="nextq" style="visibility:hidden">Avanti →</button></div>`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(answered) return; answered=true;
+    const ok=b.dataset.ok==="true";
+    if(ok) score++;
+    box.querySelectorAll(".opt").forEach(x=>{x.disabled=true;if(x.dataset.ok==="true")x.classList.add("correct");});
+    if(!ok) b.classList.add("wrong");
+    document.getElementById("expl").classList.add("show");
+    box.querySelector(".score").textContent=`Punteggio: ${score}`;
+    const n=document.getElementById("nextq"); n.style.visibility="visible";
+    n.onclick=()=>{qi++;renderQ();};
+  });
+}
+startQuiz();
+</script>
+</body>
+</html>
