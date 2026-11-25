@@ -203,6 +203,9 @@
   .essmark{color:#c4b5fd}
   .chip.sel .essmark{color:#3d2a63}
   .picklist .chip.cur .essmark{color:#04202b}
+  .noisc{font-size:9px;font-weight:700;letter-spacing:.3px;color:#7dd3fc;border:1px solid currentColor;border-radius:6px;padding:0 3px;vertical-align:1px;white-space:nowrap}
+  .chip.sel .noisc{color:#06210f}
+  .picklist .chip.cur .noisc{color:#04202b}
   .badge{
     display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
     padding:4px 9px;border-radius:99px;margin-top:8px;
@@ -344,6 +347,11 @@
       <button class="btn" id="irrV">Irregular</button>
     </div>
     <div class="row">
+      <button class="btn" id="conjAre">-are</button>
+      <button class="btn" id="conjEre">-ere</button>
+      <button class="btn" id="conjIre">-ire</button>
+    </div>
+    <div class="row">
       <button class="btn" id="essV">ⓔ Essere</button>
       <button class="btn" id="aveV">Avere</button>
     </div>
@@ -357,6 +365,7 @@
       <span><i class="dot reg"></i>regular</span>
       <span><i class="dot irr"></i>irregular</span>
       <span><b class="essmark">ⓔ</b> takes essere</span>
+      <span><b class="noisc">no-isc</b> -ire verb without -isc- (dormo, not dormisco)</span>
       <span>✈︎ travel verb</span>
       <span>🌳 base verb</span>
       <span>🔁 reflexive (-si)</span>
@@ -3860,7 +3869,7 @@ const META = {
   riconoscere: {g:"ere", reg:false, why:"Regular present/future; irregular participle: riconosciuto (inserts an i)."},
   crescere: {g:"ere", reg:false, why:"Regular present/future, but takes essere; participle cresciuto."},
   rivedere: {g:"ere", reg:false, why:"Like vedere: regular present, contracted future rivedr-, participle rivisto."},
-  convenire: {g:"ere", reg:false, why:"Like venire: stem conveng-/convien-, assimilated future conven+r → converr-; takes essere. Often impersonal: conviene = it's worth it."},
+  convenire: {g:"ire", reg:false, why:"Like venire: stem conveng-/convien-, assimilated future conven+r → converr-; takes essere. Often impersonal: conviene = it's worth it."},
   scadere: {g:"ere", reg:false, why:"Like cadere: regular present, contracted future scadr-; takes essere."},
   muovere: {g:"ere", reg:false, why:"Stressed stem muo- (muovo, muovi, muove, muovono); participle mosso."},
   rimuovere: {g:"ere", reg:false, why:"Like muovere: stressed stem rimuo-; participle rimosso."},
@@ -3869,7 +3878,7 @@ const META = {
   esporre: {g:"orre", reg:false, why:"Contracted -orre infinitive (from Latin exponere): stem espon-, future esporr-, participle esposto."},
   sedurre: {g:"urre", reg:false, why:"Contracted -urre infinitive (from Latin seducere): stem seduc-, future sedurr-, participle sedotto."},
   possedere: {g:"ere", reg:false, why:"Like sedere: stressed stem possied- (possiedo, possiede, possiedono); noi/voi stay regular."},
-  intervenire: {g:"ere", reg:false, why:"Like venire: stem interveng-/intervien-, assimilated future interven+r → interverr-; takes essere."},
+  intervenire: {g:"ire", reg:false, why:"Like venire: stem interveng-/intervien-, assimilated future interven+r → interverr-; takes essere."},
   tacere: {g:"ere", reg:false, why:"Irregular present taccio/tacciono (like piacere's -cc-); participle taciuto."},
   salire: {g:"ire", reg:false, why:"Stressed stem salg- (salgo, salgono; noi/voi stay regular); takes essere."},
 
@@ -4205,6 +4214,60 @@ VERBS.push(
    fut:["bollirò", "bollirai", "bollirà", "bolliremo", "bollirete", "bolliranno"],
    pp:"bollito", aux:"avere",
    enBase:"boil", en3:"boils", enPast:"boiled", enPart:"boiled", enFut:"will boil"},
+
+  {inf:"cucire", en:"to sew",
+   pres:["cucio", "cuci", "cuce", "cuciamo", "cucite", "cuciono"],
+   fut:["cucirò", "cucirai", "cucirà", "cuciremo", "cucirete", "cuciranno"],
+   pp:"cucito", aux:"avere",
+   enBase:"sew", en3:"sews", enPast:"sewed", enPart:"sewn", enFut:"will sew"},
+
+  {inf:"consentire", en:"to allow / to consent",
+   pres:["consento", "consenti", "consente", "consentiamo", "consentite", "consentono"],
+   fut:["consentirò", "consentirai", "consentirà", "consentiremo", "consentirete", "consentiranno"],
+   pp:"consentito", aux:"avere",
+   enBase:"allow", en3:"allows", enPast:"allowed", enPart:"allowed", enFut:"will allow"},
+
+  {inf:"convertire", en:"to convert",
+   pres:["converto", "converti", "converte", "convertiamo", "convertite", "convertono"],
+   fut:["convertirò", "convertirai", "convertirà", "convertiremo", "convertirete", "convertiranno"],
+   pp:"convertito", aux:"avere",
+   enBase:"convert", en3:"converts", enPast:"converted", enPart:"converted", enFut:"will convert"},
+
+  {inf:"inseguire", en:"to chase / to pursue",
+   pres:["inseguo", "insegui", "insegue", "inseguiamo", "inseguite", "inseguono"],
+   fut:["inseguirò", "inseguirai", "inseguirà", "inseguiremo", "inseguirete", "inseguiranno"],
+   pp:"inseguito", aux:"avere",
+   enBase:"chase", en3:"chases", enPast:"chased", enPart:"chased", enFut:"will chase"},
+
+  {inf:"eseguire", en:"to carry out / to perform",
+   pres:["eseguo", "esegui", "esegue", "eseguiamo", "eseguite", "eseguono"],
+   fut:["eseguirò", "eseguirai", "eseguirà", "eseguiremo", "eseguirete", "eseguiranno"],
+   pp:"eseguito", aux:"avere",
+   enBase:"carry out", en3:"carries out", enPast:"carried out", enPart:"carried out", enFut:"will carry out"},
+
+  {inf:"conseguire", en:"to achieve / to earn (a degree)",
+   pres:["conseguo", "consegui", "consegue", "conseguiamo", "conseguite", "conseguono"],
+   fut:["conseguirò", "conseguirai", "conseguirà", "conseguiremo", "conseguirete", "conseguiranno"],
+   pp:"conseguito", aux:"avere",
+   enBase:"earn", en3:"earns", enPast:"earned", enPart:"earned", enFut:"will earn"},
+
+  {inf:"nutrire", en:"to nourish / to feed",
+   pres:["nutro", "nutri", "nutre", "nutriamo", "nutrite", "nutrono"],
+   fut:["nutrirò", "nutrirai", "nutrirà", "nutriremo", "nutrirete", "nutriranno"],
+   pp:"nutrito", aux:"avere",
+   enBase:"nourish", en3:"nourishes", enPast:"nourished", enPart:"nourished", enFut:"will nourish"},
+
+  {inf:"udire", en:"to hear",
+   pres:["odo", "odi", "ode", "udiamo", "udite", "odono"],
+   fut:["udirò", "udirai", "udirà", "udiremo", "udirete", "udiranno"],
+   pp:"udito", aux:"avere",
+   enBase:"hear", en3:"hears", enPast:"heard", enPart:"heard", enFut:"will hear"},
+
+  {inf:"applaudire", en:"to applaud / to clap",
+   pres:["applaudo", "applaudi", "applaude", "applaudiamo", "applaudite", "applaudono"],
+   fut:["applaudirò", "applaudirai", "applaudirà", "applaudiremo", "applaudirete", "applaudiranno"],
+   pp:"applaudito", aux:"avere",
+   enBase:"applaud", en3:"applauds", enPast:"applauded", enPart:"applauded", enFut:"will applaud"},
 
   {inf:"arrostire", en:"to roast / to grill",
    pres:["arrostisco", "arrostisci", "arrostisce", "arrostiamo", "arrostite", "arrostiscono"],
@@ -4590,6 +4653,15 @@ Object.assign(META, {
   "cuocere": {g:"ere", reg:false, why:"Irregular: cuocio, cuoci, cuociono · participle cotto · passato remoto cossi, cosse, cossero. Older spellings drop the u when it isn't stressed (cociamo, cocevo); cuoc- throughout is standard today. Cuocere is to cook something (la pasta cuoce in dieci minuti); cucinare is to cook as an activity."},
   "friggere": {g:"ere", reg:false, why:"Regular present and future; irregular participle fritto and passato remoto frissi, frisse, frissero — the -gg- turns into -tt- / -ss- like leggere."},
   "bollire": {g:"ire", reg:true, why:"Regular -ire without -isc-: bollo, bolli, bolle. L'acqua bolle = the water is boiling."},
+  "cucire": {g:"ire", reg:true, why:"Plain -ire (no -isc-). Spelling: the i stays before o/a to keep the soft c — cucio, cuciono, congiuntivo cucia. Cucire un bottone = to sew on a button."},
+  "consentire": {g:"ire", reg:true, why:"Plain -ire (no -isc-), like sentire: consento, consenti, consente. Consentire a qualcuno di fare qualcosa = to allow someone to do something."},
+  "convertire": {g:"ire", reg:true, why:"Plain -ire (no -isc-): converto, converti, converte. Reflexive convertirsi = to convert (religion) / to switch to something."},
+  "inseguire": {g:"ire", reg:true, why:"Plain -ire (no -isc-), like seguire: inseguo, insegui, insegue. Inseguire un sogno = to chase a dream."},
+  "eseguire": {g:"ire", reg:true, why:"Normally plain -ire like seguire: eseguo, esegui, esegue. The -isc- forms (eseguisco) exist but are much rarer."},
+  "conseguire": {g:"ire", reg:true, why:"Plain -ire (no -isc-), like seguire: conseguo, consegui. Conseguire la laurea = to graduate / earn a degree. Formal register."},
+  "nutrire": {g:"ire", reg:true, why:"Plain -ire is the common form (nutro, nutri, nutre); nutrisco also exists. Figurative: nutrire speranze / dubbi = to harbor hopes / doubts."},
+  "applaudire": {g:"ire", reg:true, why:"Both forms are correct: applaudo (plain) and applaudisco (-isc-). The plain form is the more common today."},
+  "udire": {g:"ire", reg:false, why:"Irregular presente: the stressed stem becomes od- (odo, odi, ode, odono) while noi/voi keep ud- (udiamo, udite) — same idea as uscire → esco. Everything else is regular: udirò, udito, udivo. Literary/formal; in everyday speech Italians say sentire."},
   "arrostire": {g:"isc", reg:true, why:"Regular -isc- verb: arrostisco, arrostisci. L'arrosto = the roast."},
   "mescolare": {g:"are", reg:true, why:"Regular. Stress on the first syllable: mèscolo, mèscolano."},
   "gustare": {g:"are", reg:true, why:"Regular. Gustare is to savor, to enjoy the taste; assaggiare is to taste (try a little)."},
@@ -4800,7 +4872,7 @@ VERBS.forEach(v=>{ v.freq = FREQ_VERB[v.inf] || 0; });
 const sortVerbs = ()=> VERBS.sort((a,b)=> a.inf.localeCompare(b.inf,"it"));
 sortVerbs();
 
-const GROUP_LABEL = {are:"-are", ere:"-ere", ire:"-ire", isc:"-ire (-isc-)", orre:"-orre", urre:"-urre", arre:"-arre"};
+const GROUP_LABEL = {are:"-are", ere:"-ere", ire:"-ire (no -isc-)", isc:"-ire (-isc-)", orre:"-orre", urre:"-urre", arre:"-arre"};
 
 /* --- the rules, for the Study view --- */
 const RULES = [
@@ -5401,6 +5473,15 @@ Object.assign(ING, {
   "cuocere":"cooking",
   "friggere":"frying",
   "bollire":"boiling",
+  "cucire":"sewing",
+  "consentire":"allowing",
+  "convertire":"converting",
+  "inseguire":"chasing",
+  "eseguire":"carrying out",
+  "conseguire":"earning",
+  "nutrire":"nourishing",
+  "udire":"hearing",
+  "applaudire":"applauding",
   "arrostire":"roasting",
   "mescolare":"stirring",
   "gustare":"savoring",
@@ -6416,6 +6497,15 @@ Object.assign(COMP, {
   "cuocere":["la pasta al dente", "the pasta al dente"],
   "friggere":["le zucchine", "the zucchini"],
   "bollire":["l'acqua per la pasta", "the water for the pasta"],
+  "cucire":["un bottone sulla camicia", "a button on the shirt"],
+  "consentire":["l'uso del telefono in classe", "the use of phones in class"],
+  "convertire":["i dollari in euro", "the dollars into euros"],
+  "inseguire":["il ladro per la strada", "the thief down the street"],
+  "eseguire":["gli ordini del medico", "the doctor's orders"],
+  "conseguire":["la laurea in medicina", "a degree in medicine"],
+  "nutrire":["il corpo con cibi sani", "the body with healthy food"],
+  "udire":["un rumore strano", "a strange noise"],
+  "applaudire":["gli attori alla fine", "the actors at the end"],
   "arrostire":["la carne sulla brace", "the meat on the grill"],
   "mescolare":["il sugo", "the sauce"],
   "gustare":["un buon caffè", "a good coffee"],
@@ -9142,6 +9232,15 @@ Object.assign(EVERYDAY, {
   "cuocere":["la pasta al dente", "the pasta al dente"],
   "friggere":["le zucchine", "the zucchini"],
   "bollire":["l'acqua per la pasta", "the water for the pasta"],
+  "cucire":["un bottone sulla camicia", "a button on the shirt"],
+  "consentire":["l'uso del telefono in classe", "the use of phones in class"],
+  "convertire":["i dollari in euro", "the dollars into euros"],
+  "inseguire":["il ladro per la strada", "the thief down the street"],
+  "eseguire":["gli ordini del medico", "the doctor's orders"],
+  "conseguire":["la laurea in medicina", "a degree in medicine"],
+  "nutrire":["il corpo con cibi sani", "the body with healthy food"],
+  "udire":["un rumore strano", "a strange noise"],
+  "applaudire":["gli attori alla fine", "the actors at the end"],
   "arrostire":["la carne sulla brace", "the meat on the grill"],
   "mescolare":["il sugo", "the sauce"],
   "gustare":["un buon caffè", "a good coffee"],
@@ -10597,7 +10696,7 @@ function stressWord(w){
     "seguire","conseguire","proseguire","servire","vestire","svestire","bollire",
     "cucire","fuggire","sfuggire","avvertire","divertire","convertire","invertire",
     "pentire","mentire","consentire","acconsentire","assentire","risentire","inseguire",
-    "salire","uscire","venire","morire","aprire","coprire","nutrire","applaudire",
+    "salire","uscire","venire","morire","aprire","coprire","nutrire","applaudire","eseguire",
   ]);
   function isIsc(inf) {
     return inf.endsWith("ire") && !NON_ISC.has(inf);
@@ -11820,7 +11919,7 @@ if(!S.filt || typeof S.filt!=="object") S.filt = {travel:false, reg:null, aux:nu
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
 /* verbs added to the conjugator since this browser last opened it are switched on once,
    so new verbs show up in a saved selection; verbs you switch off later stay off */
-const ADDED_NOV_2026 = ["lavare", "pulire", "stirare", "riempire", "svuotare", "versare", "apparecchiare", "sparecchiare", "riparare", "appoggiare", "bussare", "cuocere", "friggere", "bollire", "arrostire", "mescolare", "gustare", "guidare", "attraversare", "passeggiare", "saltare", "scivolare", "inciampare", "traslocare", "affittare", "noleggiare", "consegnare", "ritirare", "telefonare", "chiacchierare", "gridare", "sussurrare", "domandare", "richiamare", "caricare", "scaricare", "ricaricare", "stampare", "cliccare", "digitare", "navigare", "fotografare", "filmare", "registrare", "sfogliare", "annullare", "indovinare", "pronunciare", "guarire", "tossire", "starnutire", "ingrassare", "dimagrire", "pesare", "annusare", "festeggiare", "divorziare", "consigliare", "osare", "proibire", "vietare", "prestare", "suonare", "anticipare", "ritardare", "programmare", "pianificare", "calcolare", "sommare", "moltiplicare", "sciare", "pescare", "godere", "piovere", "nevicare", "annoiarsi", "vergognarsi", "pentirsi", "riposarsi", "sdraiarsi", "ammalarsi", "sbrigarsi", "affrettarsi", "calmarsi", "tranquillizzarsi", "adattarsi", "atterrare", "sbarcare", "rincasare", "evadere", "precipitare", "affondare", "invecchiare", "ringiovanire", "arrossire", "impallidire", "esplodere", "scoppiare", "annegare", "affogare", "fiorire", "marcire", "sorgere", "tramontare", "svenire", "sopravvivere", "scomparire", "comparire", "provenire", "accadere", "dispiacere", "occorrere", "scorrere", "pervenire", "sopraggiungere", "riemergere", "ascendere", "discendere", "divenire", "rinascere", "ricorrere", "avvenire", "sopravvenire", "rincrescere", "consistere", "sussistere", "equivalere", "decadere", "decrescere"];
+const ADDED_NOV_2026 = ["cucire", "consentire", "convertire", "inseguire", "eseguire", "conseguire", "nutrire", "udire", "applaudire", "lavare", "pulire", "stirare", "riempire", "svuotare", "versare", "apparecchiare", "sparecchiare", "riparare", "appoggiare", "bussare", "cuocere", "friggere", "bollire", "arrostire", "mescolare", "gustare", "guidare", "attraversare", "passeggiare", "saltare", "scivolare", "inciampare", "traslocare", "affittare", "noleggiare", "consegnare", "ritirare", "telefonare", "chiacchierare", "gridare", "sussurrare", "domandare", "richiamare", "caricare", "scaricare", "ricaricare", "stampare", "cliccare", "digitare", "navigare", "fotografare", "filmare", "registrare", "sfogliare", "annullare", "indovinare", "pronunciare", "guarire", "tossire", "starnutire", "ingrassare", "dimagrire", "pesare", "annusare", "festeggiare", "divorziare", "consigliare", "osare", "proibire", "vietare", "prestare", "suonare", "anticipare", "ritardare", "programmare", "pianificare", "calcolare", "sommare", "moltiplicare", "sciare", "pescare", "godere", "piovere", "nevicare", "annoiarsi", "vergognarsi", "pentirsi", "riposarsi", "sdraiarsi", "ammalarsi", "sbrigarsi", "affrettarsi", "calmarsi", "tranquillizzarsi", "adattarsi", "atterrare", "sbarcare", "rincasare", "evadere", "precipitare", "affondare", "invecchiare", "ringiovanire", "arrossire", "impallidire", "esplodere", "scoppiare", "annegare", "affogare", "fiorire", "marcire", "sorgere", "tramontare", "svenire", "sopravvivere", "scomparire", "comparire", "provenire", "accadere", "dispiacere", "occorrere", "scorrere", "pervenire", "sopraggiungere", "riemergere", "ascendere", "discendere", "divenire", "rinascere", "ricorrere", "avvenire", "sopravvenire", "rincrescere", "consistere", "sussistere", "equivalere", "decadere", "decrescere"];
 if(!Array.isArray(S.knownVerbs)) S.knownVerbs = VERBS.map(v=>v.inf).filter(x=>!ADDED_NOV_2026.includes(x));
 { const fresh = VERBS.map(v=>v.inf).filter(x=>!S.knownVerbs.includes(x));
   if(fresh.length) S.verbs = Array.from(new Set(S.verbs.concat(fresh)));
@@ -12172,7 +12271,7 @@ function drawStudy(){
     '<div class="chip '+(i===studyIdx?'cur':'')+'" data-i="'+i+'" data-v="'+x.inf+'" data-en="'+esc(x.en)+'">'+
       '<i class="dot '+(x.reg?'reg':'irr')+'"></i>'+x.inf+
       '<span style="opacity:.55;margin-left:5px">×'+x.freq+'</span>'+
-      (x.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
+      (x.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+(x.g==="ire"?' <b class="noisc">no-isc</b>':'')+
       (x.travel?' ✈︎':'')+'</div>').join("");
   $("pickList").querySelectorAll(".chip").forEach(el=>el.onclick=()=>{
     studyIdx = +el.dataset.i;
@@ -12347,7 +12446,7 @@ function drawChips(){
   $("verbChips").innerHTML = VERBS.map(v=>
     '<div class="chip '+(S.verbs.includes(v.inf)?'sel':'')+'" data-v="'+v.inf+'" data-en="'+esc(v.en)+'">'+
       '<i class="dot '+(irrInSelection(v)?'irr':'reg')+'"></i>'+v.inf+
-      (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+
+      (v.aux==="essere"?' <b class="essmark">ⓔ</b>':'')+(v.g==="ire"?' <b class="noisc">no-isc</b>':'')+
       (v.travel?' ✈︎':'')+(FAM[v.inf]?' 🌳':'')+(v.cl==="refl"?' 🔁':v.refl?' 🧩':'')+'</div>').join("");
   drawFamChips();
 
@@ -12503,9 +12602,23 @@ function essGroupsShown(f){
 }
 function essGroupsOf(f){ const vis = new Set(essGroupsShown(f).map(g=>g.id));
   return (f.essG || []).filter(id=>ESS_SUB[id] && vis.has(ESS_SUB[id].g)); }
+/* conjugation (-are / -ere / -ire): any combination; none picked = no filter.
+   -isc- verbs count as -ire; porre/trarre/-durre (orre/arre/urre) count as -ere,
+   the conjugation they come from. Reflexive/pronominal entries carry their base verb's group. */
+const CONJ_OF = {are:"are", ere:"ere", orre:"ere", arre:"ere", urre:"ere", ire:"ire", isc:"ire"};
+function conjOf(v){
+  if (CONJ_OF[v.g]) return CONJ_OF[v.g];
+  const m = /(are|ere|ire|rre)/.exec(v.inf); return m ? (m[1]==="rre" ? "ere" : m[1]) : null;
+}
+function toggleConj(c){
+  const cur = Array.isArray(S.filt.conj) ? S.filt.conj : [];
+  S.filt.conj = cur.includes(c) ? cur.filter(x=>x!==c) : cur.concat(c);
+  applyFilters();
+}
 function verbPasses(v, ignoreGroups){
   const f = S.filt;
   if(f.travel && !v.travel) return false;
+  if(Array.isArray(f.conj) && f.conj.length && !f.conj.includes(conjOf(v))) return false;
   // regular / irregular IN THE SELECTED TENSES (e.g. only Passato remoto → only verbs irregular there)
   if(f.reg==="reg" && !regInSelection(v)) return false;
   if(f.reg==="irr" && !irrInSelection(v)) return false;
@@ -12527,6 +12640,10 @@ function drawFilters(){
   $("travV").classList.toggle("on", !!f.travel);
   $("regV").classList.toggle("on", f.reg==="reg");
   $("irrV").classList.toggle("on", f.reg==="irr");
+  const cj = Array.isArray(f.conj) ? f.conj : [];
+  $("conjAre").classList.toggle("on", cj.includes("are"));
+  $("conjEre").classList.toggle("on", cj.includes("ere"));
+  $("conjIre").classList.toggle("on", cj.includes("ire"));
   $("essV").classList.toggle("on", f.aux==="essere");
   $("aveV").classList.toggle("on", f.aux==="avere");
   drawEssGroups();
@@ -12536,6 +12653,8 @@ function drawFilters(){
   $("baseFamV").classList.toggle("on", f.base==="fam");
   const parts = [];
   if(f.travel) parts.push("travel");
+  if(Array.isArray(f.conj) && f.conj.length)
+    parts.push(["are","ere","ire"].filter(c=>f.conj.includes(c)).map(c=>"-"+c).join(" or ").replace(/^(.* or .*)$/,"($1)"));
   if(f.reg){
     const names = S.tenses.map(id=>TENSES.find(t=>t.id===id).label);
     const where = !names.length ? "" : names.length<=3 ? " in "+names.join(", ") : " in the selected tenses";
@@ -12620,6 +12739,9 @@ $("baseFamV").onclick  = ()=>{ S.filt.base = S.filt.base==="fam"  ? null : "fam"
 $("allV").onclick  = ()=>{ S.filt={travel:false,reg:null,aux:null}; applyFilters(); };
 $("noneV").onclick = ()=>{ S.filt={travel:false,reg:null,aux:null}; S.verbs=[]; save(); drawChips(); };
 $("travV").onclick = ()=>{ S.filt.travel = !S.filt.travel; applyFilters(); };
+$("conjAre").onclick = ()=>toggleConj("are");
+$("conjEre").onclick = ()=>toggleConj("ere");
+$("conjIre").onclick = ()=>toggleConj("ire");
 $("regV").onclick  = ()=>{ S.filt.reg = S.filt.reg==="reg" ? null : "reg"; applyFilters(); };
 $("irrV").onclick  = ()=>{ S.filt.reg = S.filt.reg==="irr" ? null : "irr"; applyFilters(); };
 $("essV").onclick  = ()=>{ S.filt.aux = S.filt.aux==="essere" ? null : "essere"; applyFilters(); };
