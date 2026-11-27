@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Congiunzioni subordinanti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm study tool, a little schoolroom warmth
+   IDEA: a stack of ruled index cards from an Italian quaderno
+   PICTURE: the card itself, large, flips to reveal answer
+   COLOUR and TYPE: deep ink blue field, white card, coral for congiuntivo; Fraunces + Inter
+   LAYOUT: title, filters, card, quiz buttons, nav, score */
+:root{color-scheme:light dark;--bg:light-dark(#eef2f7,#0d1520);--band:light-dark(#123a6b,#0a2340);--card:light-dark(#ffffff,#18222f);--ink:light-dark(#14202e,#e8edf3);--mut:light-dark(#5a6878,#9aa8b8);--line:light-dark(#d6e2ef,#2a3a4d);--blue:light-dark(#185fa5,#7fb6ec);--cong:light-dark(#c4472a,#f0997b);--congbg:light-dark(#fbe9e3,#3a1e15);--no:light-dark(#2f6b3a,#9fd2a8);--nobg:light-dark(#e6f2e4,#16301b);--dip:light-dark(#8a5a00,#f2c46b);--dipbg:light-dark(#fbf0d8,#352708)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+header{background:var(--band);color:#fff;padding:22px max(5vw,16px) 70px}
+h1{font:600 clamp(26px,5vw,40px)/1.05 Fraunces,Georgia,serif;margin:0 0 6px;text-wrap:balance}
+header p{margin:0;color:#c9d8ea;font-size:15px}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:16px;max-width:608px;padding:4px;border-radius:12px;background:rgba(255,255,255,.12)}
+.seg button{min-height:44px;border:0;background:transparent;color:#fff;font-size:15px;border-radius:9px}
+.seg button[aria-checked=true]{background:#fff;color:#c4472a}
+.seg button[data-m=no][aria-checked=true]{color:#2f6b3a}.seg button[data-m=all][aria-checked=true]{color:#123a6b}
+main{max-width:640px;margin:-52px auto 0;padding:0 16px 40px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.chip{flex:none;font:500 14px Inter,sans-serif;padding:8px 13px;min-height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;cursor:pointer}
+.chip[aria-pressed=true]{background:#fff;color:#123a6b;border-color:#fff}
+.sortrow{display:flex;align-items:center;justify-content:flex-end;gap:8px;font-size:14px;color:var(--mut);margin:8px 0}
+.sortrow select{font:500 16px Inter,sans-serif;min-height:40px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.stage{perspective:1400px;margin-top:6px}
+.card{position:relative;height:340px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border-radius:14px;border:1px solid var(--line);padding:22px 22px 18px;display:flex;flex-direction:column;background-image:repeating-linear-gradient(transparent 0 31px,var(--line) 31px 32px);background-position:0 72px;background-size:100% calc(100% - 72px);background-repeat:no-repeat}
+.face::before{content:"";position:absolute;left:0;right:0;top:66px;height:2px;background:var(--cong);opacity:.55}
+.back{transform:rotateY(180deg)}
+.cat{font-size:13px;font-weight:600;color:var(--mut);height:44px}
+.word{font:600 clamp(40px,11vw,60px)/1.05 Fraunces,Georgia,serif;color:var(--blue);margin:auto 0;text-align:center;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:8px}
+.fen{font:500 20px/1.3 Inter,sans-serif;color:var(--mut);margin-top:18px}
+.hint{text-align:center;font-size:13px;color:var(--mut)}
+.en{font:600 26px/1.2 Fraunces,Georgia,serif;margin:0 0 10px}
+.badge{display:inline-block;font-size:13px;font-weight:600;padding:4px 10px;border-radius:6px;margin-bottom:12px}
+.b-si{background:var(--congbg);color:var(--cong)}.b-no{background:var(--nobg);color:var(--no)}.b-dip{background:var(--dipbg);color:var(--dip)}
+.ex{font-size:16px;line-height:32px;margin:0}
+.ex u{color:var(--blue);text-decoration-thickness:2px;text-underline-offset:3px;font-weight:600}
+.exen{font-size:14px;color:var(--mut);line-height:1.5;margin:4px 0 0}
+.note{font-size:13px;color:var(--dip);margin-top:auto;line-height:1.45}
+.quiz{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.quiz p{grid-column:1/-1;margin:0;font-size:14px;color:var(--mut);text-align:center}
+button{font:600 16px Inter,sans-serif;min-height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:focus-visible,.card:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.yes{border-color:var(--cong);color:var(--cong)}.nob{border-color:var(--no);color:var(--no)}
+.fb{grid-column:1/-1;text-align:center;font-weight:600;min-height:24px}
+.nav{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:12px}
+.count{font-size:14px;color:var(--mut);text-align:center;min-width:70px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.score{font-size:14px;color:var(--mut)}
+.foot button{min-height:44px;font-size:14px;padding:0 14px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;font-size:13px}
+.audio{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.play{display:flex;align-items:center;justify-content:center;gap:8px;border-color:var(--blue);color:var(--blue)}
+.play svg{width:20px;height:20px;fill:currentColor;flex:none}
+.play.on{background:var(--blue);color:var(--card)}
+.set{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 16px}
+.set summary{font-weight:600;min-height:48px;display:flex;align-items:center;cursor:pointer}
+.set label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px;margin:10px 0}
+.set select{font:16px Inter,sans-serif;min-height:40px;max-width:60%;padding:0 8px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.set h2{font:600 17px Inter,sans-serif;margin:20px 0 6px}
+.set .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.set button{font-size:15px}
+.stat{font-size:14px;color:var(--mut);margin:6px 0}
+.small{font-size:13px;color:var(--mut);line-height:1.5}
+.set textarea{width:100%;height:160px;font:12px/1.4 ui-monospace,Menlo,monospace;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px}
+.set pre{font:13px ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px;overflow-x:auto}
+#audioCopy{width:100%;margin:6px 0}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<header>
+<h1>Congiunzioni subordinanti</h1>
+<p>Tocca la carta per girarla. Prima indovina: regge il congiuntivo?</p>
+<div class="seg" id="seg" role="radiogroup" aria-label="Modo verbale"><button role="radio" aria-checked="true" data-m="all">Tutte</button><button role="radio" aria-checked="false" data-m="si">+ congiuntivo</button><button role="radio" aria-checked="false" data-m="no">indicativo</button></div>
+</header>
+<main>
+<div class="chips" id="chips" role="toolbar" aria-label="Filtra"></div>
+<label class="sortrow">Ordina <select id="sort"><option value="az" selected>A–Z</option><option value="notes">come negli appunti</option><option value="cong">congiuntivo prima</option><option value="cat">per categoria, A–Z</option></select></label>
+<div class="stage">
+<div class="card" id="card" tabindex="0" role="button" aria-label="Gira la carta">
+<div class="face front"><div class="cat" id="fcat"></div><div style="margin:auto 0;text-align:center"><div class="word" id="fword" style="margin:0"></div><div class="fen" id="fen"></div></div><div class="hint">tocca per girare</div></div>
+<div class="face back" id="back"></div>
+</div>
+</div>
+<div class="quiz">
+<p>Regge il congiuntivo?</p>
+<button class="yes" id="qsi">Sì</button>
+<button class="nob" id="qno">No</button>
+<div class="fb" id="fb" aria-live="polite"></div>
+</div>
+<div class="nav">
+<button id="prev" aria-label="Precedente">← Prima</button>
+<div class="count" id="count"></div>
+<button id="next" aria-label="Successiva">Dopo →</button>
+</div>
+<div class="audio">
+<button id="sayOne" class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Ascolta</button>
+<button id="sayAll" class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg><span id="sayAllTxt">Ascolta tutte</span></button>
+</div>
+<div class="foot">
+<span class="score" id="score">Punteggio: 0 / 0</span>
+<span style="display:flex;gap:8px"><button id="shuf">Mescola</button><button id="reset">Azzera</button></span>
+</div>
+<div class="legend">
+<span class="badge b-si">+ congiuntivo</span><span class="badge b-no">indicativo</span><span class="badge b-dip">dipende</span>
+</div>
+<details class="set" id="set">
+<summary>Voci e file audio</summary>
+<label>Voce italiana <select id="itSel"></select></label>
+<label>Voce inglese <select id="enSel"></select></label>
+<label>Velocità <select id="rateSel"><option value="0.8">lenta</option><option value="0.95" selected>normale</option><option value="1.1">veloce</option></select></label>
+<label>Pausa tra le carte <select id="gapSel"><option value="1500">1,5 s</option><option value="2000" selected>2 s</option><option value="3000">3 s</option><option value="5000">5 s</option></select></label>
+<p class="stat" id="voiceStat"></p>
+<h2>File m4a per il Mac</h2>
+<p class="stat" id="audioStat"></p>
+<div class="row"><button id="audioDl">Esporta script audio</button><button id="audioShow">Mostra testo</button></div>
+<textarea id="audioOut" readonly hidden></textarea>
+<button id="audioCopy" hidden>Copia testo</button>
+<p class="small">Usa le carte del filtro attuale, nello stesso ordine. In Chrome lo script viene salvato nella cartella <b>ItalianVerbs</b> (la scegli una volta sola); negli altri browser finisce in Download. Poi fai doppio clic su <b>Crea_audio.command</b>, oppure nel Terminale:</p>
+<pre id="cmd">cd ~/gitdirectory/ItalianVerbs && ./Crea_audio.command</pre>
+<p class="small">Ogni carta diventa un file: categoria, parola, significato in inglese, se regge il congiuntivo, la nota, l'esempio in italiano e la traduzione. I file finiscono in <b>ItalianVerbs/audio-script-…/per-verbo/</b>, più <b>completo.m4a</b> con tutto.</p>
+</details>
+</main>
+<script>
+{
+const D=[
+["perché","Causale","because","no","Non sono andata a scuola <u>perché</u> non mi sentivo bene.","I didn't go to school because I wasn't feeling well.",""],
+["poiché","Causale","since, as","no","<u>Poiché</u> non mi sono presentato al colloquio, non mi hanno dato il lavoro.","Since I didn't show up to the interview, they didn't give me the job.",""],
+["siccome","Causale","since, as","no","<u>Siccome</u> non ci vediamo da mesi, ti va un caffè?","Since we haven't seen each other in months, fancy a coffee?",""],
+["dato che","Causale","given that","no","L'ho lasciato <u>dato che</u> mi ha tradita ben 3 volte.","I left him given that he cheated on me three times.",""],
+["perché","Finale","so that","si","L'avvocato mi ha contattato <u>perché</u> io lo pagassi.","The lawyer contacted me so that I would pay him.","Perché finale (= a quale scopo) vuole sempre il congiuntivo."],
+["affinché","Finale","so that, in order that","si","Te lo spiego <u>affinché</u> tu capisca.","I'm explaining it so that you understand.",""],
+["quando","Temporale","when","no","Andremo in vacanza <u>quando</u> avremo i soldi.","We'll go on vacation when we have the money.",""],
+["finché","Temporale","until, as long as","no","<u>Finché</u> Luca non finisce di lavorare, non possiamo uscire.","Until Luca finishes work, we can't go out.",""],
+["fin quando","Temporale","until, as long as","no","<u>Fin quando</u> i nostri figli non avranno 18 anni, non possiamo viaggiare da soli.","Until our kids turn 18, we can't travel alone.",""],
+["ogni volta che","Temporale","every time, whenever","no","Ci sarò <u>ogni volta che</u> avrai bisogno di me.","I'll be there every time you need me.",""],
+["da quando","Temporale","since (time)","no","<u>Da quando</u> ci conosciamo, non mi hai mai offerto una cena.","Since we've known each other, you've never bought me dinner.",""],
+["dopo che","Temporale","after","no","<u>Dopo che</u> finisci di studiare, scrivimi.","After you finish studying, text me.",""],
+["prima che","Temporale","before","si","<u>Prima che</u> tu vada via, mi ridai l'ombrello?","Before you leave, can you give me back the umbrella?","Prima che + indicativo (prima che vai) è solo colloquiale."],
+["intanto che","Temporale","while","no","<u>Intanto che</u> tu cucini, io apparecchio la tavola.","While you cook, I'll set the table.",""],
+["sebbene","Concessiva","although, even though","si","Siamo andati al cinema <u>sebbene</u> non ci fossero bei film.","We went to the cinema although there were no good films.",""],
+["anche se","Concessiva","even if, even though","no","Siamo usciti <u>anche se</u> pioveva.","We went out even though it was raining.","Con un'ipotesi irreale: anche se fosse vero… (congiuntivo imperfetto)."],
+["nonostante","Concessiva","although, despite","si","<u>Nonostante</u> io abbia studiato, non ho preso un bel voto.","Although I studied, I didn't get a good grade.","Davanti a un nome è una preposizione: nonostante la pioggia."],
+["anche quando","Concessiva","even when","no","Ti darò una mano <u>anche quando</u> sarò stanco.","I'll help you even when I'm tired.",""],
+["nel caso (che)","Condizionale","in case, if","si","<u>Nel caso</u> tu voglia dirmi la verità, io sono qui.","In case you want to tell me the truth, I'm here.","Negli appunti è tra le concessive, ma il senso è condizionale."],
+["qualora","Condizionale","if, should, in the event that","si","<u>Qualora</u> non dovesse arrivare in tempo, mandami una mail.","Should he not arrive in time, send me an email.","Molto formale: lingua scritta, uffici, medico."],
+["vale a dire","Dichiarativa","that is to say, namely","no","L'overtourism sta distruggendo le città, <u>vale a dire</u> le vite dei cittadini.","Overtourism is destroying cities, that is to say, residents' lives.",""],
+["cioè","Dichiarativa","that is, i.e.","no","La fotosintesi dà alle piante il nutrimento, <u>cioè</u> le aiuta a sopravvivere.","Photosynthesis gives plants nourishment, i.e. it helps them survive.",""],
+["se","Condizionale","if","dip","Domani andiamo al mare <u>se</u> c'è il sole.","Tomorrow we'll go to the beach if it's sunny.","Indicativo per ipotesi reali; congiuntivo imperfetto per ipotesi irreali: se avessi tempo, verrei."],
+["a patto che","Condizionale","provided that","si","Possiamo andare al parco <u>a patto che</u> tu finisca i compiti.","We can go to the park provided you finish your homework.",""],
+["come se","Modale","as if","si","Parli <u>come se</u> non ti conoscessi.","You talk as if I didn't know you.","Sempre congiuntivo imperfetto o trapassato."],
+["come","Modale","as, the way","no","Alla fine ha fatto <u>come</u> gli avevo detto io.","In the end he did as I'd told him.",""],
+["in modo che","Modale","so that","si","Organizzo gli appunti <u>in modo che</u> sia tutto chiaro.","I'm organizing my notes so that everything is clear.",""],
+["ma","Avversativa","but","no","Vorrei farlo, <u>ma</u> ho paura.","I'd like to do it, but I'm scared.",""],
+["mentre","Avversativa","while, whereas","no","Io sono andata a fare la spesa, <u>mentre</u> mamma è tornata a casa.","I went grocery shopping, while Mom went home.",""],
+["quando","Avversativa","whereas, when instead","no","Ha fatto di testa sua, <u>quando</u> le avevo chiesto di seguire il medico.","She did her own thing, whereas I'd asked her to follow the doctor.",""],
+["fuorché","Limitativa","except","no","Ha fatto tutto <u>fuorché</u> quello che le avevo chiesto.","She did everything except what I'd asked.",""],
+["tranne","Limitativa","except","no","Ho studiato tutto <u>tranne</u> questo argomento.","I studied everything except this topic.","Davanti a un nome funziona da preposizione."],
+["eccetto","Limitativa","except","no","Puoi comprare tutto <u>eccetto</u> questa borsa.","You can buy anything except this bag.",""],
+["a meno che","Limitativa","unless","si","Non mi chiamare <u>a meno che</u> non sia urgente.","Don't call me unless it's urgent.","Spesso con un 'non' che non nega: a meno che non sia."],
+["di quanto","Comparativa","than","dip","Sei più simpatico <u>di quanto</u> mi avessero detto.","You're nicer than they'd told me.","Standard: congiuntivo (mi avessero detto). Colloquiale: indicativo."],
+["che","Comparativa","than","no","Sembri più italiano <u>che</u> spagnolo.","You seem more Italian than Spanish.",""],
+["così come","Comparativa","just as","no","Sei <u>così come</u> mi ti immaginavo.","You're just as I imagined you.",""]
+].map((r,i)=>({id:i,w:r[0],c:r[1],en:r[2],k:r[3],ex:r[4],exen:r[5],n:r[6]}));
+const CATS=["Tutte","Causale","Finale","Temporale","Concessiva","Dichiarativa","Condizionale","Modale","Avversativa","Limitativa","Comparativa"];
+const LBL={si:["b-si","+ congiuntivo"],no:["b-no","indicativo"],dip:["b-dip","dipende"]};
+let filt="Tutte",mode="all",list=[],pos=0,ok=0,tot=0,answered=false;
+const $=id=>document.getElementById(id);
+const card=$("card");
+function build(){
+ list=D.filter(d=>(filt==="Tutte"||d.c===filt)&&(mode==="all"||(mode==="si"?d.k!=="no":d.k!=="si")));
+ const s=$("sort").value,az=(a,b)=>a.w.localeCompare(b.w,"it"),R={si:0,dip:1,no:2};
+ if(s==="az")list.sort(az);
+ else if(s==="cong")list.sort((a,b)=>R[a.k]-R[b.k]||az(a,b));
+ else if(s==="cat")list.sort((a,b)=>CATS.indexOf(a.c)-CATS.indexOf(b.c)||az(a,b));
+ pos=0;
+ if(typeof stopAll==="function"&&auto)stopAll();
+ if(typeof drawAudio==="function")drawAudio();
+ if(!$("audioOut").hidden)$("audioOut").value=buildAudioScript();
+ if(!list.length){card.classList.remove("flip");$("fcat").textContent="";$("fword").textContent="—";$("fen").textContent="Nessuna carta con questo filtro";$("count").textContent="0 / 0";return}
+ show();
+}
+function show(){
+ const d=list[pos],was=card.classList.contains("flip");card.classList.remove("flip");answered=false;$("fb").textContent="";
+ $("fcat").textContent=d.c;$("fword").textContent=d.w;$("fen").textContent=d.en;
+ const b=LBL[d.k];
+ setTimeout(()=>{$("back").innerHTML=`<div class="cat">${d.c}</div><p class="en">${d.w} = ${d.en}</p><div><span class="badge ${b[0]}">${b[1]}</span></div><p class="ex">${d.ex}</p><p class="exen">${d.exen}</p>${d.n?`<p class="note">${d.n}</p>`:""}`},was?300:0);
+ $("count").textContent=(pos+1)+" / "+list.length;
+}
+function flip(){card.classList.toggle("flip")}
+function guess(g){
+ if(!list.length)return;if(answered){flip();return}
+ const d=list[pos];answered=true;tot++;
+ const right=d.k==="dip"||d.k===g;if(right)ok++;
+ $("fb").textContent=d.k==="dip"?"Dipende: leggi la nota.":right?"Giusto!":"No, guarda la risposta.";
+ $("fb").style.color=right?"var(--no)":"var(--cong)";
+ $("score").textContent="Punteggio: "+ok+" / "+tot;
+ card.classList.add("flip");
+}
+function go(s){if(!list.length)return;pos=(pos+s+list.length)%list.length;show()}
+$("chips").innerHTML=CATS.map(c=>`<button class="chip" aria-pressed="${c===filt}" data-c="${c}">${c}</button>`).join("");
+$("chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;filt=b.dataset.c;document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));build()});
+$("seg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mode=b.dataset.m;document.querySelectorAll("#seg button").forEach(x=>x.setAttribute("aria-checked",x===b));build()});
+$("sort").addEventListener("change",build);
+card.addEventListener("click",()=>{if(list.length)flip()});
+card.addEventListener("keydown",e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();flip()}});
+$("qsi").onclick=()=>guess("si");$("qno").onclick=()=>guess("no");
+$("prev").onclick=()=>{stopAll();go(-1)};$("next").onclick=()=>{stopAll();go(1)};
+$("shuf").onclick=()=>{stopAll();for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]]}pos=0;show()};
+$("reset").onclick=()=>{ok=0;tot=0;$("score").textContent="Punteggio: 0 / 0"};
+document.addEventListener("keydown",e=>{if(/BUTTON|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==="ArrowRight"){stopAll();go(1)}else if(e.key==="ArrowLeft"){stopAll();go(-1)}});
+
+/* ---------- AUDIO ----------
+   Same idea as italianverbs.html: Italian lines in an Italian voice, English
+   lines in an English voice. On the page: speechSynthesis. For m4a files: an
+   export in the exact format render-audio.sh already reads —
+     [[slnc N]] [[rate -40]] <Categoria>. [[rate +40]] [[slnc 700]] <parola>. [[slnc 1000]]
+     ¶EN¶ <English line>
+   One file per card. No line uses [[slnc 500]], so render-audio.sh never tries
+   to guess an essere/avere auxiliary from the example sentences. */
+const HAS_TTS="speechSynthesis" in window;
+let itVoices=[],enVoices=[],itV=null,enV=null;
+const LS=k=>{try{return localStorage.getItem("cong-"+k)}catch(e){return null}};
+const LSset=(k,v)=>{try{localStorage.setItem("cong-"+k,v)}catch(e){}};
+function rankIt(v){const n=(v.name||"").toLowerCase();let s=0;if(/premium|enhanced|siri|neural/.test(n))s+=40;if(/alice|federica|luca|emma|paola|eloisa|carlo/.test(n))s+=20;if(v.localService)s+=10;if(/^it[-_]IT$/i.test(v.lang))s+=10;return s}
+function rankEn(v){const n=(v.name||"").toLowerCase();let s=0;if(/premium|enhanced|siri|neural/.test(n))s+=40;if(/ava|samantha|allison|alex|zoe|evan|nathan/.test(n))s+=20;if(v.localService)s+=10;if(/^en[-_]US$/i.test(v.lang))s+=10;return s}
+function loadVoices(){
+ if(!HAS_TTS)return 0;
+ const all=speechSynthesis.getVoices();
+ itVoices=all.filter(v=>/^it\b|^it[-_]/i.test(v.lang)).sort((a,b)=>rankIt(b)-rankIt(a));
+ enVoices=all.filter(v=>/^en\b|^en[-_]/i.test(v.lang)).sort((a,b)=>rankEn(b)-rankEn(a));
+ itV=itVoices.find(v=>v.name===LS("it"))||itVoices[0]||null;
+ enV=enVoices.find(v=>v.name===LS("en"))||enVoices[0]||null;
+ const fill=(sel,arr,cur)=>{sel.innerHTML=arr.length?arr.map((v,i)=>`<option value="${i}"${v===cur?" selected":""}></option>`).join(""):"<option>—</option>";[...sel.options].forEach((o,i)=>{if(arr[i])o.textContent=arr[i].name+(arr[i].localService?"":" (online)")})};
+ fill($("itSel"),itVoices,itV);fill($("enSel"),enVoices,enV);
+ $("voiceStat").textContent=!itVoices.length?"Nessuna voce italiana trovata. Mac: Impostazioni di Sistema › Accessibilità › Contenuto letto › Voci. iPhone: Impostazioni › Accessibilità › Contenuto letto › Voci › Italiano.":"";
+ return itVoices.length;
+}
+let vTries=0;
+function pollVoices(){if(loadVoices()||++vTries>40)return;setTimeout(pollVoices,250)}
+if(HAS_TTS){
+ speechSynthesis.onvoiceschanged=()=>{vTries=0;loadVoices()};
+ setTimeout(pollVoices,0);
+ ["touchend","click"].forEach(ev=>document.addEventListener(ev,()=>{vTries=0;pollVoices()},{passive:true,once:true}));
+}
+$("itSel").onchange=e=>{itV=itVoices[+e.target.value]||itV;if(itV)LSset("it",itV.name)};
+$("enSel").onchange=e=>{enV=enVoices[+e.target.value]||enV;if(enV)LSset("en",enV.name)};
+const r0=LS("rate"),g0=LS("gap");if(r0)$("rateSel").value=r0;if(g0)$("gapSel").value=g0;
+$("rateSel").onchange=e=>LSset("rate",e.target.value);
+$("gapSel").onchange=e=>{LSset("gap",e.target.value);drawAudio()};
+
+/* text for speech */
+const plain=s=>s.replace(/<[^>]+>/g,"");
+const sayWord=d=>d.w.replace(/\s*\(([^)]*)\)/g," $1").replace(/\s+/g," ").trim();
+const sayEn=d=>d.en.replace(/,?\s*i\.e\./g,"").replace(/\s*,\s*/g,", ").trim();
+const CONG={si:["Regge il congiuntivo.","It takes the subjunctive."],no:["Regge l'indicativo.","It takes the indicative."],dip:["Dipende: indicativo o congiuntivo.","It depends: indicative or subjunctive."]};
+function cardParts(d){
+ const p=[{t:sayWord(d),l:"it"},{t:sayEn(d)+".",l:"en"},{t:CONG[d.k][0],l:"it",flip:1},{t:CONG[d.k][1],l:"en"}];
+ if(d.n)p.push({t:d.n,l:"it"});
+ p.push({t:plain(d.ex),l:"it"},{t:d.exen,l:"en"});
+ return p;
+}
+
+/* a chain of utterances, each in its own language's voice */
+let tok=null,auto=false;
+function play(parts,done){
+ if(!HAS_TTS){$("voiceStat").textContent="Questo browser non supporta la sintesi vocale.";return}
+ if(!itV)loadVoices();
+ speechSynthesis.cancel();
+ const me={};tok=me;let i=0;
+ const rate=+$("rateSel").value||0.95;
+ const next=()=>{
+  if(tok!==me)return;
+  if(i>=parts.length){tok=null;setBtns();if(done)done();return}
+  const p=parts[i++],v=p.l==="en"?enV:itV;
+  if(p.flip&&list.length)card.classList.add("flip");
+  const u=new SpeechSynthesisUtterance(p.t);
+  if(v)u.voice=v;u.lang=v?v.lang:(p.l==="en"?"en-US":"it-IT");u.rate=rate;
+  let fired=false;const fin=()=>{if(fired)return;fired=true;setTimeout(next,p.l==="en"&&i<parts.length?350:250)};
+  u.onend=fin;u.onerror=fin;
+  speechSynthesis.speak(u);
+ };
+ setBtns(true);next();
+}
+function setBtns(on){
+ $("sayOne").classList.toggle("on",!!on&&!auto);
+ $("sayAll").classList.toggle("on",auto);
+ $("sayAllTxt").textContent=auto?"Stop":"Ascolta tutte";
+}
+function stopAll(){auto=false;tok=null;if(HAS_TTS)speechSynthesis.cancel();setBtns()}
+function playCard(){if(!list.length)return;card.classList.remove("flip");play(cardParts(list[pos]))}
+function playFrom(){
+ if(!auto||!list.length)return;
+ card.classList.remove("flip");
+ play(cardParts(list[pos]),()=>{
+  if(!auto)return;
+  setTimeout(()=>{if(!auto)return;if(pos>=list.length-1){stopAll();return}go(1);playFrom()},+$("gapSel").value||2000);
+ });
+}
+$("sayOne").onclick=()=>{if(tok&&!auto){stopAll();return}auto=false;playCard()};
+$("sayAll").onclick=()=>{if(auto){stopAll();return}auto=true;setBtns();playFrom()};
+
+/* ---- export for render-audio.sh / Crea_audio.command ---- */
+function scriptLabels(){
+ const n={};list.forEach(d=>{const w=sayWord(d);n[w]=(n[w]||0)+1});
+ return list.map(d=>{const w=sayWord(d);return n[w]>1?w+" "+d.c.toLowerCase():w});
+}
+function buildAudioScript(){
+ const gap=+$("gapSel").value||2000,lab=scriptLabels(),L=[];
+ list.forEach((d,i)=>{
+  L.push("[[slnc "+(Math.round(gap*1.25)+500)+"]] [[rate -40]] Congiunzione "+d.c.toLowerCase()+". [[rate +40]] [[slnc 700]] "+lab[i]+". [[slnc 1000]]");
+  L.push("¶EN¶ "+sayEn(d)+". [[slnc 1000]]");
+  L.push(CONG[d.k][0]+" [[slnc 800]]");
+  L.push("¶EN¶ "+CONG[d.k][1]+" [[slnc 1000]]");
+  if(d.n)L.push(d.n+" [[slnc 800]]");
+  L.push(plain(d.ex)+" [[slnc 800]]");
+  L.push("¶EN¶ "+d.exen+" [[slnc "+gap+"]]");
+ });
+ return L.join("\n");
+}
+function audioFilename(){
+ return "audio-script-"+list.length+"congiunzioni"+(mode==="si"?"-congiuntivo":mode==="no"?"-indicativo":"")+(filt!=="Tutte"?"-"+filt.toLowerCase():"")+"-"+((+$("gapSel").value||2000)/1000)+"s.txt";
+}
+function drawAudio(){
+ const secs=list.length*(16+(+$("gapSel").value||2000)/1000),m=Math.max(1,Math.round(secs/60));
+ $("audioStat").innerHTML=list.length?"<b>"+list.length+"</b> carte · circa <b>"+m+" min</b> di audio.":"Nessuna carta con questo filtro.";
+}
+/* Chrome/Edge: save straight into the ItalianVerbs folder (picked once, remembered) */
+const XDB="congiunzioni-export";
+const xdb=()=>new Promise((res,rej)=>{const r=indexedDB.open(XDB,1);r.onupgradeneeded=()=>r.result.createObjectStore("h");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function dirGet(){try{const db=await xdb();return await new Promise(res=>{const q=db.transaction("h").objectStore("h").get("dir");q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})}catch(e){return null}}
+async function dirSet(h){try{const db=await xdb();await new Promise(res=>{const tx=db.transaction("h","readwrite");h?tx.objectStore("h").put(h,"dir"):tx.objectStore("h").delete("dir");tx.oncomplete=res;tx.onerror=res})}catch(e){}}
+async function hasRenderer(dir){try{for await(const [n] of dir.entries())if(n==="render-audio.sh")return true}catch(e){}return false}
+async function getFolder(){
+ let dir=await dirGet();
+ if(dir){try{let p=await dir.queryPermission({mode:"readwrite"});if(p!=="granted")p=await dir.requestPermission({mode:"readwrite"});if(p!=="granted")dir=null}catch(e){dir=null}}
+ if(!dir){
+  $("audioStat").innerHTML="Una volta sola: scegli la cartella <b>ItalianVerbs</b> (quella con render-audio.sh) e consenti l'accesso.";
+  dir=await window.showDirectoryPicker({id:"congiunzioni-export",mode:"readwrite",startIn:"documents"});
+  if(!(await hasRenderer(dir))){$("audioStat").innerHTML="La cartella <b>"+dir.name.replace(/</g,"&lt;")+"</b> non contiene render-audio.sh. Riprova e scegli ItalianVerbs.";return false}
+  await dirSet(dir);
+ }
+ return dir;
+}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+$("audioDl").onclick=async()=>{
+ if(!list.length){drawAudio();return}
+ let dir=null,why="";
+ if(window.showDirectoryPicker){
+  try{dir=await getFolder();if(dir===false)return}
+  catch(e){if(e&&e.name==="AbortError"){drawAudio();return}why=e&&e.message||String(e);dir=null}
+ }
+ const txt=buildAudioScript(),name=audioFilename();
+ if(dir){
+  try{const fh=await dir.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(txt);await w.close();
+   $("audioStat").innerHTML="Salvato <b>"+esc(name)+"</b> in <b>"+esc(dir.name)+"</b>. Ora fai doppio clic su <b>Crea_audio.command</b>.";return}
+  catch(e){why=e&&e.message||String(e)}
+ }
+ let framed=false;try{framed=window.top!==window}catch(e){framed=true}
+ if(framed){showText(true);$("audioStat").innerHTML="Qui dentro non posso salvare file: copia il testo e salvalo come <b>"+esc(name)+"</b> in Download, oppure apri <b>congiunzioni.html</b> dalla cartella ItalianVerbs in Chrome.";return}
+ try{
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},60000);
+  $("audioStat").innerHTML="Scaricato <b>"+esc(name)+"</b> in Download"+(why?" (cartella non disponibile: "+esc(why)+")":"")+". Ora fai doppio clic su <b>Crea_audio.command</b>. Se il download non parte, usa “Mostra testo”.";
+ }catch(e){showText(true);$("audioStat").innerHTML="Download bloccato qui: copia il testo e salvalo come <b>"+esc(name)+"</b>."}
+};
+function showText(force){
+ const ta=$("audioOut"),open=force||ta.hidden;
+ if(open){ta.value=buildAudioScript();ta.hidden=false;$("audioCopy").hidden=false;$("audioShow").textContent="Nascondi testo"}
+ else{ta.hidden=true;$("audioCopy").hidden=true;$("audioShow").textContent="Mostra testo"}
+}
+$("audioShow").onclick=()=>showText(false);
+$("audioCopy").onclick=async()=>{try{await navigator.clipboard.writeText($("audioOut").value);$("audioCopy").textContent="Copiato"}catch(e){$("audioOut").select();$("audioCopy").textContent="Seleziona e copia"}setTimeout(()=>$("audioCopy").textContent="Copia testo",2000)};
+build();
+}
+</script>
+</body>
+</html>
